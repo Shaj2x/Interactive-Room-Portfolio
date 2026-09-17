@@ -100,8 +100,18 @@ Higher depth = nearer the camera = moves more. The depths live in one place,
 
 - **Intro** — about 2.6 seconds, and any click or keypress skips it. Arriving on
   a deep link (`#projects`) skips it entirely.
-- **Easter egg** — clicking the desk lamp turns it off and the room falls
-  further into shadow. The laptop screen cycles `screenLines`.
+- **Easter egg** — clicking the desk lamp turns it off; the candles and every
+  warm light go out with it and the room falls back to screen-blue alone. The
+  laptop screen cycles `screenLines`.
+- **Candles and flicker** — three candles (`scene/layers/CandleLayer.tsx`) light
+  the room warm. Their flame *shape* loops on CSS keyframes with durations that
+  share no common multiple, so the three never sync into a visible beat; their
+  *brightness* is driven by `hooks/useWarmFlicker.ts`, which is genuinely
+  random — irregular intervals, occasional deeper "gust" dips. Any element
+  marked `data-warm="<base opacity>"` joins the flicker, with
+  `data-warm-swing` setting how far it is allowed to move.
+- **Rain** — falling drops seen through the glass, plus drops that cling to the
+  window and then break and run down it.
 - **Room tone** — soft rain and a distant hum, synthesised with the Web Audio
   API rather than shipped as an audio file. Off by default, toggled bottom-left.
 - **Portrait screens** — the room is fitted rather than cropped so nothing is

@@ -43,6 +43,8 @@ export function DesktopLayer({ screenLine, lampOn, onToggleLamp }: Props) {
               fill="url(#g-lamp-bloom)"
               className="lamp-bloom"
               filter="url(#f-bloom-lg)"
+              data-warm="0.95"
+              data-warm-swing="0.16"
             />
           </>
         )}
@@ -50,7 +52,17 @@ export function DesktopLayer({ screenLine, lampOn, onToggleLamp }: Props) {
         <path d="M386 612 L370 424" stroke="#16242f" strokeWidth="9" strokeLinecap="round" />
         <path d="M370 424 L468 380" stroke="#16242f" strokeWidth="9" strokeLinecap="round" />
         <path d="M444 356 L508 390 L478 414 L428 384 Z" fill="#1a2934" />
-        {lampOn && <ellipse cx="478" cy="398" rx="17" ry="11" fill="#ffd3a1" opacity="0.92" />}
+        {lampOn && (
+          <ellipse
+            cx="478"
+            cy="398"
+            rx="17"
+            ry="11"
+            fill="#ffd3a1"
+            data-warm="0.92"
+            data-warm-swing="0.2"
+          />
+        )}
         {/* Generous invisible target so the egg is findable without being obvious. */}
         <rect
           x="352"

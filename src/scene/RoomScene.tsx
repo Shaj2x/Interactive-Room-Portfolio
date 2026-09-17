@@ -6,11 +6,13 @@ import { DesktopLayer } from './layers/DesktopLayer';
 import { PersonLayer } from './layers/PersonLayer';
 import { ForegroundLayer } from './layers/ForegroundLayer';
 import { PlateLayer } from './layers/PlateLayer';
+import { CandleLayer } from './layers/CandleLayer';
 import { plateSrc } from './plate';
 import { Atmosphere } from './Atmosphere';
 import { Hotspot } from './Hotspot';
 import { HOTSPOTS, DEPTH, isTappableWhenCompact } from './hotspots';
 import { useParallax } from '../hooks/useParallax';
+import { useWarmFlicker } from '../hooks/useWarmFlicker';
 import { screenLines, type SectionId } from '../content/profile';
 import './room.css';
 
@@ -33,6 +35,10 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
     disabled: reducedMotion || dimmed,
     strength: compact ? 0.45 : 1,
   });
+
+  // Every warm light in the room flickers together, irregularly. Off with the
+  // lamp easter egg, and off for reduced motion.
+  useWarmFlicker(stageRef, { disabled: reducedMotion || !lampOn });
 
   // The laptop cycles a line of its own text. Slow on purpose: it should be
   // something you notice on the second look, not a ticker.
@@ -87,6 +93,12 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
                   onToggleLamp={() => setLampOn((v) => !v)}
                 />
               </g>
+              {/* Candles sit with the furniture, behind the person. */}
+              {lampOn && (
+                <g data-depth={DEPTH.furniture}>
+                  <CandleLayer />
+                </g>
+              )}
               <g data-depth={DEPTH.person}>
                 <PersonLayer />
               </g>

@@ -27,11 +27,24 @@ const CITY = [
   [252, 342], [330, 336], [128, 318], [386, 274],
 ];
 
-const RAIN = Array.from({ length: 22 }, (_, i) => ({
-  x: 118 + ((i * 37) % 272),
-  delay: (i * 0.41) % 4.2,
-  dur: 2.6 + ((i * 7) % 11) / 10,
-  len: 16 + ((i * 13) % 18),
+/* Falling rain seen through the glass. Deterministic table, but the durations
+   and delays are spread so no two drops ever line up into a visible rhythm. */
+const RAIN = Array.from({ length: 46 }, (_, i) => ({
+  x: 116 + ((i * 53) % 276),
+  delay: (i * 0.29) % 5.1,
+  dur: 1.5 + ((i * 17) % 23) / 10,
+  len: 18 + ((i * 13) % 34),
+  w: 0.9 + ((i * 7) % 5) / 5,
+}));
+
+/* Drops sitting on the glass, which slide and then run. These read as "rain on
+   the window" far more than falling lines do. */
+const RUNNELS = Array.from({ length: 14 }, (_, i) => ({
+  x: 126 + ((i * 71) % 258),
+  y: 132 + ((i * 47) % 220),
+  r: 1.8 + ((i * 11) % 7) / 3,
+  delay: (i * 0.83) % 9,
+  dur: 5 + ((i * 19) % 41) / 5,
 }));
 
 export function WallLayer() {
@@ -43,6 +56,17 @@ export function WallLayer() {
       <rect x="0" y="664" width="1600" height="24" fill="#0a1119" />
       <rect x="0" y="664" width="1600" height="2" fill="#16242f" opacity="0.7" />
 
+      {/* Candlelight on the walls. Flickers with the candles, via data-warm. */}
+      <rect
+        x="0"
+        y="0"
+        width="1600"
+        height="900"
+        fill="url(#g-warm-wash)"
+        data-warm="0.85"
+        data-warm-swing="0.1"
+      />
+
       {/* Pool of screen light thrown onto the wall behind the desk. */}
       <ellipse
         cx="1040"
@@ -52,6 +76,7 @@ export function WallLayer() {
         fill="url(#g-screen-bloom)"
         opacity="0.5"
         filter="url(#f-bloom-lg)"
+        className="screen-bloom"
       />
 
       {/* ---------------- Window (ambient only, not a hotspot) ------------- */}
@@ -74,13 +99,24 @@ export function WallLayer() {
             <line
               key={i}
               x1={d.x}
-              y1="120"
-              x2={d.x - 6}
-              y2={120 + d.len}
-              stroke="#9fd4f0"
-              strokeWidth="1.1"
-              opacity="0.22"
+              y1="118"
+              x2={d.x - 7}
+              y2={118 + d.len}
+              stroke="url(#g-raindrop)"
+              strokeWidth={d.w}
+              strokeLinecap="round"
               className="raindrop"
+              style={{ animationDelay: `${d.delay}s`, animationDuration: `${d.dur}s` }}
+            />
+          ))}
+          {RUNNELS.map((d, i) => (
+            <circle
+              key={`r${i}`}
+              cx={d.x}
+              cy={d.y}
+              r={d.r}
+              fill="#cfe8f8"
+              className="runnel"
               style={{ animationDelay: `${d.delay}s`, animationDuration: `${d.dur}s` }}
             />
           ))}
@@ -98,7 +134,13 @@ export function WallLayer() {
         />
         <line x1="255" y1="120" x2="255" y2="420" stroke="#16242f" strokeWidth="7" />
         <line x1="110" y1="270" x2="400" y2="270" stroke="#16242f" strokeWidth="7" />
-        <rect x="104" y="414" width="302" height="14" rx="3" fill="#121e28" />
+        <rect x="104" y="414" width="302" height="14" rx="3" fill="#191a1c" />
+        {/* Curtains, drawn back — they frame the window and darken the corners. */}
+        <path d="M78 104 L150 104 C132 200 134 320 152 436 L78 436 Z" fill="#0d1116" />
+        <path d="M360 104 L432 104 L432 436 L358 436 C376 320 378 200 360 104 Z" fill="#0d1116" />
+        <path d="M78 104 L112 104 C100 210 102 330 114 436 L78 436 Z" fill="#12171d" opacity="0.8" />
+        <path d="M398 104 L432 104 L432 436 L396 436 C408 330 410 210 398 104 Z" fill="#12171d" opacity="0.8" />
+        <rect x="86" y="96" width="338" height="7" rx="3.5" fill="#15171a" />
       </g>
 
       {/* ---------------- Corkboard → About -------------------------------- */}
@@ -211,17 +253,19 @@ export function WallLayer() {
           width="278"
           height="56"
           fill="url(#g-doorleak)"
-          className="door-leak"
+          data-warm="0.95"
+          data-warm-swing="0.12"
         />
-        <rect x="1330" y="690" width="278" height="8" fill="#ffc287" opacity="0.5" />
+        <rect x="1330" y="690" width="278" height="8" fill="#ffc287" data-warm="0.55" data-warm-swing="0.14" />
         <ellipse
           cx="1460"
           cy="712"
           rx="210"
           ry="46"
           fill="url(#g-lamp-bloom)"
-          opacity="0.45"
           filter="url(#f-bloom-lg)"
+          data-warm="0.45"
+          data-warm-swing="0.16"
         />
       </g>
     </g>

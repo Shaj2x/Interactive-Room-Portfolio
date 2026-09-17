@@ -57,13 +57,24 @@ export function PersonLayer() {
       />
       {/* A trace of the warm lamp on the far shoulder, for contrast. */}
       <path
-        d="M560 512 C546 548 540 590 538 632"
+        d="M604 438 C572 458 550 494 542 534 C536 570 534 606 534 640"
         fill="none"
         stroke="#ffb567"
+        strokeWidth="5"
+        strokeLinecap="round"
+        filter="url(#f-soft)"
+        data-warm="0.34"
+        data-warm-swing="0.3"
+      />
+      <path
+        d="M632 330 C608 342 596 362 594 386"
+        fill="none"
+        stroke="#ffcb92"
         strokeWidth="4"
         strokeLinecap="round"
-        opacity="0.16"
         filter="url(#f-soft)"
+        data-warm="0.28"
+        data-warm-swing="0.3"
       />
     </g>
   );

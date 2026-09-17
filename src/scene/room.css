@@ -64,6 +64,19 @@
   will-change: transform;
 }
 
+/* -------- Light sources ---------------------------------------------------
+   Every bloom in the room blends additively. A plain translucent ellipse only
+   passes for glow over near-black; over the warm candlelit wall it reads as a
+   coloured shape with an edge. `screen` makes them add light and disappear
+   where there is nothing to light. */
+.screen-bloom,
+.lamp-bloom,
+.phone-bloom,
+.candle .flame path,
+.candle ellipse {
+  mix-blend-mode: screen;
+}
+
 /* -------- Ambient life ---------------------------------------------------- */
 
 /* The laptop: a slow hue and brightness drift, plus a rare, quick flicker.
@@ -127,15 +140,48 @@
   100%      { opacity: 0; transform: translate3d(var(--dust-drift), -190px, 0); }
 }
 
-/* Rain on the window. */
+/* -------- Rain ------------------------------------------------------------ */
+
+/* Falling drops seen through the glass. */
 .raindrop {
+  opacity: 0;
   animation: rain-fall linear infinite;
 }
 @keyframes rain-fall {
-  0%   { opacity: 0; transform: translate3d(0, 0, 0); }
-  10%  { opacity: 0.22; }
-  90%  { opacity: 0.22; }
-  100% { opacity: 0; transform: translate3d(-24px, 300px, 0); }
+  0%   { opacity: 0; transform: translate3d(0, -40px, 0); }
+  8%   { opacity: 0.5; }
+  88%  { opacity: 0.5; }
+  100% { opacity: 0; transform: translate3d(-30px, 330px, 0); }
+}
+
+/* Drops clinging to the glass: they hang, then break and run down fast,
+   which is what actually reads as rain on a window. */
+.runnel {
+  opacity: 0;
+  animation: runnel-slide linear infinite;
+}
+@keyframes runnel-slide {
+  0%, 22%  { opacity: 0.55; transform: translate3d(0, 0, 0) scaleY(1); }
+  30%      { opacity: 0.6; transform: translate3d(0, 10px, 0) scaleY(1.5); }
+  70%      { opacity: 0.45; transform: translate3d(-3px, 130px, 0) scaleY(2.4); }
+  100%     { opacity: 0; transform: translate3d(-5px, 232px, 0) scaleY(1.2); }
+}
+
+/* -------- Candles ---------------------------------------------------------
+   The flame's SHAPE loops here; its BRIGHTNESS is driven by useWarmFlicker,
+   which is genuinely random. Durations across the three candles share no
+   common multiple, so the shapes never resolve into a single visible beat. */
+.flame {
+  animation-name: flame-dance;
+  animation-timing-function: var(--ease-in-out);
+  animation-iteration-count: infinite;
+}
+@keyframes flame-dance {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  22%      { transform: scale(0.94, 1.1) skewX(-3.5deg); }
+  46%      { transform: scale(1.05, 0.93) skewX(2.5deg); }
+  68%      { transform: scale(0.97, 1.06) skewX(-1.5deg); }
+  84%      { transform: scale(1.03, 0.97) skewX(3deg); }
 }
 
 .city-light {
@@ -442,6 +488,8 @@
   .door-leak,
   .dust,
   .raindrop,
+  .runnel,
+  .flame,
   .city-light,
   .steam,
   .notif-dot,
@@ -451,6 +499,8 @@
     animation: none !important;
   }
   .dust { opacity: var(--dust-o); }
+  .raindrop { opacity: 0.4; }
+  .runnel { opacity: 0.5; }
   .room.is-dimmed {
     filter: brightness(0.4) saturate(0.7);
   }

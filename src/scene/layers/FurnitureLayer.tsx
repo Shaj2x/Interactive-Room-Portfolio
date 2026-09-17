@@ -96,6 +96,7 @@ export function FurnitureLayer() {
           fill="#8fd2f5"
           opacity="0.09"
           filter="url(#f-bloom-sm)"
+          className="screen-bloom"
         />
         {/* Front face + legs */}
         <rect x="300" y="700" width="1100" height="44" fill="url(#g-desk-front)" />
