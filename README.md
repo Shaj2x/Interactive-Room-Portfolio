@@ -5,11 +5,12 @@ room at night, shown from a fixed cinematic angle. Ordinary objects in it are
 secretly interactive: hover reveals them, clicking moves into a section.
 
 - Stack: React 18 + Vite + TypeScript, GSAP for the intro timeline.
-- The room is **layered SVG and CSS**, not bitmaps — nothing to download, sharp
-  at any resolution, and every light source is a value you can tune.
-- It is rendered **painterly**, not flat-vector: the wall carries plaster grain
-  and uneven paint, and object edges are displaced by low-frequency turbulence
-  so a straight line wanders the way a drawn one does.
+- The room is a **painted plate** — `src/assets/room-plate.webp`, 1600x900,
+  52 kB — with the light and weather rebuilt as animated overlays on top of it:
+  rain on its window, blooms that breathe on its laptop, lamp and door strip,
+  drifting dust, grain and vignette.
+- A hand-built **SVG room** is still in `scene/layers/*` as the alternative art
+  path. Set `plateSrc` to `null` in `src/scene/plate.ts` and it renders instead.
 - Ambient motion runs on CSS keyframes (off the main thread); only the
   pointer-following parallax uses `requestAnimationFrame`.
 
@@ -71,8 +72,26 @@ from `HOTSPOTS`, so there is nothing else to keep in sync.
 
 ## 2. Editing or replacing the artwork
 
-The scene is an SVG with a `0 0 1600 900` viewBox, split into five layers that
-parallax independently:
+### Swapping the plate
+
+The plate is exactly **1600 x 900**, the same as the scene's viewBox, so image
+pixels map 1:1 onto scene coordinates: whatever you measure in the picture is
+the number you write in `src/scene/plate.ts`. To swap the artwork:
+
+1. Resize the new image to 1600 x 900 and save it as
+   `src/assets/room-plate.webp`.
+2. Measure the objects in it and update `plateHotspots` — each box is x, y,
+   width, height in image pixels.
+3. Update `plateLights` (the blooms that breathe) and `plateWindow` (where the
+   animated rain is clipped to) the same way.
+
+Nothing else needs to change: the parallax, the portrait reframing, the
+sections and the menus all read from those coordinates.
+
+### The SVG art path
+
+The alternative scene is an SVG with a `0 0 1600 900` viewBox, split into five
+layers that parallax independently:
 
 | File | Layer | Depth | Contains |
 | --- | --- | --- | --- |

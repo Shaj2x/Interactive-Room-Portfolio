@@ -66,11 +66,10 @@ export function PlateLayer({ lampOn }: Props) {
       {/* The lights that breathe. Screen-blue keeps going when the lamp is off;
           the warm sources are exactly what the easter egg switches out. */}
       {plateLights.map((l) => {
+        // The lamp easter egg puts out every warm source in the room.
         if (!lampOn && l.kind === 'warm') return null;
-        const fill =
-          l.kind === 'warm' ? 'url(#g-candle-bloom)'
-          : l.kind === 'screen' ? 'url(#g-key-bloom)'
-          : 'url(#g-cool-bloom)';
+        const warm = l.kind === 'warm';
+        const fill = warm ? 'url(#g-candle-bloom)' : 'url(#g-cool-bloom)';
         return (
           <ellipse
             key={l.id}
@@ -81,7 +80,7 @@ export function PlateLayer({ lampOn }: Props) {
             fill={fill}
             opacity={l.intensity}
             filter="url(#f-bloom-lg)"
-            className={l.kind === 'screen' ? 'key-bloom' : 'lamp-bloom'}
+            className={warm ? 'lamp-bloom' : 'key-bloom'}
             style={{ transformOrigin: `${l.cx}px ${l.cy}px` }}
           />
         );
