@@ -50,11 +50,43 @@ const RUNNELS = Array.from({ length: 14 }, (_, i) => ({
 export function WallLayer() {
   return (
     <g id="layer-wall">
-      {/* Wall and floor */}
+      {/* ---- Wall and floor -------------------------------------------------
+          Built up in passes rather than as one fill: base, plaster grain,
+          uneven paint, then the light pools brushed over the top. */}
       <rect x="0" y="0" width="1600" height="690" fill="url(#g-wall)" />
+
+      {/* Uneven paint. Plain blurred shapes, not turbulence: the plaster grain
+          that used to be a full-screen SVG filter here now lives in
+          <WallTexture>, as a static composited layer. Running turbulence and
+          displacement across 1600x900 inside a layer whose transform changes
+          every frame cost about 45fps. */}
+      <g filter="url(#f-dof)" opacity="0.55">
+        <ellipse cx="300" cy="230" rx="330" ry="220" fill="#241a12" />
+        <ellipse cx="900" cy="150" rx="420" ry="190" fill="#11151b" />
+        <ellipse cx="1290" cy="330" rx="300" ry="260" fill="#1a1510" />
+        <ellipse cx="640" cy="520" rx="380" ry="200" fill="#2a1d12" />
+      </g>
+
+      {/* Where wall meets ceiling and floor, light falls off. Gradients, not
+          blurred rectangles — a blurred rectangle still ends somewhere, and
+          that edge reads as a bar across the frame. */}
+      <rect x="0" y="0" width="1600" height="210" fill="url(#g-ceiling-fall)" />
+      <rect x="0" y="470" width="1600" height="220" fill="url(#g-floor-fall)" />
+
       <rect x="0" y="686" width="1600" height="214" fill="url(#g-floor)" />
-      <rect x="0" y="664" width="1600" height="24" fill="#0a1119" />
-      <rect x="0" y="664" width="1600" height="2" fill="#16242f" opacity="0.7" />
+      {/* Floorboards, barely there — enough to stop the floor reading as a slab. */}
+      <g opacity="0.3">
+        {[706, 742, 786, 840].map((y) => (
+          <path
+            key={y}
+            d={`M0 ${y} L1600 ${y - 6}`}
+            stroke="#231d18"
+            strokeWidth="2.5"
+          />
+        ))}
+      </g>
+      <rect x="0" y="664" width="1600" height="24" fill="#0b0c10" />
+      <rect x="0" y="664" width="1600" height="2" fill="#2a2620" opacity="0.6" />
 
       {/* Candlelight on the walls. Flickers with the candles, via data-warm. */}
       <rect
@@ -80,7 +112,7 @@ export function WallLayer() {
       />
 
       {/* ---------------- Window (ambient only, not a hotspot) ------------- */}
-      <g id="obj-window">
+      <g id="obj-window" className="paintable" filter="url(#f-paint)">
         <rect x="110" y="120" width="290" height="300" rx="4" fill="url(#g-window)" />
         <g className="rain-group">
           {CITY.map(([cx, cy], i) => (
@@ -144,7 +176,7 @@ export function WallLayer() {
       </g>
 
       {/* ---------------- Corkboard → About -------------------------------- */}
-      <g id="obj-corkboard">
+      <g id="obj-corkboard" className="paintable" filter="url(#f-paint)">
         <rect x="536" y="84" width="268" height="220" rx="5" fill="#1b1813" />
         <rect
           x="536"
@@ -173,7 +205,7 @@ export function WallLayer() {
       </g>
 
       {/* ---------------- Poster frame → Projects -------------------------- */}
-      <g id="obj-poster">
+      <g id="obj-poster" className="paintable" filter="url(#f-paint)">
         <rect x="876" y="86" width="208" height="248" rx="3" fill="#0d151d" />
         <rect
           x="876"
@@ -203,7 +235,7 @@ export function WallLayer() {
       </g>
 
       {/* ---------------- Sticky notes → Leadership ------------------------ */}
-      <g id="obj-stickies">
+      <g id="obj-stickies" className="paintable" filter="url(#f-paint)">
         {STICKIES.map((s, i) => (
           <g key={i} transform={`rotate(${s.r} ${s.x + s.s / 2} ${s.y + s.s / 2})`}>
             <rect x={s.x} y={s.y} width={s.s} height={s.s} fill={s.fill} />
@@ -230,7 +262,7 @@ export function WallLayer() {
       </g>
 
       {/* ---------------- Door → Résumé ------------------------------------ */}
-      <g id="obj-door">
+      <g id="obj-door" className="paintable" filter="url(#f-paint)">
         <rect x="1338" y="24" width="264" height="676" fill="#0a121a" />
         <rect
           x="1338"
@@ -258,13 +290,14 @@ export function WallLayer() {
         />
         <rect x="1330" y="690" width="278" height="8" fill="#ffc287" data-warm="0.55" data-warm-swing="0.14" />
         <ellipse
-          cx="1460"
-          cy="712"
-          rx="210"
-          ry="46"
+          cx="1478"
+          cy="706"
+          rx="168"
+          ry="34"
           fill="url(#g-lamp-bloom)"
           filter="url(#f-bloom-lg)"
-          data-warm="0.45"
+          className="lamp-bloom"
+          data-warm="0.32"
           data-warm-swing="0.16"
         />
       </g>

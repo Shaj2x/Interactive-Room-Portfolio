@@ -55,6 +55,14 @@
   width: 100%;
   height: 100%;
   display: block;
+  /* The scene is art. Every hotspot is an HTML button layered over it, so
+     nothing drawn here should ever take a click — a candle's bloom is a large
+     transparent ellipse, and it was swallowing clicks meant for the lamp
+     behind it. The lamp opts back in below; it is the only exception. */
+  pointer-events: none;
+}
+.scene .lamp-hit {
+  pointer-events: auto;
 }
 
 /* Layers get their transform written directly by useParallax. `will-change`
@@ -90,12 +98,15 @@
   transform-origin: 1046px 504px;
 }
 @keyframes screen-breathe {
-  0%, 100% { opacity: 1; filter: hue-rotate(0deg); }
-  50%      { opacity: 0.94; filter: hue-rotate(-7deg); }
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.94; }
 }
+/* Opacity only. Animating `transform` here forced the blur behind it to be
+   recomputed on every frame; opacity is applied after the filter, so it is
+   free by comparison. */
 @keyframes bloom-breathe {
-  0%, 100% { opacity: 0.95; transform: scale(1); }
-  50%      { opacity: 0.78; transform: scale(0.975); }
+  0%, 100% { opacity: 0.95; }
+  50%      { opacity: 0.78; }
 }
 @keyframes screen-flicker {
   0%, 96.4%, 100% { filter: brightness(1); }
@@ -221,6 +232,44 @@
   fill: rgba(95, 231, 224, 0.05);
   stroke: var(--c-accent);
   stroke-width: 2;
+}
+
+/* -------- Wall texture ----------------------------------------------------
+   Static bitmaps, rasterised once and thereafter only composited. The SVG
+   filter version of this cost about 45fps, because it sat inside a layer whose
+   transform the parallax rewrites every frame. */
+
+.wall-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* The wall stops where the floor starts. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 72%, transparent 78%);
+  mask-image: linear-gradient(to bottom, #000 0 72%, transparent 78%);
+}
+
+.wall-grain,
+.wall-mottle {
+  position: absolute;
+  inset: 0;
+}
+/* Two stacked full-screen blend layers cost twice what one does, and the
+   mottle is the half that carries the look. */
+.wall-grain { mix-blend-mode: soft-light; }
+
+/* Coarse plaster. */
+.wall-grain {
+  opacity: 0.42;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.05' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23p)'/%3E%3C/svg%3E");
+  background-size: 420px 420px;
+}
+
+/* Broad warm and cold patches, so no two areas of wall match. */
+.wall-mottle {
+  opacity: 0.55;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.006' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0 0.26 0 0 0 0.75 0'/%3E%3C/filter%3E%3Crect width='800' height='500' filter='url(%23m)'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
 }
 
 /* -------- Hotspots -------------------------------------------------------- */
@@ -433,6 +482,12 @@
     );
   }
   .hotspot-label { font-size: 10px; padding: 3px 8px; bottom: -22px; }
+
+  /* The room renders about 220px tall here. The painterly edge displacement
+     is not visible at that size but costs exactly as much as it does on a
+     desktop, on hardware far less able to afford it. */
+  .paintable { filter: none !important; }
+  .wall-grain { display: none; }
 }
 
 /* -------- Compact section list -------------------------------------------- */
@@ -500,6 +555,7 @@
   }
   .dust { opacity: var(--dust-o); }
   .raindrop { opacity: 0.4; }
+  .grain { display: none; }
   .runnel { opacity: 0.5; }
   .room.is-dimmed {
     filter: brightness(0.4) saturate(0.7);

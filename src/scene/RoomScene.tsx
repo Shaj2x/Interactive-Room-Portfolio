@@ -9,6 +9,7 @@ import { PlateLayer } from './layers/PlateLayer';
 import { CandleLayer } from './layers/CandleLayer';
 import { plateSrc } from './plate';
 import { Atmosphere } from './Atmosphere';
+import { WallTexture } from './WallTexture';
 import { Hotspot } from './Hotspot';
 import { HOTSPOTS, DEPTH, isTappableWhenCompact } from './hotspots';
 import { useParallax } from '../hooks/useParallax';
@@ -63,6 +64,9 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
         .join(' ')}
     >
       <div className="stage" ref={stageRef}>
+        {/* Static plaster grain, composited under the scene. */}
+        {!plateSrc && <WallTexture />}
+
         <svg
           className="scene"
           viewBox="0 0 1600 900"
@@ -86,6 +90,12 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
               <g data-depth={DEPTH.furniture}>
                 <FurnitureLayer />
               </g>
+              {/* Candles sit with the furniture, behind the desk objects. */}
+              {lampOn && (
+                <g data-depth={DEPTH.furniture}>
+                  <CandleLayer />
+                </g>
+              )}
               <g data-depth={DEPTH.desktop}>
                 <DesktopLayer
                   screenLine={screenLine}
@@ -93,12 +103,6 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
                   onToggleLamp={() => setLampOn((v) => !v)}
                 />
               </g>
-              {/* Candles sit with the furniture, behind the person. */}
-              {lampOn && (
-                <g data-depth={DEPTH.furniture}>
-                  <CandleLayer />
-                </g>
-              )}
               <g data-depth={DEPTH.person}>
                 <PersonLayer />
               </g>

@@ -6,7 +6,7 @@
  */
 export function PersonLayer() {
   return (
-    <g id="layer-person">
+    <g id="layer-person" className="paintable" filter="url(#f-paint-fine)">
       {/* Body: shoulders and back, cut off by the bottom of the frame. */}
       <path
         d="M604 436 C566 452 542 500 538 548 L532 900 L812 900 L806 566
@@ -26,6 +26,10 @@ export function PersonLayer() {
       <ellipse cx="672" cy="376" rx="54" ry="62" fill="#05090e" />
       {/* Neck */}
       <rect x="648" y="424" width="48" height="30" fill="#05090e" />
+
+      {/* No internal shading. Lit from behind by the screen, a figure at a desk
+          really is a near-flat shape; painting folds into it only produced
+          lighter patches that read as blocks. The rim light does the work. */}
 
       {/* Rim light — right side only, thrown by the screen. */}
       <path

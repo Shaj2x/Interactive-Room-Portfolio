@@ -41,7 +41,7 @@ export function FurnitureLayer() {
   return (
     <g id="layer-furniture">
       {/* ---------------- Bookshelf → Record ------------------------------- */}
-      <g id="obj-bookshelf">
+      <g id="obj-bookshelf" className="paintable" filter="url(#f-paint-fine)">
         <rect x="58" y="436" width="236" height="388" rx="3" fill="url(#g-shelf)" />
         <rect
           x="58"
@@ -69,7 +69,7 @@ export function FurnitureLayer() {
       </g>
 
       {/* ---------------- Chair (behind the person) ------------------------ */}
-      <g id="obj-chair">
+      <g id="obj-chair" className="paintable" filter="url(#f-paint-fine)">
         <rect x="548" y="462" width="252" height="252" rx="26" fill="#070d14" />
         <rect
           x="548"
@@ -84,7 +84,7 @@ export function FurnitureLayer() {
       </g>
 
       {/* ---------------- Desk --------------------------------------------- */}
-      <g id="obj-desk">
+      <g id="obj-desk" className="paintable" filter="url(#f-paint-fine)">
         {/* Top surface, in slight perspective */}
         <path d="M320 622 L1348 622 L1400 700 L300 700 Z" fill="url(#g-desk)" />
         {/* The screen's reflection on the desk, right under the laptop. */}
@@ -104,6 +104,17 @@ export function FurnitureLayer() {
         <rect x="1342" y="744" width="22" height="156" fill="#070d13" />
         {/* The lamp's warm pool on the left of the surface, opposite the screen. */}
         <ellipse cx="470" cy="660" rx="200" ry="38" fill="#ffb567" opacity="0.07" filter="url(#f-bloom-sm)" />
+        {/* Grain dragged along the surface. */}
+        <g opacity="0.18">
+          {[638, 652, 666, 680].map((y, i) => (
+            <path
+              key={y}
+              d={`M330 ${y} L1360 ${y + 4 + i * 2}`}
+              stroke="#3a2c20"
+              strokeWidth="3"
+            />
+          ))}
+        </g>
         {/* Back edge catching the key light, and the front lip catching a little
             less — two lines are what make a flat polygon read as a surface. */}
         <path d="M320 622 L1348 622 L1348 627 L320 627 Z" fill="#9fd4f0" opacity="0.3" />

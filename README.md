@@ -7,6 +7,9 @@ secretly interactive: hover reveals them, clicking moves into a section.
 - Stack: React 18 + Vite + TypeScript, GSAP for the intro timeline.
 - The room is **layered SVG and CSS**, not bitmaps — nothing to download, sharp
   at any resolution, and every light source is a value you can tune.
+- It is rendered **painterly**, not flat-vector: the wall carries plaster grain
+  and uneven paint, and object edges are displaced by low-frequency turbulence
+  so a straight line wanders the way a drawn one does.
 - Ambient motion runs on CSS keyframes (off the main thread); only the
   pointer-following parallax uses `requestAnimationFrame`.
 
@@ -96,7 +99,34 @@ Higher depth = nearer the camera = moves more. The depths live in one place,
 
 ---
 
-## 3. Behaviour worth knowing
+## 3. Performance notes
+
+SVG filters are the expensive part of this scene, and a few rules keep them
+affordable:
+
+- **Every filter sets `color-interpolation-filters="sRGB"`.** SVG defaults to
+  linearRGB, which converts the whole filter region into linear space and back
+  on every pass, for no visible benefit here.
+- **Never animate `transform` on a filtered element.** It forces the filter to
+  be recomputed each frame. Animate `opacity` instead — it is applied after
+  filtering. The blooms used to scale; that alone cost about 6fps.
+- **Static texture does not belong in an SVG filter** if it sits inside a layer
+  the parallax transforms. The wall's plaster was a full-screen turbulence
+  filter being re-rasterised every frame; it is now `<WallTexture>`, a plain
+  element with a static background image, rasterised once and thereafter only
+  composited.
+- **Keep filter regions tight.** A filter costs roughly its area.
+- On portrait screens the painterly displacement is switched off
+  (`.paintable { filter: none }`): the room renders about 220px tall there, so
+  the detail is invisible while costing exactly as much.
+
+Note that the measurements behind these choices were taken in a headless
+browser with **no GPU** (SwiftShader, software rasterisation). Blur and blend
+are precisely what a GPU accelerates, so the absolute frame rates there are a
+worst case rather than a prediction. Worth a look on a real low-end phone
+before launch.
+
+## 4. Behaviour worth knowing
 
 - **Intro** — about 2.6 seconds, and any click or keypress skips it. Arriving on
   a deep link (`#projects`) skips it entirely.
@@ -125,7 +155,7 @@ Higher depth = nearer the camera = moves more. The depths live in one place,
 
 ---
 
-## 4. Deploying
+## 5. Deploying
 
 `vite.config.ts` defaults `base` to `/Interactive-Room-Portfolio/` for GitHub
 Pages project hosting. The included workflow

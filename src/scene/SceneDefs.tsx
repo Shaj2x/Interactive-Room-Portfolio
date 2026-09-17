@@ -99,24 +99,81 @@ export function SceneDefs() {
       </linearGradient>
 
       {/* --- Blur / bloom filters ------------------------------------------- */}
-      <filter id="f-bloom-lg" x="-60%" y="-60%" width="220%" height="220%">
-        <feGaussianBlur stdDeviation="34" />
+      <filter id="f-bloom-lg" colorInterpolationFilters="sRGB" x="-35%" y="-35%" width="170%" height="170%">
+        <feGaussianBlur stdDeviation="24" />
       </filter>
-      <filter id="f-bloom-sm" x="-60%" y="-60%" width="220%" height="220%">
+      <filter id="f-bloom-sm" colorInterpolationFilters="sRGB" x="-35%" y="-35%" width="170%" height="170%">
         <feGaussianBlur stdDeviation="9" />
       </filter>
-      <filter id="f-soft" x="-30%" y="-30%" width="160%" height="160%">
+      <filter id="f-soft" colorInterpolationFilters="sRGB" x="-15%" y="-15%" width="130%" height="130%">
         <feGaussianBlur stdDeviation="3" />
       </filter>
-      <filter id="f-fore-blur" x="-20%" y="-20%" width="140%" height="140%">
+      <filter id="f-fore-blur" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
         <feGaussianBlur stdDeviation="14" />
       </filter>
 
-      {/* Haze in the light beam: turbulence, not a bitmap. */}
-      <filter id="f-haze" x="-20%" y="-20%" width="140%" height="140%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="3" seed="7" />
-        <feDisplacementMap in="SourceGraphic" scale="26" />
-        <feGaussianBlur stdDeviation="16" />
+      {/* Haze in the light beam. This was turbulence + displacement + blur and
+          it was animated, so it re-ran every frame; at this size a plain blur
+          is indistinguishable. */}
+      <filter id="f-haze" colorInterpolationFilters="sRGB" x="-15%" y="-15%" width="130%" height="130%">
+        <feGaussianBlur stdDeviation="14" />
+      </filter>
+
+      <linearGradient id="g-ceiling-fall" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#04050a" stopOpacity="0.92" />
+        <stop offset="60%" stopColor="#05070c" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#05070c" stopOpacity="0" />
+      </linearGradient>
+      <linearGradient id="g-floor-fall" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#07060a" stopOpacity="0" />
+        <stop offset="100%" stopColor="#07060a" stopOpacity="0.72" />
+      </linearGradient>
+
+      {/* --- Painterly rendering --------------------------------------------
+          What makes vector art read as vector art is the edges: mathematically
+          exact, identical along their whole length. These filters break that
+          up. Turbulence displaces every edge by a few pixels at a low
+          frequency, so a straight line wanders the way a drawn one does, and a
+          light blur stops the result looking like torn paper. */}
+      <filter id="f-paint" colorInterpolationFilters="sRGB" x="-3%" y="-3%" width="106%" height="106%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="2" seed="11" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G" />
+        <feGaussianBlur stdDeviation="0.7" />
+      </filter>
+
+      {/* Same idea, gentler — for objects near the camera, which should stay
+          crisper than the far wall. */}
+      <filter id="f-paint-fine" colorInterpolationFilters="sRGB" x="-2%" y="-2%" width="104%" height="104%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.024" numOctaves="2" seed="5" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" xChannelSelector="R" yChannelSelector="G" />
+        <feGaussianBlur stdDeviation="0.45" />
+      </filter>
+
+      {/* Depth of field: the far wall sits slightly out of focus, which is what
+          a camera in a small room would actually do. */}
+      <filter id="f-dof" colorInterpolationFilters="sRGB" x="-6%" y="-6%" width="112%" height="112%">
+        <feGaussianBlur stdDeviation="1.9" />
+      </filter>
+
+      {/* Plaster. Coarse mottling across the wall so it is a painted surface
+          with history rather than a clean gradient. */}
+      <filter id="f-plaster" colorInterpolationFilters="sRGB" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.009 0.013" numOctaves="5" seed="23" result="t" />
+        <feColorMatrix
+          in="t"
+          type="matrix"
+          values="0 0 0 0 0.62
+                  0 0 0 0 0.45
+                  0 0 0 0 0.30
+                  0 0 0 0.5 0"
+        />
+      </filter>
+
+      {/* Brush drag: streaky, directional noise for the wall's light pools. */}
+      <filter id="f-brush" colorInterpolationFilters="sRGB" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.004 0.05" numOctaves="3" seed="3" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G" />
+        <feGaussianBlur stdDeviation="9" />
       </filter>
 
       {/* Masks the bloom so the glow does not bleed past the wall. */}
