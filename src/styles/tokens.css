@@ -1,0 +1,48 @@
+/* -----------------------------------------------------------------------------
+   Design tokens. The whole site is built from these; change a value here and it
+   propagates everywhere. Palette is deliberately narrow: near-black base, navy
+   and teal shadow, cold screen-blue key light, a little warm amber, and ONE
+   accent (cyan) reserved exclusively for interactive glows.
+----------------------------------------------------------------------------- */
+:root {
+  /* Base / shadow */
+  --c-void: #04060a;
+  --c-ink: #070b12;
+  --c-navy: #0c1622;
+  --c-navy-hi: #132234;
+  --c-teal-shadow: #10242c;
+
+  /* Key light — the laptop */
+  --c-screen: #bfe4ff;
+  --c-screen-core: #eaf6ff;
+  --c-screen-deep: #2e6f9e;
+
+  /* Secondary warm — the lamp and the door leak */
+  --c-amber: #ffb567;
+  --c-amber-deep: #8a4f1c;
+
+  /* The one accent. Interactive only. Never decorative. */
+  --c-accent: #5fe7e0;
+  --c-accent-dim: #2b8c8c;
+
+  /* Type */
+  --c-text: #dfe9f4;
+  --c-text-dim: #93a5b8;
+  --c-text-faint: #5d7086;
+
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  /* Motion. Built-in CSS easings are too weak for this; these are the only
+     curves used on the site. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --d-hover: 180ms;   /* hover / rim light  */
+  --d-ui: 240ms;      /* small UI state     */
+  --d-camera: 620ms;  /* the cinematic push */
+
+  --stage-w: 1600;
+  --stage-h: 900;
+}

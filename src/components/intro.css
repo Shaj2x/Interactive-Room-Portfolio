@@ -1,0 +1,82 @@
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: var(--c-void);
+  overflow: hidden;
+}
+
+/* Starts opaque and lifts to 0.55, so the room resolves out of darkness
+   rather than being revealed by a curtain. */
+.intro-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--c-void);
+  opacity: 1;
+}
+
+/* The laptop coming on — positioned over where the screen actually sits. */
+.intro-bloom {
+  position: absolute;
+  left: 62%;
+  top: 54%;
+  width: 46vmax;
+  height: 46vmax;
+  transform: translate(-50%, -50%) scale(0.72);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(191, 228, 255, 0.22) 0%,
+    rgba(111, 182, 230, 0.08) 42%,
+    transparent 70%
+  );
+  opacity: 0;
+  filter: blur(26px);
+  pointer-events: none;
+}
+
+.intro-copy { position: relative; text-align: center; padding: 0 24px; }
+
+.intro-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 7vw, 76px);
+  letter-spacing: -0.02em;
+  color: var(--c-screen-core);
+}
+
+.intro-sub {
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.6vw, 14px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+
+.intro-skip {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(143, 165, 184, 0.28);
+  background: transparent;
+  color: var(--c-text-faint);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--d-hover) var(--ease), border-color var(--d-hover) var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .intro-skip:hover { color: var(--c-text); border-color: var(--c-text-faint); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-bloom { display: none; }
+}

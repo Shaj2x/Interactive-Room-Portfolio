@@ -1,0 +1,460 @@
+/* -----------------------------------------------------------------------------
+   The room: framing, ambient motion, hotspot affordance.
+
+   Ambient motion is CSS keyframes rather than JS on purpose — CSS animations
+   run off the main thread, so dust keeps drifting and the screen keeps
+   flickering while React mounts a section. Only the parallax, which has to
+   follow the pointer, uses rAF.
+----------------------------------------------------------------------------- */
+
+.room {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--c-void);
+  transition: filter var(--d-camera) var(--ease-out), opacity var(--d-camera) var(--ease-out);
+}
+
+/* The camera push. When a section opens the room recedes and blurs, but is
+   never replaced — the setting stays behind the content, as the brief asks. */
+.room.is-dimmed {
+  filter: blur(14px) brightness(0.4) saturate(0.7);
+}
+.room.is-dimmed .stage {
+  transform: scale(1.06);
+}
+
+/* Lamp easter egg: the room drops toward its cold key light alone. */
+.room.is-lampless {
+  filter: brightness(0.74) saturate(0.86);
+}
+.room.is-lampless.is-dimmed {
+  filter: blur(14px) brightness(0.3) saturate(0.6);
+}
+
+/* -------- Stage: locked to the scene's 16:9 and scaled to cover ----------- */
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100vw, calc(100vh * 16 / 9));
+  height: max(100vh, calc(100vw * 9 / 16));
+  /* Centring uses the standalone `translate` property so that `transform` is
+     free to carry the camera push on its own, with no matrix to recompose. */
+  translate: -50% -50%;
+  transform-origin: center;
+  transition: transform var(--d-camera) var(--ease-out);
+}
+.room.is-dimmed .stage {
+  transform: scale(1.06);
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Layers get their transform written directly by useParallax. `will-change`
+   promotes them once, up front, instead of on the first frame of movement. */
+.scene > g[data-depth],
+.hotspot-depth {
+  will-change: transform;
+}
+
+/* -------- Ambient life ---------------------------------------------------- */
+
+/* The laptop: a slow hue and brightness drift, plus a rare, quick flicker.
+   Amplitude is deliberately tiny — alive, not strobing. */
+.screen {
+  animation: screen-breathe 9s var(--ease-in-out) infinite, screen-flicker 13s linear infinite;
+  transform-origin: 1046px 506px;
+}
+.screen-bloom {
+  animation: bloom-breathe 9s var(--ease-in-out) infinite;
+  transform-origin: 1046px 504px;
+}
+@keyframes screen-breathe {
+  0%, 100% { opacity: 1; filter: hue-rotate(0deg); }
+  50%      { opacity: 0.94; filter: hue-rotate(-7deg); }
+}
+@keyframes bloom-breathe {
+  0%, 100% { opacity: 0.95; transform: scale(1); }
+  50%      { opacity: 0.78; transform: scale(0.975); }
+}
+@keyframes screen-flicker {
+  0%, 96.4%, 100% { filter: brightness(1); }
+  96.8%           { filter: brightness(1.16); }
+  97.2%           { filter: brightness(0.9); }
+  97.6%           { filter: brightness(1.08); }
+}
+
+/* The lamp breathes a little warmer and back. */
+.lamp-bloom {
+  animation: lamp-breathe 11s var(--ease-in-out) infinite;
+  transform-origin: 486px 382px;
+}
+.lamp-cone {
+  animation: lamp-breathe 11s var(--ease-in-out) infinite;
+  transform-origin: 486px 500px;
+}
+@keyframes lamp-breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.82; }
+}
+
+.door-leak {
+  animation: leak-breathe 17s var(--ease-in-out) infinite;
+}
+@keyframes leak-breathe {
+  0%, 100% { opacity: 1; }
+  45%      { opacity: 0.74; }
+}
+
+/* Dust drifting up through the light. Each mote carries its own duration,
+   delay and drift as custom properties, so one keyframe set covers them all. */
+.dust {
+  opacity: 0;
+  animation: dust-drift var(--dust-dur) linear infinite;
+  animation-delay: var(--dust-delay);
+}
+@keyframes dust-drift {
+  0%        { opacity: 0; transform: translate3d(0, 0, 0); }
+  12%       { opacity: var(--dust-o); }
+  80%       { opacity: var(--dust-o); }
+  100%      { opacity: 0; transform: translate3d(var(--dust-drift), -190px, 0); }
+}
+
+/* Rain on the window. */
+.raindrop {
+  animation: rain-fall linear infinite;
+}
+@keyframes rain-fall {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0); }
+  10%  { opacity: 0.22; }
+  90%  { opacity: 0.22; }
+  100% { opacity: 0; transform: translate3d(-24px, 300px, 0); }
+}
+
+.city-light {
+  animation: city-blink 9s var(--ease-in-out) infinite;
+}
+@keyframes city-blink {
+  0%, 100% { opacity: 0.5; }
+  40%      { opacity: 0.16; }
+}
+
+.steam {
+  animation: steam-rise 7s var(--ease-in-out) infinite;
+}
+.steam-b { animation-duration: 9s; animation-delay: 1.4s; }
+@keyframes steam-rise {
+  0%, 100% { opacity: 0; transform: translate3d(0, 0, 0); }
+  35%      { opacity: 0.16; }
+  100%     { opacity: 0; transform: translate3d(5px, -22px, 0); }
+}
+
+/* The phone's notification pulse — the only accent-coloured motion at rest. */
+.notif-dot {
+  animation: notif-pulse 4.5s var(--ease-out) infinite;
+  transform-origin: 1288px 590px;
+}
+@keyframes notif-pulse {
+  0%, 70%, 100% { opacity: 0.85; transform: scale(1); }
+  78%           { opacity: 1; transform: scale(1.35); }
+}
+.phone-bloom {
+  animation: lamp-breathe 6s var(--ease-in-out) infinite;
+}
+
+.lamp-hit { cursor: pointer; }
+.lamp-hit:focus-visible {
+  outline: none;
+  fill: rgba(95, 231, 224, 0.05);
+  stroke: var(--c-accent);
+  stroke-width: 2;
+}
+
+/* -------- Hotspots -------------------------------------------------------- */
+
+.hotspot-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hotspot-depth {
+  position: absolute;
+  inset: 0;
+}
+
+.hotspot {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.hotspot:disabled {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* The affordance: a soft accent rim, not a box. Discoverable, not garish. */
+.hotspot-rim {
+  position: absolute;
+  inset: -8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  box-shadow: none;
+  background: transparent;
+  opacity: 0;
+  transition:
+    opacity var(--d-hover) var(--ease-out),
+    box-shadow var(--d-hover) var(--ease-out);
+}
+
+.hotspot-label {
+  position: absolute;
+  left: 50%;
+  bottom: -34px;
+  transform: translate3d(-50%, 6px, 0);
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(95, 231, 224, 0.28);
+  background: rgba(6, 12, 18, 0.82);
+  backdrop-filter: blur(6px);
+  color: var(--c-accent);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--d-hover) var(--ease-out),
+    transform var(--d-hover) var(--ease-out);
+}
+
+/* Hover motion is gated: a tap on touch fires a phantom :hover that would
+   leave a hotspot lit up with no way to unlight it. */
+@media (hover: hover) and (pointer: fine) {
+  .hotspot:hover .hotspot-rim {
+    opacity: 1;
+    border-color: rgba(95, 231, 224, 0.42);
+    box-shadow:
+      0 0 0 1px rgba(95, 231, 224, 0.12),
+      0 0 26px 4px rgba(95, 231, 224, 0.16),
+      inset 0 0 30px rgba(95, 231, 224, 0.09);
+  }
+  .hotspot:hover .hotspot-label {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.hotspot:focus-visible {
+  outline: none;
+}
+.hotspot:focus-visible .hotspot-rim {
+  opacity: 1;
+  border-color: var(--c-accent);
+  box-shadow: 0 0 22px 3px rgba(95, 231, 224, 0.2);
+}
+.hotspot:focus-visible .hotspot-label {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0);
+}
+
+/* Edge-anchored labels, so nothing runs off the side of the frame. */
+.hotspot-label[data-anchor='left'] {
+  left: 0;
+  transform: translate3d(0, 6px, 0);
+}
+.hotspot-label[data-anchor='right'] {
+  left: auto;
+  right: 0;
+  transform: translate3d(0, 6px, 0);
+}
+@media (hover: hover) and (pointer: fine) {
+  .hotspot:hover .hotspot-label[data-anchor='left'],
+  .hotspot:hover .hotspot-label[data-anchor='right'] {
+    transform: translate3d(0, 0, 0);
+  }
+}
+.hotspot:focus-visible .hotspot-label[data-anchor='left'],
+.hotspot:focus-visible .hotspot-label[data-anchor='right'],
+.hotspot.is-labelled .hotspot-label[data-anchor='left'],
+.hotspot.is-labelled .hotspot-label[data-anchor='right'] {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Touch has no hover, so the label is simply always on. */
+.hotspot.is-labelled .hotspot-label {
+  opacity: 0.82;
+  transform: translate3d(-50%, 0, 0);
+  bottom: -28px;
+  font-size: 11px;
+}
+
+/* First-load teaching pulse. One hotspot, three beats, then it stops for good
+   — `showHint` flips false on the first interaction. */
+/* Glow only — a visible border here reads as a debug outline, not an
+   invitation. The pulse has to suggest the object is warm, not box it. */
+.hotspot.is-hinting .hotspot-rim {
+  opacity: 1;
+  border-color: transparent;
+  border-radius: 50%;
+  animation: hint-pulse 2.6s var(--ease-out) 3;
+}
+@keyframes hint-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(95, 231, 224, 0); }
+  45%      { box-shadow: 0 0 46px 14px rgba(95, 231, 224, 0.16); }
+}
+
+/* -------- Atmosphere ------------------------------------------------------ */
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 78% 68% at 62% 52%,
+      transparent 0%,
+      rgba(2, 4, 7, 0.36) 62%,
+      rgba(2, 4, 7, 0.86) 100%
+    );
+}
+
+/* Film grain. An SVG turbulence data-URI: no image request, and it stays
+   sharp at any resolution. */
+.grain {
+  position: absolute;
+  inset: -60px;
+  opacity: 0.2;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  animation: grain-shift 0.7s steps(1) infinite;
+}
+@keyframes grain-shift {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(-14px, 8px, 0); }
+  50%  { transform: translate3d(9px, -12px, 0); }
+  75%  { transform: translate3d(-6px, -6px, 0); }
+  100% { transform: translate3d(11px, 5px, 0); }
+}
+
+/* -------- Compact / portrait reframing ------------------------------------ */
+
+/* Covering a portrait viewport with a 16:9 scene crops the sides, which would
+   lose the door and the window. Nudge the framing toward the desk — the part
+   of the room that carries the hotspots — instead of the geometric centre. */
+/* Portrait: covering a 16:9 scene would crop away the door, the window and
+   half the hotspots. Fit it to the width instead and sit it high in the frame,
+   so the whole room is visible as a cinematic band; the section list below
+   (.compact-nav) carries the objects that are too small to tap at this size. */
+@media (max-width: 820px) {
+  .room {
+    background:
+      radial-gradient(ellipse 120% 60% at 50% 22%, #0a1420 0%, var(--c-void) 70%);
+  }
+  .stage {
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+    width: 100vw;
+    height: calc(100vw * 9 / 16);
+    margin-top: 11vh;
+  }
+  .vignette {
+    background: radial-gradient(
+      ellipse 92% 44% at 50% 36%,
+      transparent 0%,
+      rgba(2, 4, 7, 0.4) 62%,
+      rgba(2, 4, 7, 0.9) 100%
+    );
+  }
+  .hotspot-label { font-size: 10px; padding: 3px 8px; bottom: -22px; }
+}
+
+/* -------- Compact section list -------------------------------------------- */
+.compact-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Starts just under the room band, so the list fills the lower half of the
+     screen instead of leaving a void between the scene and the navigation. */
+  top: calc(11vh + 100vw * 9 / 16 + 28px);
+  z-index: 46;
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(16px, 5vw, 28px) calc(20px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--c-void) 55%, rgba(4, 6, 10, 0));
+  pointer-events: none;
+}
+.compact-nav nav { width: 100%; pointer-events: auto; }
+.compact-nav ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.compact-nav button {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 16px;
+  border-radius: 9px;
+  border: 1px solid rgba(95, 231, 224, 0.18);
+  background: rgba(9, 17, 26, 0.8);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--d-hover) var(--ease-out);
+}
+.compact-nav button:active { border-color: var(--c-accent); }
+
+/* -------- Reduced motion --------------------------------------------------
+   Gentler and fewer, not zero. The cross-fade into a section stays, because it
+   explains where the content came from. Everything that drifts, flickers,
+   pulses or parallaxes stops. */
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .screen-bloom,
+  .lamp-bloom,
+  .lamp-cone,
+  .door-leak,
+  .dust,
+  .raindrop,
+  .city-light,
+  .steam,
+  .notif-dot,
+  .phone-bloom,
+  .grain,
+  .hotspot.is-hinting .hotspot-rim {
+    animation: none !important;
+  }
+  .dust { opacity: var(--dust-o); }
+  .room.is-dimmed {
+    filter: brightness(0.4) saturate(0.7);
+  }
+  .room.is-dimmed .stage {
+    transform: none;
+  }
+}
