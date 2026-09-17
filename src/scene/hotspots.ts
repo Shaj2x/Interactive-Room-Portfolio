@@ -1,4 +1,5 @@
 import type { SectionId } from '../content/profile';
+import { plateHotspots, plateSrc } from './plate';
 
 /**
  * The room's navigation. Each hotspot is an ordinary object in the scene that
@@ -37,7 +38,8 @@ export function isTappableWhenCompact(h: HotspotDef): boolean {
   return h.w >= 200 && h.h >= 200;
 }
 
-export const HOTSPOTS: HotspotDef[] = [
+/** Object positions in the hand-built SVG room. */
+const SVG_HOTSPOTS: HotspotDef[] = [
   {
     id: 'build',
     label: 'What I build',
@@ -127,6 +129,15 @@ export const HOTSPOTS: HotspotDef[] = [
     order: 8,
   },
 ];
+
+/**
+ * The active set. The painted plate puts the objects in different places than
+ * the SVG room does, so each art path carries its own coordinates and
+ * everything downstream — the buttons, the menus, the keyboard order — reads
+ * from whichever is live.
+ */
+export const HOTSPOTS: HotspotDef[] =
+  plateSrc && plateHotspots.length > 0 ? plateHotspots : SVG_HOTSPOTS;
 
 export const HOTSPOT_BY_ID = Object.fromEntries(
   HOTSPOTS.map((h) => [h.id, h]),
