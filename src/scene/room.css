@@ -77,7 +77,7 @@
    passes for glow over near-black; over the warm candlelit wall it reads as a
    coloured shape with an edge. `screen` makes them add light and disappear
    where there is nothing to light. */
-.screen-bloom,
+.key-bloom,
 .lamp-bloom,
 .phone-bloom,
 .candle .flame path,
@@ -91,11 +91,9 @@
    Amplitude is deliberately tiny — alive, not strobing. */
 .screen {
   animation: screen-breathe 9s var(--ease-in-out) infinite, screen-flicker 13s linear infinite;
-  transform-origin: 1046px 506px;
 }
-.screen-bloom {
+.key-bloom {
   animation: bloom-breathe 9s var(--ease-in-out) infinite;
-  transform-origin: 1046px 504px;
 }
 @keyframes screen-breathe {
   0%, 100% { opacity: 1; }
@@ -118,11 +116,6 @@
 /* The lamp breathes a little warmer and back. */
 .lamp-bloom {
   animation: lamp-breathe 11s var(--ease-in-out) infinite;
-  transform-origin: 486px 382px;
-}
-.lamp-cone {
-  animation: lamp-breathe 11s var(--ease-in-out) infinite;
-  transform-origin: 486px 500px;
 }
 @keyframes lamp-breathe {
   0%, 100% { opacity: 1; }
@@ -159,10 +152,10 @@
   animation: rain-fall linear infinite;
 }
 @keyframes rain-fall {
-  0%   { opacity: 0; transform: translate3d(0, -40px, 0); }
-  8%   { opacity: 0.5; }
-  88%  { opacity: 0.5; }
-  100% { opacity: 0; transform: translate3d(-30px, 330px, 0); }
+  0%   { opacity: 0; transform: translate3d(0, 0, 0); }
+  8%   { opacity: 0.55; }
+  88%  { opacity: 0.55; }
+  100% { opacity: 0; transform: translate3d(-34px, 440px, 0); }
 }
 
 /* Drops clinging to the glass: they hang, then break and run down fast,
@@ -216,7 +209,7 @@
 /* The phone's notification pulse — the only accent-coloured motion at rest. */
 .notif-dot {
   animation: notif-pulse 4.5s var(--ease-out) infinite;
-  transform-origin: 1288px 590px;
+  transform-origin: 714px 538px;
 }
 @keyframes notif-pulse {
   0%, 70%, 100% { opacity: 0.85; transform: scale(1); }
@@ -232,6 +225,15 @@
   fill: rgba(95, 231, 224, 0.05);
   stroke: var(--c-accent);
   stroke-width: 2;
+}
+
+/* The quality guard measured this machine struggling. Same composition, same
+   motion — without the filters that cost the most and add the least at speed. */
+.room.is-lite .paintable {
+  filter: none;
+}
+.room.is-lite .grain {
+  display: none;
 }
 
 /* -------- Wall texture ----------------------------------------------------
@@ -537,9 +539,8 @@
    pulses or parallaxes stops. */
 @media (prefers-reduced-motion: reduce) {
   .screen,
-  .screen-bloom,
+  .key-bloom,
   .lamp-bloom,
-  .lamp-cone,
   .door-leak,
   .dust,
   .raindrop,

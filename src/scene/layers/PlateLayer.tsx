@@ -68,11 +68,9 @@ export function PlateLayer({ lampOn }: Props) {
       {plateLights.map((l) => {
         if (!lampOn && l.kind === 'warm') return null;
         const fill =
-          l.kind === 'screen'
-            ? 'url(#g-screen-bloom)'
-            : l.kind === 'warm'
-              ? 'url(#g-lamp-bloom)'
-              : 'url(#g-screen-bloom)';
+          l.kind === 'warm' ? 'url(#g-candle-bloom)'
+          : l.kind === 'screen' ? 'url(#g-key-bloom)'
+          : 'url(#g-cool-bloom)';
         return (
           <ellipse
             key={l.id}
@@ -83,7 +81,7 @@ export function PlateLayer({ lampOn }: Props) {
             fill={fill}
             opacity={l.intensity}
             filter="url(#f-bloom-lg)"
-            className={l.kind === 'screen' ? 'screen-bloom' : 'lamp-bloom'}
+            className={l.kind === 'screen' ? 'key-bloom' : 'lamp-bloom'}
             style={{ transformOrigin: `${l.cx}px ${l.cy}px` }}
           />
         );

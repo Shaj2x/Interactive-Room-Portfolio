@@ -76,11 +76,21 @@ parallax independently:
 
 | File | Layer | Depth | Contains |
 | --- | --- | --- | --- |
-| `scene/layers/WallLayer.tsx` | Wall | 0.15 | Window, corkboard, poster, sticky notes, door |
-| `scene/layers/FurnitureLayer.tsx` | Furniture | 0.35 | Bookshelf, desk, chair |
-| `scene/layers/DesktopLayer.tsx` | Desk objects | 0.55 | Lamp, mug, laptop, phone |
+| `scene/layers/WallLayer.tsx` | Wall | 0.15 | Corkboard, sticky notes, framed print, window and city, door |
+| `scene/layers/FurnitureLayer.tsx` | Furniture | 0.35 | Floor, bookshelf, desk, chair, bed, low shelf |
+| `scene/layers/CandleLayer.tsx` | Furniture | 0.35 | Three candles |
+| `scene/layers/DesktopLayer.tsx` | Desk objects | 0.55 | Laptop, mug, phone, lamp |
 | `scene/layers/PersonLayer.tsx` | Person | 0.85 | The seated silhouette |
 | `scene/layers/ForegroundLayer.tsx` | Foreground | 1.3 | Dust, blurred near edges |
+
+**Lighting hierarchy**, which every surface follows and `SceneDefs.tsx` defines:
+
+| | Source | Colour |
+| --- | --- | --- |
+| Key | The laptop | Warm cream to amber. The brightest thing in the frame. |
+| Warm | Candles, the strip under the door | Same family as key. |
+| Cool | The phone, the window | The only cool light — the contrast that stops the warm reading as a sepia wash. |
+| Accent | Interactive glow only | Cyan. Never decorative. |
 
 Higher depth = nearer the camera = moves more. The depths live in one place,
 `DEPTH` in `scene/hotspots.ts`.
@@ -119,6 +129,12 @@ affordable:
 - On portrait screens the painterly displacement is switched off
   (`.paintable { filter: none }`): the room renders about 220px tall there, so
   the detail is invisible while costing exactly as much.
+- **The page measures itself.** `hooks/useQualityGuard.ts` samples real frame
+  times once, shortly after the room settles, and drops to the lite path
+  (`.room.is-lite`) below 38fps. Screen size tells you nothing about rendering
+  power, so this measures instead of guessing. The lite path keeps the
+  composition, the lighting and every animation — it only sheds the filters
+  that cost the most and add the least at speed.
 
 Note that the measurements behind these choices were taken in a headless
 browser with **no GPU** (SwiftShader, software rasterisation). Blur and blend

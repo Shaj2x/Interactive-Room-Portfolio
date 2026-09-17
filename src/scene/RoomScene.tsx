@@ -14,6 +14,7 @@ import { Hotspot } from './Hotspot';
 import { HOTSPOTS, DEPTH, isTappableWhenCompact } from './hotspots';
 import { useParallax } from '../hooks/useParallax';
 import { useWarmFlicker } from '../hooks/useWarmFlicker';
+import { useQualityGuard } from '../hooks/useQualityGuard';
 import { screenLines, type SectionId } from '../content/profile';
 import './room.css';
 
@@ -41,6 +42,9 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
   // lamp easter egg, and off for reduced motion.
   useWarmFlicker(stageRef, { disabled: reducedMotion || !lampOn });
 
+  // Measured, not guessed: screen size says nothing about rendering power.
+  const lite = useQualityGuard({ enabled: !reducedMotion && !compact });
+
   // The laptop cycles a line of its own text. Slow on purpose: it should be
   // something you notice on the second look, not a ticker.
   useEffect(() => {
@@ -58,6 +62,7 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
         'room',
         dimmed ? 'is-dimmed' : '',
         lampOn ? '' : 'is-lampless',
+        lite ? 'is-lite' : '',
         reducedMotion ? 'is-still' : '',
       ]
         .filter(Boolean)

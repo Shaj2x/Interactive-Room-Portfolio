@@ -1,139 +1,162 @@
 /**
- * Back wall, depth 0.15 — the furthest plane, so it moves least under parallax.
- * Carries four hotspot objects (corkboard, poster, sticky notes, door) plus the
- * window, which is ambient only and deliberately not clickable.
+ * The back wall, depth 0.15 — furthest plane, so it takes the least parallax.
+ *
+ * Composition, left to right: corkboard, sticky notes, the framed print above
+ * the bookshelf, the window onto the city, and the strip of warm light at the
+ * door. Four of those are hotspots; the window is ambient only.
  */
 
-const POLAROIDS = [
-  { x: 560, y: 108, w: 62, h: 74, r: -6 },
-  { x: 640, y: 120, w: 58, h: 70, r: 4 },
-  { x: 712, y: 106, w: 64, h: 76, r: -3 },
-  { x: 572, y: 198, w: 60, h: 72, r: 5 },
-  { x: 654, y: 206, w: 56, h: 66, r: -4 },
-  { x: 726, y: 196, w: 58, h: 70, r: 7 },
+/* Pinned to the corkboard. Kept to the left of the figure's head so the
+   hotspot is never behind him. */
+const PINNED = [
+  { x: 26, y: 52, w: 64, h: 78, r: -5, tint: '#2b3540' },
+  { x: 104, y: 44, w: 58, h: 72, r: 4, tint: '#3a2f28' },
+  { x: 176, y: 58, w: 62, h: 76, r: -3, tint: '#2e3a34' },
+  { x: 20, y: 156, w: 70, h: 84, r: 3, tint: '#38302a' },
+  { x: 106, y: 168, w: 60, h: 74, r: -6, tint: '#2a323c' },
+  { x: 180, y: 160, w: 58, h: 70, r: 5, tint: '#3b3128' },
 ];
 
 const STICKIES = [
-  { x: 1142, y: 152, s: 56, r: -5, fill: '#2a3b2e' },
-  { x: 1214, y: 160, s: 52, r: 6, fill: '#3a3526' },
-  { x: 1150, y: 224, s: 54, r: 4, fill: '#33302a' },
-  { x: 1222, y: 234, s: 50, r: -7, fill: '#26343c' },
+  { x: 322, y: 126, s: 54, r: -5, fill: '#3b3620' },
+  { x: 388, y: 136, s: 50, r: 6, fill: '#34301c' },
+  { x: 330, y: 194, s: 52, r: 4, fill: '#383322' },
+  { x: 394, y: 202, s: 48, r: -7, fill: '#2f2b1e' },
 ];
 
-/** Distant windows in the buildings outside. Fixed seed, so no layout jitter. */
-const CITY = [
-  [148, 286], [172, 254], [206, 300], [232, 268], [268, 312],
-  [292, 246], [318, 292], [346, 262], [368, 306], [196, 330],
-  [252, 342], [330, 336], [128, 318], [386, 274],
+/* The city. Buildings first, then lit windows over them — warm and cool
+   mixed, because a skyline all one temperature reads as a texture. */
+const TOWERS = [
+  { x: 902, w: 58, top: 176 }, { x: 966, w: 42, top: 132 },
+  { x: 1012, w: 66, top: 206 }, { x: 1082, w: 38, top: 98 },
+  { x: 1124, w: 54, top: 162 }, { x: 1182, w: 46, top: 122 },
+  { x: 1232, w: 62, top: 190 }, { x: 938, w: 24, top: 108 },
+  { x: 1160, w: 18, top: 86 }, { x: 1296, w: 40, top: 152 },
 ];
 
-/* Falling rain seen through the glass. Deterministic table, but the durations
-   and delays are spread so no two drops ever line up into a visible rhythm. */
-const RAIN = Array.from({ length: 46 }, (_, i) => ({
-  x: 116 + ((i * 53) % 276),
-  delay: (i * 0.29) % 5.1,
-  dur: 1.5 + ((i * 17) % 23) / 10,
-  len: 18 + ((i * 13) % 34),
-  w: 0.9 + ((i * 7) % 5) / 5,
+const CITY_LIGHTS = Array.from({ length: 86 }, (_, i) => {
+  const t = TOWERS[i % TOWERS.length];
+  const col = i % 7;
+  return {
+    x: t.x + 5 + ((i * 13) % Math.max(1, t.w - 12)),
+    y: t.top + 10 + ((i * 29) % 190),
+    w: 3 + ((i * 5) % 4),
+    h: 2 + ((i * 3) % 3),
+    fill: col < 3 ? '#ffb861' : col < 5 ? '#cfe4f5' : col === 5 ? '#7fb8e8' : '#ff8d4a',
+    o: 0.55 + ((i * 7) % 45) / 100,
+    delay: (i * 0.31) % 7,
+  };
+});
+
+const RAIN = Array.from({ length: 44 }, (_, i) => ({
+  x: 902 + ((i * 59) % 396),
+  delay: (i * 0.27) % 4.8,
+  dur: 1.3 + ((i * 17) % 21) / 10,
+  len: 20 + ((i * 13) % 40),
+  w: 0.8 + ((i * 7) % 5) / 5,
 }));
 
-/* Drops sitting on the glass, which slide and then run. These read as "rain on
-   the window" far more than falling lines do. */
-const RUNNELS = Array.from({ length: 14 }, (_, i) => ({
-  x: 126 + ((i * 71) % 258),
-  y: 132 + ((i * 47) % 220),
-  r: 1.8 + ((i * 11) % 7) / 3,
-  delay: (i * 0.83) % 9,
+const RUNNELS = Array.from({ length: 12 }, (_, i) => ({
+  x: 914 + ((i * 73) % 376),
+  y: 30 + ((i * 47) % 250),
+  r: 1.7 + ((i * 11) % 7) / 3,
+  delay: (i * 0.91) % 9,
   dur: 5 + ((i * 19) % 41) / 5,
 }));
 
 export function WallLayer() {
   return (
     <g id="layer-wall">
-      {/* ---- Wall and floor -------------------------------------------------
-          Built up in passes rather than as one fill: base, plaster grain,
-          uneven paint, then the light pools brushed over the top. */}
-      <rect x="0" y="0" width="1600" height="690" fill="url(#g-wall)" />
+      <rect x="0" y="0" width="1600" height="700" fill="url(#g-wall)" />
+      <rect x="0" y="688" width="1600" height="212" fill="url(#g-floor)" />
 
-      {/* Uneven paint. Plain blurred shapes, not turbulence: the plaster grain
-          that used to be a full-screen SVG filter here now lives in
-          <WallTexture>, as a static composited layer. Running turbulence and
-          displacement across 1600x900 inside a layer whose transform changes
-          every frame cost about 45fps. */}
-      <g filter="url(#f-dof)" opacity="0.55">
-        <ellipse cx="300" cy="230" rx="330" ry="220" fill="#241a12" />
-        <ellipse cx="900" cy="150" rx="420" ry="190" fill="#11151b" />
-        <ellipse cx="1290" cy="330" rx="300" ry="260" fill="#1a1510" />
-        <ellipse cx="640" cy="520" rx="380" ry="200" fill="#2a1d12" />
+      {/* Uneven paint. The fine plaster grain is <WallTexture>, a composited
+          layer — as an SVG filter it was re-rasterised on every parallax frame. */}
+      <g filter="url(#f-dof)" opacity="0.5">
+        <ellipse cx="240" cy="260" rx="330" ry="240" fill="#2a1d12" />
+        <ellipse cx="700" cy="180" rx="360" ry="200" fill="#16120e" />
+        <ellipse cx="1180" cy="440" rx="380" ry="240" fill="#0f1319" />
+        <ellipse cx="520" cy="560" rx="340" ry="190" fill="#31220f" />
       </g>
 
-      {/* Where wall meets ceiling and floor, light falls off. Gradients, not
-          blurred rectangles — a blurred rectangle still ends somewhere, and
-          that edge reads as a bar across the frame. */}
-      <rect x="0" y="0" width="1600" height="210" fill="url(#g-ceiling-fall)" />
-      <rect x="0" y="470" width="1600" height="220" fill="url(#g-floor-fall)" />
+      {/* The key light, thrown back onto the wall from the laptop. */}
+      <ellipse
+        cx="520"
+        cy="430"
+        rx="400"
+        ry="290"
+        fill="url(#g-key-bloom)"
+        opacity="0.42"
+        filter="url(#f-bloom-lg)"
+        className="key-bloom"
+      />
 
-      <rect x="0" y="686" width="1600" height="214" fill="url(#g-floor)" />
-      {/* Floorboards, barely there — enough to stop the floor reading as a slab. */}
-      <g opacity="0.3">
-        {[706, 742, 786, 840].map((y) => (
-          <path
-            key={y}
-            d={`M0 ${y} L1600 ${y - 6}`}
-            stroke="#231d18"
-            strokeWidth="2.5"
-          />
+      {/* ---------------- Corkboard → About -------------------------------- */}
+      <g id="obj-corkboard" className="paintable" filter="url(#f-paint)">
+        <rect x="4" y="22" width="296" height="330" rx="4" fill="url(#g-cork)" />
+        <rect x="4" y="22" width="296" height="330" rx="4" fill="none" stroke="#3f2b16" strokeWidth="11" />
+        {PINNED.map((p, i) => (
+          <g key={i} transform={`rotate(${p.r} ${p.x + p.w / 2} ${p.y + p.h / 2})`}>
+            <rect x={p.x} y={p.y} width={p.w} height={p.h} fill="#161311" />
+            <rect x={p.x + 5} y={p.y + 5} width={p.w - 10} height={p.h - 22} fill={p.tint} />
+            <circle cx={p.x + p.w / 2} cy={p.y + 4} r="3" fill="#8a6134" />
+          </g>
         ))}
       </g>
-      <rect x="0" y="664" width="1600" height="24" fill="#0b0c10" />
-      <rect x="0" y="664" width="1600" height="2" fill="#2a2620" opacity="0.6" />
 
-      {/* Candlelight on the walls. Flickers with the candles, via data-warm. */}
-      <rect
-        x="0"
-        y="0"
-        width="1600"
-        height="900"
-        fill="url(#g-warm-wash)"
-        data-warm="0.85"
-        data-warm-swing="0.1"
-      />
+      {/* ---------------- Sticky notes → Leadership ------------------------ */}
+      <g id="obj-stickies" className="paintable" filter="url(#f-paint)">
+        {STICKIES.map((s, i) => (
+          <g key={i} transform={`rotate(${s.r} ${s.x + s.s / 2} ${s.y + s.s / 2})`}>
+            <rect x={s.x} y={s.y} width={s.s} height={s.s} fill={s.fill} />
+            <line x1={s.x + 9} y1={s.y + 18} x2={s.x + s.s - 9} y2={s.y + 18} stroke="#8d7f5e" strokeWidth="2" opacity="0.45" />
+            <line x1={s.x + 9} y1={s.y + 30} x2={s.x + s.s - 16} y2={s.y + 30} stroke="#8d7f5e" strokeWidth="2" opacity="0.3" />
+          </g>
+        ))}
+      </g>
 
-      {/* Pool of screen light thrown onto the wall behind the desk. */}
-      <ellipse
-        cx="1040"
-        cy="470"
-        rx="470"
-        ry="300"
-        fill="url(#g-screen-bloom)"
-        opacity="0.5"
-        filter="url(#f-bloom-lg)"
-        className="screen-bloom"
-      />
+      {/* ---------------- Framed print → Projects --------------------------- */}
+      <g id="obj-poster" className="paintable" filter="url(#f-paint)">
+        <rect x="608" y="18" width="192" height="146" fill="#0f0c0a" />
+        <rect x="608" y="18" width="192" height="146" fill="none" stroke="#241a11" strokeWidth="9" />
+        <rect x="624" y="22" width="160" height="134" fill="#141c26" />
+        {/* A warm figure in a dark field — the print reads at a glance. */}
+        <ellipse cx="704" cy="82" rx="34" ry="40" fill="#c8912f" opacity="0.75" />
+        <path d="M660 156 C668 118 686 102 704 102 C722 102 740 118 748 156 Z" fill="#1d1c1a" />
+      </g>
 
-      {/* ---------------- Window (ambient only, not a hotspot) ------------- */}
-      <g id="obj-window" className="paintable" filter="url(#f-paint)">
-        <rect x="110" y="120" width="290" height="300" rx="4" fill="url(#g-window)" />
-        <g className="rain-group">
-          {CITY.map(([cx, cy], i) => (
-            <circle
-              key={i}
-              cx={cx}
-              cy={cy}
-              r={1.6}
-              fill="#8fd2f5"
-              opacity="0.5"
+      {/* ---------------- Window (ambient only) ----------------------------- */}
+      <g id="obj-window">
+        <rect x="898" y="24" width="404" height="376" fill="url(#g-sky)" />
+        <g clipPath="url(#clip-window)">
+          <clipPath id="clip-window">
+            <rect x="898" y="24" width="404" height="376" />
+          </clipPath>
+          {TOWERS.map((t, i) => (
+            <rect key={i} x={t.x} y={t.top + 24} width={t.w} height={400 - t.top} fill="#0a1018" opacity="0.95" />
+          ))}
+          {CITY_LIGHTS.map((c, i) => (
+            <rect
+              key={`c${i}`}
+              x={c.x}
+              y={c.y + 24}
+              width={c.w}
+              height={c.h}
+              fill={c.fill}
+              opacity={c.o}
               className="city-light"
-              style={{ animationDelay: `${(i * 0.7) % 5}s` }}
+              style={{ animationDelay: `${c.delay}s` }}
             />
           ))}
+          {/* Haze over the city, so it sits behind glass rather than on it. */}
+          <rect x="898" y="150" width="404" height="250" fill="#1b2632" opacity="0.22" filter="url(#f-bloom-lg)" />
           {RAIN.map((d, i) => (
             <line
-              key={i}
+              key={`r${i}`}
               x1={d.x}
-              y1="118"
+              y1="-40"
               x2={d.x - 7}
-              y2={118 + d.len}
+              y2={-40 + d.len}
               stroke="url(#g-raindrop)"
               strokeWidth={d.w}
               strokeLinecap="round"
@@ -143,7 +166,7 @@ export function WallLayer() {
           ))}
           {RUNNELS.map((d, i) => (
             <circle
-              key={`r${i}`}
+              key={`u${i}`}
               cx={d.x}
               cy={d.y}
               r={d.r}
@@ -153,154 +176,46 @@ export function WallLayer() {
             />
           ))}
         </g>
-        {/* Frame and mullions */}
-        <rect
-          x="110"
-          y="120"
-          width="290"
-          height="300"
-          rx="4"
-          fill="none"
-          stroke="#16242f"
-          strokeWidth="9"
-        />
-        <line x1="255" y1="120" x2="255" y2="420" stroke="#16242f" strokeWidth="7" />
-        <line x1="110" y1="270" x2="400" y2="270" stroke="#16242f" strokeWidth="7" />
-        <rect x="104" y="414" width="302" height="14" rx="3" fill="#191a1c" />
-        {/* Curtains, drawn back — they frame the window and darken the corners. */}
-        <path d="M78 104 L150 104 C132 200 134 320 152 436 L78 436 Z" fill="#0d1116" />
-        <path d="M360 104 L432 104 L432 436 L358 436 C376 320 378 200 360 104 Z" fill="#0d1116" />
-        <path d="M78 104 L112 104 C100 210 102 330 114 436 L78 436 Z" fill="#12171d" opacity="0.8" />
-        <path d="M398 104 L432 104 L432 436 L396 436 C408 330 410 210 398 104 Z" fill="#12171d" opacity="0.8" />
-        <rect x="86" y="96" width="338" height="7" rx="3.5" fill="#15171a" />
+
+        {/* Frame, mullions and sill */}
+        <rect x="898" y="24" width="404" height="376" fill="none" stroke="#1c1814" strokeWidth="10" />
+        <line x1="1100" y1="24" x2="1100" y2="400" stroke="#1c1814" strokeWidth="8" />
+        <line x1="898" y1="220" x2="1302" y2="220" stroke="#1c1814" strokeWidth="8" />
+        <rect x="886" y="394" width="430" height="20" rx="3" fill="#231c15" />
+        {/* The window's cool spill onto the wall below it. */}
+        <ellipse cx="1100" cy="454" rx="260" ry="120" fill="url(#g-cool-bloom)" opacity="0.3" filter="url(#f-bloom-lg)" />
+
+        {/* Curtains, drawn back, heavy. */}
+        <path d="M852 12 L944 12 C922 142 926 280 948 448 L852 448 Z" fill="url(#g-curtain)" />
+        <path d="M1256 12 L1352 12 L1352 448 L1252 448 C1276 280 1280 142 1256 12 Z" fill="url(#g-curtain)" />
+        <rect x="846" y="10" width="512" height="14" fill="#15110d" />
       </g>
 
-      {/* ---------------- Corkboard → About -------------------------------- */}
-      <g id="obj-corkboard" className="paintable" filter="url(#f-paint)">
-        <rect x="536" y="84" width="268" height="220" rx="5" fill="#1b1813" />
-        <rect
-          x="536"
-          y="84"
-          width="268"
-          height="220"
-          rx="5"
-          fill="none"
-          stroke="#2a2419"
-          strokeWidth="7"
-        />
-        {POLAROIDS.map((p, i) => (
-          <g key={i} transform={`rotate(${p.r} ${p.x + p.w / 2} ${p.y + p.h / 2})`}>
-            <rect x={p.x} y={p.y} width={p.w} height={p.h} fill="#1d2731" />
-            <rect
-              x={p.x + 5}
-              y={p.y + 5}
-              width={p.w - 10}
-              height={p.h - 20}
-              fill="#25333f"
-              opacity="0.95"
-            />
-            <circle cx={p.x + p.w / 2} cy={p.y + 4} r="3" fill="#4d6070" />
-          </g>
-        ))}
-      </g>
-
-      {/* ---------------- Poster frame → Projects -------------------------- */}
-      <g id="obj-poster" className="paintable" filter="url(#f-paint)">
-        <rect x="876" y="86" width="208" height="248" rx="3" fill="#0d151d" />
-        <rect
-          x="876"
-          y="86"
-          width="208"
-          height="248"
-          rx="3"
-          fill="none"
-          stroke="#1c2a36"
-          strokeWidth="8"
-        />
-        <rect x="894" y="104" width="172" height="212" fill="#101b25" />
-        {/* Six marks on the print — one per shipped project. */}
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <rect
-            key={i}
-            x={910 + (i % 2) * 74}
-            y={122 + Math.floor(i / 2) * 62}
-            width="62"
-            height="46"
-            rx="2"
-            fill="#1b2d3c"
-            opacity={0.55 + i * 0.05}
-          />
-        ))}
-        <line x1="910" y1="292" x2="1050" y2="292" stroke="#2b4759" strokeWidth="2" />
-      </g>
-
-      {/* ---------------- Sticky notes → Leadership ------------------------ */}
-      <g id="obj-stickies" className="paintable" filter="url(#f-paint)">
-        {STICKIES.map((s, i) => (
-          <g key={i} transform={`rotate(${s.r} ${s.x + s.s / 2} ${s.y + s.s / 2})`}>
-            <rect x={s.x} y={s.y} width={s.s} height={s.s} fill={s.fill} />
-            <line
-              x1={s.x + 9}
-              y1={s.y + 18}
-              x2={s.x + s.s - 9}
-              y2={s.y + 18}
-              stroke="#5d7086"
-              strokeWidth="2"
-              opacity="0.5"
-            />
-            <line
-              x1={s.x + 9}
-              y1={s.y + 30}
-              x2={s.x + s.s - 16}
-              y2={s.y + 30}
-              stroke="#5d7086"
-              strokeWidth="2"
-              opacity="0.35"
-            />
-          </g>
-        ))}
-      </g>
-
-      {/* ---------------- Door → Résumé ------------------------------------ */}
-      <g id="obj-door" className="paintable" filter="url(#f-paint)">
-        <rect x="1338" y="24" width="264" height="676" fill="#0a121a" />
-        <rect
-          x="1338"
-          y="24"
-          width="264"
-          height="676"
-          fill="none"
-          stroke="#16232e"
-          strokeWidth="10"
-        />
-        <rect x="1372" y="72" width="94" height="240" rx="3" fill="#0d1721" />
-        <rect x="1490" y="72" width="94" height="240" rx="3" fill="#0d1721" />
-        <rect x="1372" y="356" width="94" height="288" rx="3" fill="#0d1721" />
-        <rect x="1490" y="356" width="94" height="288" rx="3" fill="#0d1721" />
-        <circle cx="1360" cy="386" r="9" fill="#2a3b48" />
-        {/* Warm light leaking under the door — the room's second light source. */}
-        <rect
-          x="1330"
-          y="644"
-          width="278"
-          height="56"
-          fill="url(#g-doorleak)"
-          data-warm="0.95"
-          data-warm-swing="0.12"
-        />
-        <rect x="1330" y="690" width="278" height="8" fill="#ffc287" data-warm="0.55" data-warm-swing="0.14" />
+      {/* ---------------- Door → Résumé ------------------------------------- */}
+      <g id="obj-door">
+        {/* The door itself is almost entirely in shadow; what you actually see
+            is the light escaping around its edge. */}
+        <rect x="1404" y="0" width="196" height="790" fill="#080706" />
+        <rect x="1448" y="0" width="30" height="778" fill="url(#g-doorstrip)" data-warm="0.9" data-warm-swing="0.14" />
+        <rect x="1459" y="0" width="7" height="778" fill="#ffe0b4" data-warm="0.95" data-warm-swing="0.14" />
         <ellipse
-          cx="1478"
-          cy="706"
-          rx="168"
-          ry="34"
-          fill="url(#g-lamp-bloom)"
+          cx="1463"
+          cy="400"
+          rx="120"
+          ry="420"
+          fill="url(#g-candle-bloom)"
           filter="url(#f-bloom-lg)"
           className="lamp-bloom"
-          data-warm="0.32"
+          data-warm="0.5"
           data-warm-swing="0.16"
         />
+        <rect x="1478" y="0" width="122" height="790" fill="#0a0908" />
       </g>
+
+      {/* Edge falloff. */}
+      <rect x="0" y="0" width="1600" height="200" fill="url(#g-ceiling-fall)" />
+      <rect x="0" y="470" width="1600" height="230" fill="url(#g-floor-fall)" />
+      <rect x="0" y="0" width="180" height="900" fill="url(#g-side-fall)" opacity="0.5" />
     </g>
   );
 }

@@ -26,12 +26,12 @@ interface Candle {
 }
 
 const CANDLES: Candle[] = [
-  // On the bookshelf, top shelf.
-  { id: 'shelf', x: 246, y: 560, h: 46, w: 17, glow: 128, warm: 0.5, dur: 3.1 },
-  // On the desk, left of the person, catching the edge of the surface.
-  { id: 'desk', x: 468, y: 624, h: 62, w: 21, glow: 186, warm: 0.62, dur: 2.3 },
-  // A short one on the windowsill, far left, mostly bloom.
-  { id: 'sill', x: 150, y: 414, h: 30, w: 15, glow: 104, warm: 0.4, dur: 4.7 },
+  // On the bookshelf's middle shelf, beside the framed photo.
+  { id: 'shelf', x: 692, y: 366, h: 40, w: 15, glow: 118, warm: 0.46, dur: 3.1 },
+  // On the desk, right of the mug, at the near edge.
+  { id: 'desk', x: 776, y: 556, h: 54, w: 19, glow: 168, warm: 0.56, dur: 2.3 },
+  // On the low shelf far left — mostly bloom, it lifts the dark corner.
+  { id: 'low', x: 96, y: 512, h: 34, w: 16, glow: 126, warm: 0.42, dur: 4.7 },
 ];
 
 export function CandleLayer() {

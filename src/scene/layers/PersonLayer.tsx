@@ -1,84 +1,80 @@
 /**
- * The person at the desk. Depth 0.85 — nearest of the drawn subjects, so it
- * takes the most parallax. Drawn as a silhouette with a screen-blue rim light
- * on the side facing the laptop: the figure should read as a shape, not a
- * portrait. Not interactive.
+ * The figure at the desk. Depth 0.85 — nearest of the drawn subjects, so it
+ * takes the most parallax.
+ *
+ * Left of centre and large in frame, seen from behind, curly hair. It stays a
+ * near-flat silhouette on purpose: lit from in front by the laptop, that is
+ * genuinely what you would see, and painting folds into it only produced
+ * lighter patches that read as blocks. The rim light does the work.
  */
 export function PersonLayer() {
   return (
     <g id="layer-person" className="paintable" filter="url(#f-paint-fine)">
-      {/* Body: shoulders and back, cut off by the bottom of the frame. */}
+      {/* Shoulders and back, cut off by the bottom of the frame. */}
       <path
-        d="M604 436 C566 452 542 500 538 548 L532 900 L812 900 L806 566
-           C802 512 780 462 740 438 Z"
-        fill="#05090e"
+        d="M292 382 C214 400 150 456 132 540 L104 900 L470 900 L452 548
+           C436 462 384 404 318 384 Z"
+        fill="#08070a"
       />
-      {/* Arm reaching toward the laptop. Stroked, not filled: a round cap
-          gives a hand and a natural taper that a filled wedge cannot. */}
+      {/* Arm reaching to the keyboard. Stroked, not filled: a round cap gives a
+          hand and a natural taper that a filled wedge never will. */}
       <path
-        d="M734 498 C800 514 856 558 890 606"
+        d="M392 470 C440 492 482 522 512 556"
         fill="none"
-        stroke="#05090e"
-        strokeWidth="56"
+        stroke="#08070a"
+        strokeWidth="62"
         strokeLinecap="round"
       />
-      {/* Head */}
-      <ellipse cx="672" cy="376" rx="54" ry="62" fill="#05090e" />
-      {/* Neck */}
-      <rect x="648" y="424" width="48" height="30" fill="#05090e" />
+      {/* Head and curls. The silhouette is built from overlapping lobes so the
+          outline is irregular the way hair is, not a clean ellipse. */}
+      <ellipse cx="302" cy="300" rx="72" ry="78" fill="#08070a" />
+      {[
+        [250, 254, 28], [280, 230, 31], [318, 224, 33], [352, 246, 28],
+        [366, 282, 25], [242, 306, 23], [264, 222, 21], [340, 218, 23],
+      ].map(([cx, cy, r], i) => (
+        <circle key={i} cx={cx} cy={cy} r={r} fill="#08070a" />
+      ))}
+      <rect x="272" y="358" width="60" height="42" fill="#08070a" />
 
-      {/* No internal shading. Lit from behind by the screen, a figure at a desk
-          really is a near-flat shape; painting folds into it only produced
-          lighter patches that read as blocks. The rim light does the work. */}
-
-      {/* Rim light — right side only, thrown by the screen. */}
+      {/* Rim light. The key is warm and in front-right of him, so the warm edge
+          runs down the side facing the laptop. */}
       <path
-        d="M716 344 C736 362 740 400 728 428"
+        d="M366 232 C392 256 400 300 386 340"
         fill="none"
-        stroke="#bfe4ff"
+        stroke="#ffd9a4"
         strokeWidth="5"
         strokeLinecap="round"
-        opacity="0.5"
+        opacity="0.42"
         filter="url(#f-soft)"
       />
       <path
-        d="M742 442 C776 466 796 512 802 566 L806 640"
-        fill="none"
-        stroke="#8fd2f5"
-        strokeWidth="4.5"
-        strokeLinecap="round"
-        opacity="0.38"
-        filter="url(#f-soft)"
-      />
-      <path
-        d="M846 556 C872 576 886 592 898 610"
-        fill="none"
-        stroke="#bfe4ff"
-        strokeWidth="4"
-        strokeLinecap="round"
-        opacity="0.4"
-        filter="url(#f-soft)"
-      />
-      {/* A trace of the warm lamp on the far shoulder, for contrast. */}
-      <path
-        d="M604 438 C572 458 550 494 542 534 C536 570 534 606 534 640"
-        fill="none"
-        stroke="#ffb567"
-        strokeWidth="5"
-        strokeLinecap="round"
-        filter="url(#f-soft)"
-        data-warm="0.34"
-        data-warm-swing="0.3"
-      />
-      <path
-        d="M632 330 C608 342 596 362 594 386"
+        d="M392 372 C428 400 448 460 452 548 L456 640"
         fill="none"
         stroke="#ffcb92"
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.34"
+        filter="url(#f-soft)"
+      />
+      <path
+        d="M462 528 C486 542 502 552 514 562"
+        fill="none"
+        stroke="#ffe7c6"
         strokeWidth="4"
         strokeLinecap="round"
+        opacity="0.36"
         filter="url(#f-soft)"
-        data-warm="0.28"
-        data-warm-swing="0.3"
+      />
+      {/* A trace of the window's cool light on the far shoulder — the only
+          thing separating his back edge from the wall behind it. */}
+      <path
+        d="M214 404 C176 432 148 484 138 546"
+        fill="none"
+        stroke="#9fc9e8"
+        strokeWidth="4"
+        strokeLinecap="round"
+        opacity="0.13"
+        filter="url(#f-soft)"
       />
     </g>
   );
