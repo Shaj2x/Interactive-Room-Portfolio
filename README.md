@@ -78,7 +78,7 @@ parallax independently:
 | --- | --- | --- | --- |
 | `scene/layers/WallLayer.tsx` | Wall | 0.15 | Corkboard, sticky notes, framed print, window and city, door |
 | `scene/layers/FurnitureLayer.tsx` | Furniture | 0.35 | Floor, bookshelf, desk, chair, bed, low shelf |
-| `scene/layers/CandleLayer.tsx` | Furniture | 0.35 | Three candles |
+| `scene/layers/CandleLayer.tsx` | Furniture | 0.35 | Two candles |
 | `scene/layers/DesktopLayer.tsx` | Desk objects | 0.55 | Laptop, mug, phone, lamp |
 | `scene/layers/PersonLayer.tsx` | Person | 0.85 | The seated silhouette |
 | `scene/layers/ForegroundLayer.tsx` | Foreground | 1.3 | Dust, blurred near edges |

@@ -27,11 +27,9 @@ interface Candle {
 
 const CANDLES: Candle[] = [
   // On the bookshelf's middle shelf, beside the framed photo.
-  { id: 'shelf', x: 692, y: 366, h: 40, w: 15, glow: 118, warm: 0.46, dur: 3.1 },
+  { id: 'shelf', x: 728, y: 428, h: 36, w: 14, glow: 110, warm: 0.4, dur: 3.1 },
   // On the desk, right of the mug, at the near edge.
-  { id: 'desk', x: 776, y: 556, h: 54, w: 19, glow: 168, warm: 0.56, dur: 2.3 },
-  // On the low shelf far left — mostly bloom, it lifts the dark corner.
-  { id: 'low', x: 96, y: 512, h: 34, w: 16, glow: 126, warm: 0.42, dur: 4.7 },
+  { id: 'desk', x: 812, y: 636, h: 48, w: 18, glow: 152, warm: 0.5, dur: 2.3 },
 ];
 
 export function CandleLayer() {
