@@ -7,7 +7,10 @@
 .section-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  /* Above the signature (45) and the compact section list (46), which are room
+     furniture and were showing through — and on a phone, straight across an
+     open panel. Still below the menu button (50), which stays reachable. */
+  z-index: 48;
   display: grid;
   place-items: center;
   padding: clamp(0px, 3vw, 48px);

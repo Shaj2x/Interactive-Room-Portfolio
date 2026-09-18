@@ -1,0 +1,286 @@
+/* -----------------------------------------------------------------------------
+   The arcade. Dark glass, thin rules, amber for the player and teal for the
+   system — the same language as the room, not a game library.
+----------------------------------------------------------------------------- */
+
+.arcade {
+  display: grid;
+  grid-template-columns: minmax(210px, 264px) 1fr;
+  gap: clamp(16px, 2.2vw, 28px);
+  margin: 28px 0 8px;
+  align-items: start;
+}
+
+/* -------- Cabinet list ------------------------------------------------------ */
+.arc-cabinets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.arc-cabinet {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid rgba(143, 210, 245, 0.11);
+  border-left: 2px solid transparent;
+  border-radius: 9px;
+  background: rgba(7, 12, 19, 0.6);
+  color: var(--c-text);
+  transition:
+    background-color var(--d-ui) var(--ease-out),
+    border-color var(--d-ui) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .arc-cabinet:hover { background: rgba(16, 30, 44, 0.72); border-color: rgba(95, 231, 224, 0.3); }
+}
+.arc-cabinet.is-active {
+  border-left-color: var(--c-amber);
+  background: linear-gradient(100deg, rgba(255, 181, 103, 0.09), rgba(9, 16, 25, 0.8) 62%);
+  border-color: rgba(255, 181, 103, 0.24);
+}
+
+.arc-cabinet-kind {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+.arc-cabinet.is-active .arc-cabinet-kind { color: var(--c-amber); }
+
+.arc-cabinet-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.12;
+  color: var(--c-screen-core);
+}
+.arc-cabinet-tag { font-size: 13px; line-height: 1.4; color: var(--c-text-dim); }
+
+.arc-cabinet-best {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--c-accent-dim);
+}
+
+/* -------- Stage ------------------------------------------------------------- */
+.arc-stage {
+  border: 1px solid rgba(95, 231, 224, 0.13);
+  border-radius: 12px;
+  background: linear-gradient(168deg, rgba(12, 22, 34, 0.78), rgba(4, 7, 12, 0.92));
+  overflow: hidden;
+  /* Switching cabinets re-keys this element, so the swap reads as a cut to a
+     new machine rather than a silent content change. */
+  animation: arc-stage-in 380ms var(--ease-out) both;
+}
+@keyframes arc-stage-in {
+  from { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.992); }
+  to   { opacity: 1; transform: none; }
+}
+
+.arc-stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid rgba(143, 210, 245, 0.1);
+}
+.arc-kind {
+  margin: 0 0 3px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.arc-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--c-screen-core);
+}
+
+/* -------- HUD --------------------------------------------------------------- */
+.arc-hud { display: flex; gap: 18px; margin: 0; flex-wrap: wrap; }
+.arc-hud-cell { text-align: right; }
+.arc-hud dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+.arc-hud dd {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+.arc-hud .tone-accent dd { color: var(--c-amber); }
+.arc-hud .tone-live dd { color: var(--c-accent); }
+
+/* -------- Canvas ------------------------------------------------------------ */
+.arc-canvas-wrap {
+  position: relative;
+  /* Shaped per game from its logical playfield (set inline by the stage), so a
+     court fills the stage rather than sitting in letterbox bands. This is the
+     fallback for the first paint. */
+  aspect-ratio: 16 / 10;
+  background: var(--c-void);
+}
+.arc-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The games claim drags and taps; the page must not scroll under them. */
+  touch-action: none;
+  outline: none;
+}
+.arc-canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--c-accent); }
+
+/* -------- Overlays ---------------------------------------------------------- */
+.arc-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: radial-gradient(ellipse at 50% 50%, rgba(4, 7, 12, 0.62), rgba(3, 5, 9, 0.88));
+  backdrop-filter: blur(2px);
+  animation: arc-overlay-in 260ms var(--ease-out) both;
+}
+@keyframes arc-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.arc-overlay-kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.arc-overlay-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--c-screen-core);
+}
+.arc-overlay-line {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--c-text-dim);
+}
+.arc-overlay-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 4px; }
+
+/* One accent per outcome: amber won it, teal came close, warm grey did not. */
+.arc-overlay-result.tone-win .arc-overlay-title { color: var(--c-amber); }
+.arc-overlay-result.tone-near .arc-overlay-title { color: var(--c-accent); }
+.arc-overlay-result.tone-loss .arc-overlay-title { color: #b6a99a; }
+
+/* -------- Controls ---------------------------------------------------------- */
+.arc-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 13px 18px 15px;
+  border-top: 1px solid rgba(143, 210, 245, 0.1);
+}
+.arc-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.arc-btn {
+  padding: 8px 15px;
+  border-radius: 7px;
+  border: 1px solid rgba(143, 210, 245, 0.2);
+  background: rgba(10, 18, 28, 0.85);
+  color: var(--c-text);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    background-color var(--d-hover) var(--ease-out),
+    border-color var(--d-hover) var(--ease-out),
+    transform 120ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .arc-btn:hover:not(:disabled) { border-color: var(--c-accent); background: rgba(18, 34, 50, 0.9); }
+}
+.arc-btn:active:not(:disabled) { transform: scale(0.98); }
+.arc-btn:disabled { opacity: 0.38; cursor: default; }
+
+.arc-btn.primary {
+  border-color: rgba(255, 181, 103, 0.45);
+  background: rgba(255, 181, 103, 0.12);
+  color: #ffd9ac;
+}
+@media (hover: hover) and (pointer: fine) {
+  .arc-btn.primary:hover { background: rgba(255, 181, 103, 0.2); border-color: var(--c-amber); }
+}
+.arc-btn.quiet { border-color: rgba(143, 210, 245, 0.12); color: var(--c-text-dim); }
+
+.arc-hint {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--c-text-faint);
+}
+
+/* -------- Narrow viewports -------------------------------------------------- */
+@media (max-width: 860px) {
+  .arcade { grid-template-columns: 1fr; }
+  .arc-cabinets {
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .arc-cabinet {
+    flex: 0 0 auto;
+    width: 62vw;
+    max-width: 260px;
+    scroll-snap-align: start;
+  }
+  .arc-stage-head { padding: 12px 14px 10px; }
+  .arc-hud { gap: 14px; }
+  .arc-hud dd { font-size: 15px; }
+  .arc-controls { padding: 12px 14px; }
+  .arc-hint { width: 100%; }
+}
+
+@media (max-width: 520px) {
+  .arc-cabinet-tag { display: none; }
+  .arc-buttons { width: 100%; }
+  .arc-btn { flex: 1 1 auto; text-align: center; }
+}
+
+/* -------- Reduced motion ---------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .arc-stage { animation: arc-overlay-in 180ms var(--ease-out) both; }
+  .arc-overlay { animation-duration: 120ms; }
+  .arc-btn:active:not(:disabled) { transform: none; }
+}

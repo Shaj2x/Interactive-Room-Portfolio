@@ -1,3 +1,4 @@
+import { Arcade } from '../arcade/Arcade';
 import { SectionShell } from './SectionShell';
 import {
   about,
@@ -242,18 +243,11 @@ function Play({ onClose }: { onClose: () => void }) {
     <SectionShell eyebrow="The mug" title="Play" onClose={onClose}>
       <section className="stagger">
         <p className="lede">{play.intro}</p>
-        <ul className="games">
-          {play.games.map((g) => (
-            <li key={g.name}>
-              <h3>{g.name}</h3>
-              <p>{g.how}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="body-lg quiet">
-          {play.note} <Out href={identity.sourcePortfolio}>Go and play them</Out>
-        </p>
       </section>
+
+      {/* Outside .stagger: the arcade runs its own entrance, and a staggered
+          fade on a live canvas fights the game's first frame. */}
+      <Arcade />
 
       <section className="stagger">
         <h2>Toolkit</h2>

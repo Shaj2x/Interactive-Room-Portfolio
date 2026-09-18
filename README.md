@@ -23,6 +23,15 @@ npm run preview
 
 ---
 
+## Companion documents
+
+| Document | What is in it |
+| --- | --- |
+| `STRUCTURE.md` | The arcade's architecture — where React stops and a game starts |
+| `PLAN.md` | Risks, what verification found, and the decisions worth knowing |
+| `ASSETS.md` | Room artwork, fonts, and the two assets the spec calls for that are not here |
+| `CLAUDE_ARCADE_REMAKE.md` | The original handoff specification, unedited |
+
 ## 1. Editing the content
 
 **`src/content/profile.ts` is the only file you need to touch to change words.**
@@ -41,7 +50,7 @@ The exports map to sections like this:
 | `education`, `work` | **Record** (the bookshelf) |
 | `leadership` | **Leadership** (the sticky notes) |
 | `projects` | **Projects** (the poster) |
-| `play`, `toolkit` | **Play** (the mug) |
+| `play`, `toolkit` | **Play** (the mug) — `play.games` also names the arcade cabinets |
 | `contact` | **Contact** (the phone) |
 | `resumeUrl` | **Résumé** (the door) |
 | `screenLines` | The lines that cycle on the laptop screen |

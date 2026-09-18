@@ -327,19 +327,40 @@ export const projects = [
   },
 ] as const;
 
+/**
+ * The arcade. `id` keys the game implementations in `src/game/`; the copy here
+ * is what the cabinet list and the stage header show. Adding a game means
+ * adding a row here and a factory in `src/arcade/registry.ts`.
+ */
 export const play = {
   intro:
-    'Four games written instead of sleeping. All run entirely in the browser. No engine, no library, no framework. Three canvases and a game loop; one is nothing but a clock and your nerve.',
+    'Four games written instead of sleeping. All four run inside this page — no engine, no library, no framework. Three canvases and a game loop; one is nothing but a clock and your nerve.',
   games: [
-    { name: 'Pong', how: 'First to 5 wins. Mouse, drag, or W/S' },
-    { name: 'Snake', how: 'Arrow keys or WASD. Walls are fatal' },
     {
-      name: 'Time it',
-      how: 'Read the target, start the timer, stop when you think you are there. Targets on quarter seconds. Space works',
+      id: 'pong',
+      name: 'Night Shift Pong',
+      kind: 'Duel',
+      how: 'First to seven. The machine is awake too.',
     },
-    { name: 'Updraft', how: 'One button. Space, click, or tap to climb. Everything else is gravity' },
+    {
+      id: 'snake',
+      name: 'Signal Snake',
+      kind: 'Survival',
+      how: 'Collect the nodes. The edges wrap; your tail does not.',
+    },
+    {
+      id: 'time-it',
+      name: 'Quarter Second',
+      kind: 'Nerve',
+      how: 'Stop the clock on the target, blind.',
+    },
+    {
+      id: 'updraft',
+      name: 'Updraft',
+      kind: 'Climb',
+      how: 'Climb the weather. Gravity never stops asking.',
+    },
   ],
-  note: 'The four games live on the source portfolio.',
 } as const;
 
 export const toolkit = [
