@@ -48,17 +48,34 @@ export function renderUpdraft(
   ctx.restore();
 }
 
+/**
+ * The sky gradient, rebuilt only when it would actually look different.
+ *
+ * It depends on the viewport and on how far the player has climbed, and the
+ * climb term moves slowly — quantising it to 32 steps means the gradient is
+ * built a handful of times per run instead of sixty times a second.
+ */
+let skyCache: { key: string; gradient: CanvasGradient } | null = null;
+
+function skyGradient(ctx: CanvasRenderingContext2D, height: number, tier: number): CanvasGradient {
+  const key = `${height}:${tier}`;
+  if (skyCache && skyCache.key === key) return skyCache.gradient;
+  const t = tier / 32;
+  const sky = ctx.createLinearGradient(0, 0, 0, height);
+  sky.addColorStop(0, mix(PALETTE.navy, '#020409', 0.25 + t * 0.55));
+  sky.addColorStop(0.55, mix(PALETTE.ink, '#050b16', 0.3));
+  sky.addColorStop(1, mix('#0d1a28', PALETTE.void, t * 0.5));
+  skyCache = { key, gradient: sky };
+  return sky;
+}
+
 /** Vertical atmospheric gradient that deepens with altitude. */
 function drawSky(ctx: CanvasRenderingContext2D, view: GameContext, world: World): void {
   const climbed = Math.max(0, START_Y - world.peakY) / METRE;
   // 0 at the ground, 1 by 900m: the air thins and cools as you climb.
-  const t = Math.min(1, climbed / 900);
+  const tier = Math.round(Math.min(1, climbed / 900) * 32);
 
-  const sky = ctx.createLinearGradient(0, 0, 0, view.height);
-  sky.addColorStop(0, mix(PALETTE.navy, '#020409', 0.25 + t * 0.55));
-  sky.addColorStop(0.55, mix(PALETTE.ink, '#050b16', 0.3));
-  sky.addColorStop(1, mix('#0d1a28', PALETTE.void, t * 0.5));
-  ctx.fillStyle = sky;
+  ctx.fillStyle = skyGradient(ctx, view.height, tier);
   ctx.fillRect(0, 0, view.width, view.height);
 
   // Thin cloud bands, parallaxed against the camera so the climb has depth.
@@ -129,19 +146,41 @@ function drawWinds(ctx: CanvasRenderingContext2D, world: World, reduced: boolean
   }
 }
 
-function drawPlatforms(ctx: CanvasRenderingContext2D, world: World, reduced: boolean): void {
+function drawPlatforms(
+  ctx: CanvasRenderingContext2D,
+  world: World,
+  reduced: boolean,
+): void {
   const thickness = 12;
+  const top = world.cameraY - thickness;
+  const bottom = world.cameraY + VIEW_H + thickness;
+
   for (const platform of world.platforms) {
-    const glow = reduced ? 8 : 10 + platform.flash * 26;
+    // Vertical cull. The route extends a screen above and below the camera, so
+    // without this a third of the draws are for platforms nobody can see.
+    if (platform.y < top || platform.y > bottom) continue;
+
+    // `shadowBlur` is the most expensive thing in this renderer, so it is spent
+    // only where it reads: on the platform the player just hit. The rest get a
+    // flat lit edge, which at this size is indistinguishable.
+    const lit = !reduced && platform.flash > 0.01;
+
     // A platform crossing the seam is drawn twice so it is never clipped in half.
     for (const offset of [0, -WORLD_W, WORLD_W]) {
       const x = platform.x + offset;
       if (x > WORLD_W || x + platform.w < 0) continue;
-      withGlow(ctx, alpha(PALETTE.teal, 0.35 + platform.flash * 0.45), glow, () => {
+
+      const body = () => {
         ctx.fillStyle = alpha(PALETTE.screen, 0.16 + platform.flash * 0.2);
         roundRect(ctx, x, platform.y - thickness / 2, platform.w, thickness, 5);
         ctx.fill();
-      });
+      };
+      if (lit) {
+        withGlow(ctx, alpha(PALETTE.teal, 0.35 + platform.flash * 0.45), 10 + platform.flash * 26, body);
+      } else {
+        body();
+      }
+
       // Lit top edge — the surface you actually land on.
       ctx.fillStyle = alpha(PALETTE.teal, 0.75 + platform.flash * 0.25);
       roundRect(ctx, x + 3, platform.y - thickness / 2, platform.w - 6, 2.4, 1.2);
@@ -151,8 +190,11 @@ function drawPlatforms(ctx: CanvasRenderingContext2D, world: World, reduced: boo
 }
 
 function drawMotes(ctx: CanvasRenderingContext2D, world: World, reduced: boolean): void {
+  const top = world.cameraY - 20;
+  const bottom = world.cameraY + VIEW_H + 20;
   for (const mote of world.motes) {
     if (mote.taken && mote.pop <= 0.01) continue;
+    if (mote.y < top || mote.y > bottom) continue;
     const pulse = reduced ? 0.5 : 0.5 + Math.sin(world.clock * 5 + mote.x * 0.02) * 0.5;
     const scale = mote.taken ? 1 + (1 - mote.pop) * 1.4 : 1;
     const opacity = mote.taken ? mote.pop : 1;

@@ -147,6 +147,26 @@ All input goes through `attachInput`:
 `getGame` is a callback, looked up per event, so swapping cabinets never leaves
 a stale reference behind.
 
+## Motion, and what it costs
+
+Two rules came out of profiling this site, and both are easy to break by
+accident:
+
+1. **Nothing animates behind an open section.** The room is frozen
+   (`animation-play-state: paused`), the flicker and screen-line intervals stop,
+   and once the veil has faded in the live scene stops rendering entirely. If
+   you add ambient motion to the room, it must respect `dimmed` the same way.
+
+2. **No full-viewport `filter` or `backdrop-filter` on anything that sits over
+   moving content.** Both are recomputed every frame the page composites. The
+   room's blur is baked into a 48x27 image (`scene/plateVeil.ts`) instead, and
+   the arcade's overlays use a plain scrim. `PLAN.md` has the measurements.
+
+Canvas renderers follow the same spirit: `shadowBlur` is the most expensive
+call in any of them, so it is spent only where it reads — the ball, the snake's
+head, the platform the player just hit — and never on every element of a
+collection.
+
 ## Copy
 
 Game names, kinds and taglines live in `play.games` in `src/content/profile.ts`,

@@ -31,6 +31,14 @@ const CAMERA_ANCHOR = 0.64;
 /** Past this far below the camera, the run is over. */
 const FALL_MARGIN = 60;
 
+/**
+ * How often the off-screen route is swept up. Rebuilding three arrays is not
+ * something to do on every physics step — a platform lingering a fifth of a
+ * second longer than it needs to costs nothing, and the renderer culls by
+ * camera bounds anyway.
+ */
+const CULL_INTERVAL = 0.2;
+
 export interface UpdraftWorld {
   playerX: number;
   playerY: number;
@@ -70,6 +78,7 @@ export class UpdraftGame extends BaseGame {
   private highestY = 0;
   private lastPlatformX = WORLD_W / 2;
   private flapHeld = false;
+  private cullTimer = 0;
 
   /* ---------------------------------------------------------- lifecycle */
 
@@ -78,6 +87,7 @@ export class UpdraftGame extends BaseGame {
     this.highestY = 0;
     this.lastPlatformX = WORLD_W / 2;
     this.flapHeld = false;
+    this.cullTimer = 0;
 
     // A wide ledger directly under the player, so the first bounce is free.
     const ground: Platform = { x: WORLD_W / 2 - 150, y: 0, w: 300, flash: 0 };
@@ -120,7 +130,12 @@ export class UpdraftGame extends BaseGame {
     }
 
     this.generateAhead();
-    this.cull();
+    this.decay(dt);
+    this.cullTimer -= dt;
+    if (this.cullTimer <= 0) {
+      this.cull();
+      this.cullTimer = CULL_INTERVAL;
+    }
 
     if (w.vy > 0 && w.playerY > w.cameraY + VIEW_H * 0.92) w.falling = true;
     if (w.playerY > w.cameraY + VIEW_H + FALL_MARGIN) this.die();
@@ -266,6 +281,21 @@ export class UpdraftGame extends BaseGame {
     w.winds.push({ yTop: y - height, yBottom: y, strength });
   }
 
+  /**
+   * Fades the things that fade. Separated from `cull` because it has to happen
+   * on every step to be smooth, and because tying a decay rate to how often
+   * the sweep ran made it depend on the step rate rather than on time.
+   */
+  private decay(dt: number): void {
+    const w = this.world;
+    for (const mote of w.motes) {
+      if (mote.taken) mote.pop = Math.max(0, mote.pop - dt * 3.2);
+    }
+    for (const platform of w.platforms) {
+      platform.flash = Math.max(0, platform.flash - dt * 4.8);
+    }
+  }
+
   /** Drops anything that has scrolled off the bottom. */
   private cull(): void {
     const w = this.world;
@@ -273,8 +303,6 @@ export class UpdraftGame extends BaseGame {
     w.platforms = w.platforms.filter((p) => p.y < floor);
     w.motes = w.motes.filter((m) => m.y < floor && (!m.taken || m.pop > 0.01));
     w.winds = w.winds.filter((z) => z.yTop < floor);
-    for (const mote of w.motes) if (mote.taken) mote.pop *= 0.88;
-    for (const platform of w.platforms) platform.flash = Math.max(0, platform.flash - 0.04);
   }
 
   private die(): void {

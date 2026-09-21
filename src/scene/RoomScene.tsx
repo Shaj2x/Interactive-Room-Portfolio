@@ -8,6 +8,7 @@ import { ForegroundLayer } from './layers/ForegroundLayer';
 import { PlateLayer } from './layers/PlateLayer';
 import { CandleLayer } from './layers/CandleLayer';
 import { plateSrc } from './plate';
+import { plateVeil } from './plateVeil';
 import { Atmosphere } from './Atmosphere';
 import { WallTexture } from './WallTexture';
 import { Hotspot } from './Hotspot';
@@ -32,6 +33,28 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
   const stageRef = useRef<HTMLDivElement>(null);
   const [screenLine, setScreenLine] = useState(0);
   const [lampOn, setLampOn] = useState(true);
+  /**
+   * True once the baked veil has finished fading over the room, at which point
+   * the live scene underneath is invisible and can stop being rendered at all.
+   *
+   * It lags `dimmed` on the way in (so the cross-fade is seen) and leads it on
+   * the way out (so the room is back before it is uncovered).
+   */
+  const [veiled, setVeiled] = useState(false);
+
+  useEffect(() => {
+    if (!dimmed) {
+      setVeiled(false);
+      return;
+    }
+    if (reducedMotion) {
+      setVeiled(true);
+      return;
+    }
+    // 620ms is --d-camera, the length of the veil's fade.
+    const t = window.setTimeout(() => setVeiled(true), 640);
+    return () => window.clearTimeout(t);
+  }, [dimmed, reducedMotion]);
 
   useParallax(stageRef, {
     disabled: reducedMotion || dimmed,
@@ -39,8 +62,11 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
   });
 
   // Every warm light in the room flickers together, irregularly. Off with the
-  // lamp easter egg, and off for reduced motion.
-  useWarmFlicker(stageRef, { disabled: reducedMotion || !lampOn });
+  // lamp easter egg, off for reduced motion, and off behind an open section:
+  // each step rewrites opacity on the warm lights, and behind the blur that
+  // means recomputing a viewport-sized filter eight times a second for motion
+  // nobody can see.
+  useWarmFlicker(stageRef, { disabled: reducedMotion || !lampOn || dimmed });
 
   // Measured, not guessed: screen size says nothing about rendering power.
   const lite = useQualityGuard({ enabled: !reducedMotion && !compact });
@@ -48,19 +74,22 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
   // The laptop cycles a line of its own text. Slow on purpose: it should be
   // something you notice on the second look, not a ticker.
   useEffect(() => {
-    if (reducedMotion) return;
+    // Paused behind an open section for the same reason as the flicker: the
+    // line is unreadable through the blur, and changing it repaints the room.
+    if (reducedMotion || dimmed) return;
     const t = window.setInterval(
       () => setScreenLine((i) => (i + 1) % screenLines.length),
       7400,
     );
     return () => window.clearInterval(t);
-  }, [reducedMotion]);
+  }, [reducedMotion, dimmed]);
 
   return (
     <div
       className={[
         'room',
         dimmed ? 'is-dimmed' : '',
+        veiled ? 'is-veiled' : '',
         lampOn ? '' : 'is-lampless',
         lite ? 'is-lite' : '',
         reducedMotion ? 'is-still' : '',
@@ -68,6 +97,14 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
         .filter(Boolean)
         .join(' ')}
     >
+      {/* The baked stand-in for the room, shown while a section is open. See
+          plateVeil.ts for why this is an image and not a blur filter. */}
+      <div
+        className="room-veil"
+        aria-hidden="true"
+        style={plateSrc ? { backgroundImage: `url(${plateVeil})` } : undefined}
+      />
+
       <div className="stage" ref={stageRef}>
         {/* Static plaster grain, composited under the scene. */}
         {!plateSrc && <WallTexture />}

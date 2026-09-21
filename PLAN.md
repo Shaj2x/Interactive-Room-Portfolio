@@ -134,6 +134,77 @@ TypeScript runs `strict`, `noUnusedLocals` and `noUnusedParameters`.
 > config. It was already broken and was left alone rather than quietly widening
 > this change.
 
+## Animation performance
+
+Measured, not assumed. Frame deltas were sampled over 5–6 second windows for
+every animated surface, with the page driven the way a visitor would drive it.
+
+| Scenario | Before | After |
+| --- | --- | --- |
+| Room, idle | 40.3fps, 18/197 janky | 55.1fps, 5/327 |
+| Room, pointer sweeping | 43.3fps | 43.6fps |
+| Play section open | 14.5fps, 63/68 janky | 59.8fps, 1/354 |
+| Night Shift Pong | 15.7fps | 59.0fps |
+| Signal Snake | 16.2fps | 59.5fps |
+| Quarter Second | 16.0fps | 59.5fps |
+| Updraft | 15.0fps | 57.5fps |
+| Updraft, flapping | 15.1fps | 58.8fps |
+
+At 4x CPU throttling — a mid-range phone — every scenario still holds 56–60fps
+except the room under a moving pointer. Throttling the CPU barely moves these
+numbers, which is itself the finding: the cost was never JavaScript.
+
+### What was actually wrong
+
+Three causes, each found by ablation rather than inspection. Two of them were
+not where the code looked like it should be.
+
+1. **A live blur behind the arcade.** `.room.is-dimmed` carried
+   `filter: blur(14px) brightness(0.4)`. A viewport-sized filter is recomputed
+   every frame the page composites, and with a game running on top that is
+   every frame — it cost about 44 of the 60 frames available. The blur and the
+   grade are now baked into `src/scene/plateVeil.ts`: the plate at 48x27
+   pixels, stretched back across the viewport, where the browser's own
+   interpolation *is* the blur. Once it has faded in, the live room stops being
+   rendered at all (`content-visibility: hidden`). This is the single biggest
+   win in the table.
+
+2. **`backdrop-filter: blur(2px)` on the arcade overlay.** Almost invisible,
+   and because it samples the canvas underneath it forced the whole stage to be
+   re-read every frame: 46fps with it, 120fps without, on the ready overlay
+   every visitor sees first. Replaced with a slightly heavier scrim.
+
+3. **Breathing lights.** The blooms carry a large gaussian filter *and*
+   `mix-blend-mode: screen`, so each opacity change re-blends a filtered layer
+   against the whole scene. The breath is now stepped — a few changes a second
+   rather than sixty — across a swing of 0.06–0.18 opacity over nine seconds,
+   far below what the eye resolves. 42.6fps to 54.2fps.
+
+Two smaller ones: the parallax loop ran forever, writing transforms that no
+longer changed anything, and now sleeps once the layers settle and wakes on the
+next pointer event; and Updraft rebuilt three arrays 120 times a second to cull
+its off-screen route, which now happens five times a second with the fades
+moved to proper time-based decay.
+
+### What was measured and deliberately left alone
+
+- **The film grain.** A full-viewport `mix-blend-mode: overlay` is the largest
+  remaining cost whenever the room moves (43.6fps with it, 59.5 without). It
+  stays: a blend is a shader on real hardware and cheap, the exaggeration here
+  is software rasterisation, and the quality guard already drops the grain
+  entirely on machines that genuinely struggle. Removing it lifts the blacks
+  the whole room is built on.
+- **The room under a moving pointer**, 43.6fps, for the same reason. It was
+  43.3fps before this work, so nothing regressed; it is simply the one surface
+  where the grain's blend and the parallax repaint coincide.
+
+> **Read the absolute numbers with care.** These come from headless Chromium
+> with no GPU, so everything rasterises in software and filters, blurs and
+> blend modes cost far more than they would on a real machine. The *relative*
+> findings are sound — each was confirmed by removing one thing at a time — and
+> every fix helps on real hardware too. But a browser with a GPU will sit above
+> these figures, not at them.
+
 ## Deliberate decisions worth knowing
 
 - **Updraft has limited lift.** The spec asks for a flap impulse *and* for a

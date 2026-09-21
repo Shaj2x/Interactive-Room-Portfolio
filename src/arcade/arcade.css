@@ -158,8 +158,12 @@
   gap: 12px;
   padding: 24px;
   text-align: center;
-  background: radial-gradient(ellipse at 50% 50%, rgba(4, 7, 12, 0.62), rgba(3, 5, 9, 0.88));
-  backdrop-filter: blur(2px);
+  /* Deliberately not `backdrop-filter`. A 2px blur here is almost invisible,
+     and because it samples the canvas underneath it forces the whole stage to
+     be re-read every frame — measured at 46fps with it and 120fps without, on
+     the ready overlay every visitor sees first. A slightly heavier scrim does
+     the same separating job for nothing. */
+  background: radial-gradient(ellipse at 50% 50%, rgba(4, 7, 12, 0.74), rgba(3, 5, 9, 0.93));
   animation: arc-overlay-in 260ms var(--ease-out) both;
 }
 @keyframes arc-overlay-in {
