@@ -87,8 +87,9 @@ The plate is exactly **1600 x 900**, the same as the scene's viewBox, so image
 pixels map 1:1 onto scene coordinates: whatever you measure in the picture is
 the number you write in `src/scene/plate.ts`. To swap the artwork:
 
-1. Resize the new image to 1600 x 900 and save it as
-   `src/assets/room-plate.webp`.
+1. Save the new image as `src/assets/room-plate.jpg`, unmodified — any 16:9
+   image works, and it should not be resized or recompressed (see `ASSETS.md`
+   for why). Measure it against a 1600 x 900 grid.
 2. Measure the objects in it and update `plateHotspots` — each box is x, y,
    width, height in image pixels.
 3. Update `plateLights` (the blooms that breathe) and `plateWindow` (where the

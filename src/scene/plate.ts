@@ -1,5 +1,5 @@
 import type { HotspotDef } from './hotspots';
-import plateImage from '../assets/room-plate.webp';
+import plateImage from '../assets/room-plate.jpg';
 
 /**
  * PAINTED-PLATE ART PATH
@@ -13,9 +13,17 @@ import plateImage from '../assets/room-plate.webp';
  * animations the SVG room uses. The plate takes a small parallax drift and the
  * overlays take more, which reads as depth without real layers.
  *
- * Every coordinate below is in the same 1600 x 900 space the SVG room uses,
- * and the plate is exactly 1600 x 900, so image pixels map 1:1 onto scene
- * coordinates: what you measure in the picture is what you write here.
+ * Every coordinate below is in the same 1600 x 900 space the SVG room uses.
+ * The plate itself is larger than that — it ships at its native resolution so
+ * it stays sharp on a high-density display — and the browser scales it into
+ * the 1600 x 900 box. The image's own pixel size therefore has no bearing on
+ * anything here: measure in 1600 x 900 scene units and write that down.
+ *
+ * The plate is shipped exactly as supplied, with no resize and no re-encode.
+ * It was briefly stored downscaled and recompressed, which quietly erased the
+ * raindrops on the window glass and the lettering on the book spines — the
+ * fine detail this picture is carried by. If it ever needs to be replaced,
+ * replace it; do not "optimise" it.
  */
 
 /** `null` falls back to the hand-built SVG room in `scene/layers/*`. */

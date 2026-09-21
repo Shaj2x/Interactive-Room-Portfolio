@@ -7,7 +7,7 @@ file.
 
 | Asset | Form | Location |
 | --- | --- | --- |
-| Room artwork | Painted plate, 1600 × 900 WebP, 53 kB | `src/assets/room-plate.webp` |
+| Room artwork | Room photograph, 2000 × 1125 JPEG, 229 kB | `src/assets/room-plate.jpg` |
 | Room artwork (alternative) | Hand-built SVG, five parallax layers | `src/scene/layers/*.tsx` |
 | Arcade artwork | None — drawn at runtime on canvas | `src/game/*/`*Renderer*`.ts` |
 | Dimmed-room backdrop | 48 × 27 baked copy of the plate, inline, ~1.1 kB | `src/scene/plateVeil.ts` |
@@ -18,16 +18,31 @@ file.
 
 ## Room artwork
 
-The live scene is the painted plate at `src/assets/room-plate.webp`, imported by
+The live scene is the plate at `src/assets/room-plate.jpg`, imported by
 `src/scene/plate.ts`. Hotspot boxes, the lamp blooms that breathe and the window
-rectangle the rain is clipped to are all measured against that image in
+rectangle the rain is clipped to are all measured against it in
 `plateHotspots`, `plateLights` and `plateWindow`.
+
+**It ships exactly as supplied — no resize, no re-encode.** That is deliberate,
+and the reason is worth keeping: it was briefly stored downscaled to 1600 × 900
+and re-encoded to WebP at quality 0.86, which took it from 229 kB to 53 kB and
+quietly destroyed the detail the picture is carried by. The raindrops on the
+window glass smeared into mush and the lettering on the book spines
+disappeared. Both survive a single lossy pass badly, and this image had already
+been through one.
+
+The plate is also the only thing on the page whose resolution the display can
+actually use: the SVG scales it into a 1600 × 900 box, so on a 2× screen a
+1600-wide source is being upscaled. Native resolution is not waste here.
+
+If it needs replacing, replace it. Do not compress it.
 
 **Swapping the artwork is four steps, and the fourth is easy to miss:**
 
-1. Resize the new image to exactly 1600 × 900 and save it to the same path.
-   The plate is drawn into a 1600 × 900 space, so image pixels map 1:1 onto
-   scene coordinates — what you measure in the picture is what you write down.
+1. Save the new image to the same path, unmodified. Any 16:9 image works; it
+   does not need to be 1600 × 900. Measure it against a 1600 × 900 grid, since
+   that is the space every coordinate below is written in — for a 2000 × 1125
+   image, scene units are image pixels × 0.8.
 2. Re-measure `plateHotspots`, `plateLights` and `plateWindow` in
    `src/scene/plate.ts`. **These are per-image.** Swapping the picture without
    redoing them leaves every hotspot floating over the wrong object and the

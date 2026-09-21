@@ -12,7 +12,7 @@
  * saturate(0.84)`; stretched back across the viewport, the interpolation *is*
  * the blur. It costs one small texture on upload and nothing per frame.
  *
- * Regenerate it by drawing `room-plate.webp` into a 48x27 canvas with
+ * Regenerate it by drawing `room-plate.jpg` into a 48x27 canvas with
  * `ctx.filter = 'brightness(0.85) saturate(0.84)'` and taking
  * `toDataURL('image/webp', 0.85)`. Keep it under about 2 kB: it is inline, so
  * its weight is parse cost on every load.
