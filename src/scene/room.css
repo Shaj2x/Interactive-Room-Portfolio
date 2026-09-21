@@ -273,33 +273,43 @@
 }
 
 /* -------- The room, breathing -----------------------------------------------
-   The same idea as the lights, across the whole picture: black over it, and
-   animating the opacity takes brightness away and gives it back. It rests at
-   nothing, so the room at its lightest is exactly the photograph. */
-.room-dim {
-  position: absolute;
-  /* Oversized: the stage takes a parallax nudge, and an edge must never show. */
-  inset: -3%;
-  background: #000;
-  opacity: 0;
-  pointer-events: none;
-  will-change: opacity;
-  animation-iteration-count: infinite;
-  animation-timing-function: steps(6);
+   The lights themselves rise and fall, so this multiplies the picture rather
+   than laying anything over it: `brightness` below 1 dims, above 1 lifts, and
+   because it is a multiply the blacks stay black while the lit surfaces carry
+   the change. That is what a light getting brighter does.
+
+   It replaced a black overlay whose opacity was animated. That was cheaper,
+   but it could only ever subtract — the photograph was the ceiling, so the
+   room dimmed and recovered and never actually brightened.
+
+   The cost is real and worth knowing: a filter on the stage keeps it on a
+   filtered rendering path, measured at about ten frames a second in a
+   software rasteriser. On a GPU a brightness multiply is one instruction per
+   pixel. If it ever needs to go, delete the `animation` line below and the
+   room simply stops breathing; nothing else depends on it. */
+.stage {
+  animation: room-breath 19s steps(6) infinite;
 }
-.pulse-room {
-  animation-name: pulse-room;
-  animation-duration: 19s;
+
+/* Behind an open section the room is not visible, and a filter left declared
+   on a hidden stage still costs: it keeps the subtree on a filtered rendering
+   path whether or not anything paints. Measured with Pong running on top, that
+   was nine frames a second taken from the game for a room nobody can see.
+   Pausing the animation is not enough — the paused value is still a filter —
+   so it comes off entirely. */
+.room.is-dimmed .stage {
+  animation: none;
+  filter: none;
 }
-@keyframes pulse-room {
-  0%, 100% { opacity: 0; }
-  12.5%    { opacity: 0.032; }
-  25%      { opacity: 0.11; }
-  37.5%    { opacity: 0.188; }
-  50%      { opacity: 0.22; }
-  62.5%    { opacity: 0.188; }
-  75%      { opacity: 0.11; }
-  87.5%    { opacity: 0.032; }
+@keyframes room-breath {
+  0%, 100% { filter: brightness(0.85); }
+  12.5%    { filter: brightness(0.887); }
+  25%      { filter: brightness(0.975); }
+  37.5%    { filter: brightness(1.063); }
+  50%      { filter: brightness(1.1); }
+  62.5%    { filter: brightness(1.063); }
+  75%      { filter: brightness(0.975); }
+  87.5%    { filter: brightness(0.887); }
 }
 
 /* Driven by useWarmFlicker instead. The hook writes `style.opacity`, and a
@@ -738,7 +748,6 @@
   .door-leak,
   .dust,
   .plate-dim,
-  .room-dim,
   .plate-raindrop,
   .raindrop,
   .runnel,
@@ -752,6 +761,7 @@
     animation: none !important;
   }
   .dust { opacity: var(--dust-o); }
+  .stage { animation: none !important; }
   .raindrop { opacity: 0.4; }
   .plate-raindrop { opacity: 0.55; }
   .grain { display: none; }

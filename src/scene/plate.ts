@@ -153,18 +153,6 @@ export const plateGlass: PlateGlass[] = [
 ];
 
 /**
- * A slow breath across the whole room.
- *
- * Same trick as the lights: black over the picture, and animating its opacity
- * takes brightness out and gives it back. It rests at nothing and swells to a
- * little over a fifth, across nineteen seconds — so the room sits between 78%
- * and 100% of the photograph, and at its lightest is exactly the photograph.
- * Nineteen shares no multiple with the hall light's eleven or the screen's
- * seventeen, so the three never resolve into one beat.
- */
-export const plateRoomBreath = { animation: 'pulse-room' } as const;
-
-/**
  * Hotspot boxes measured off the plate, in its own 1600 x 900 pixel space.
  *
  * The corkboard carries two of them: the pinned notes are About, the two

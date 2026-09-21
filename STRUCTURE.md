@@ -171,6 +171,19 @@ accident:
    `mix-blend-mode: multiply` — for a black fill the two are identical and one
    of them costs a blend pass.
 
+   The exception is the room's own breath, which has to go *above* the
+   photograph as well as below it. Nothing laid on top can do that: black only
+   subtracts, and a screen-blended lift raises the shadows rather than the
+   lights, which turns the blacks milky. Only a multiply gets it right, so the
+   breath is `filter: brightness()` on `.stage` — below 1 it dims, above 1 it
+   lifts, and the blacks stay black either way.
+
+   That filter is the one place the room pays for a filter, and it is fenced in
+   two ways: it comes off entirely behind an open section (`.room.is-dimmed
+   .stage`), because a filter declared on a hidden stage still keeps the
+   subtree on a filtered path and was taking nine frames a second from the
+   arcade; and reduced motion removes it with the animation.
+
 4. **Rain belongs to the glass, not the window — and must never meet an edge.**
    `plateGlass` holds one rectangle per pane and the rain is clipped to each
    separately; clipping to the window as a whole lets drops fall across the
