@@ -6,7 +6,7 @@ import { DesktopLayer } from './layers/DesktopLayer';
 import { PersonLayer } from './layers/PersonLayer';
 import { ForegroundLayer } from './layers/ForegroundLayer';
 import { PlateLayer } from './layers/PlateLayer';
-import { PlateFlickers } from './PlateFlickers';
+import { PlatePulses } from './PlatePulses';
 import { CandleLayer } from './layers/CandleLayer';
 import { plateSrc } from './plate';
 import { plateVeil } from './plateVeil';
@@ -159,10 +159,10 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
           </g>
         </svg>
 
-        {/* Lights that flicker: over the scene, not inside it. Inside, every
+        {/* Lights that pulse: over the scene, not inside it. Inside, every
             frame of the animation repaints the filtered SVG; out here each one
             is a compositor layer animating only opacity. */}
-        <PlateFlickers lampOn={lampOn} />
+        <PlatePulses lampOn={lampOn} />
 
         {/* Hotspots ride the same depth as the art they sit on, so they never
             drift away from their object as the room parallaxes. */}

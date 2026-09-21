@@ -1,8 +1,8 @@
 import { DEPTH } from './hotspots';
-import { plateFlickers, plateSrc } from './plate';
+import { platePulses, plateSrc } from './plate';
 
 /**
- * The flickering lights, as HTML over the stage rather than SVG inside it.
+ * The pulsing lights, as HTML over the stage rather than SVG inside it.
  *
  * They started life as `<rect>`s in the plate group, which worked and cost
  * about five frames a second: animating anything inside the scene makes the
@@ -17,23 +17,23 @@ import { plateFlickers, plateSrc } from './plate';
  * converted to percentages — the stage is locked to the scene's 16:9, so the
  * two spaces line up exactly.
  */
-export function PlateFlickers({ lampOn }: { lampOn: boolean }) {
+export function PlatePulses({ lampOn }: { lampOn: boolean }) {
   // Out with the lamp, like every other warm source in the room.
   if (!plateSrc || !lampOn) return null;
 
   return (
     <div className="plate-dims" data-depth={DEPTH.wall} aria-hidden="true">
-      {plateFlickers.map((f) => (
+      {platePulses.map((p) => (
         <div
-          key={f.id}
-          className={`plate-dim ${f.animation}`}
+          key={p.id}
+          className={`plate-dim ${p.animation}${p.soft ? ' is-soft' : ''}`}
           style={{
-            left: `${(f.x / 1600) * 100}%`,
-            top: `${(f.y / 900) * 100}%`,
-            width: `${(f.w / 1600) * 100}%`,
-            height: `${(f.h / 900) * 100}%`,
-            borderRadius: f.rx ? `${f.rx}px` : undefined,
-            opacity: f.rest,
+            left: `${(p.x / 1600) * 100}%`,
+            top: `${(p.y / 900) * 100}%`,
+            width: `${(p.w / 1600) * 100}%`,
+            height: `${(p.h / 900) * 100}%`,
+            borderRadius: p.rx ? `${p.rx}px` : undefined,
+            opacity: p.rest,
           }}
         />
       ))}

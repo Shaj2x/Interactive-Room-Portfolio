@@ -92,8 +92,8 @@ the number you write in `src/scene/plate.ts`. To swap the artwork:
    for why). Measure it against a 1600 x 900 grid.
 2. Measure the objects in it and update `plateHotspots` — each box is x, y,
    width, height in image pixels.
-3. Update `plateLights` (the blooms that breathe) and `plateWindow` (where the
-   animated rain is clipped to) the same way.
+3. Update `plateLights` (the blooms that breathe) and `plateGlass` (the panes the
+   animated rain is clipped to, one rectangle each) the same way.
 4. Regenerate `src/scene/plateVeil.ts`, the baked backdrop shown behind open
    sections — it is a shrunk copy of the plate and will otherwise still show
    the old room. See `ASSETS.md`, which spells the whole swap out.

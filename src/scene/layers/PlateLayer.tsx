@@ -1,4 +1,4 @@
-import { plateLights, plateSrc, plateWindow } from '../plate';
+import { plateGlass, plateLights, plateSrc } from '../plate';
 
 /**
  * The painted room, plus everything that has to move re-created over it.
@@ -15,23 +15,30 @@ interface Props {
 }
 
 /**
- * Deterministic rain, laid over wherever the painting's window is.
+ * Rain, in three depth bands.
  *
- * Deterministic rather than random so the pattern is identical on every load
- * and between the two art paths. The spread of delays and durations is what
- * stops thirty-odd drops reading as a repeating band.
+ * All of it falls beyond the glass, so the nearer a band is the faster,
+ * brighter and longer its drops — that difference is the only depth cue
+ * available on a flat plate, and without it the rain reads as a pattern
+ * painted on the window rather than weather behind it. Nothing is bright: the
+ * plate's own streaks on the glass are the foreground, and these sit under
+ * them.
+ *
+ * Deterministic rather than random, so the pattern is identical on every load.
+ * The spread of delays and durations is what stops three dozen drops reading
+ * as a repeating band.
  */
-const RAIN = Array.from({ length: 34 }, (_, i) => ({
-  t: (i * 29) % 100,
-  delay: (i * 0.31) % 4.6,
-  dur: 2.4 + ((i * 7) % 13) / 10,
-  len: 10 + ((i * 11) % 16),
-}));
+const RAIN_BANDS = [
+  { id: 'far', count: 13, width: 0.55, opacity: 0.1, len: 9, dur: [4.6, 5.8] },
+  { id: 'mid', count: 11, width: 0.8, opacity: 0.15, len: 14, dur: [3.4, 4.3] },
+  { id: 'near', count: 8, width: 1.1, opacity: 0.2, len: 21, dur: [2.4, 3.1] },
+] as const;
+
+/** Drops start above the pane so they are already falling when they appear. */
+const RAIN_ENTRY = 34;
 
 export function PlateLayer({ lampOn }: Props) {
   if (!plateSrc) return null;
-  // Bound to a local so the narrowing survives into the map callbacks below.
-  const win = plateWindow;
 
   return (
     <g id="layer-plate">
@@ -46,28 +53,51 @@ export function PlateLayer({ lampOn }: Props) {
         preserveAspectRatio="xMidYMid slice"
       />
 
-      {/* Rain on the painting's window. */}
-      {win && (
-        <g clipPath="url(#clip-plate-window)">
-          <clipPath id="clip-plate-window">
-            <rect x={win.x} y={win.y} width={win.w} height={win.h} />
+      {/* Rain, clipped to each pane of glass on its own. The mullion between
+          them and the frame around them are solid, so rain crossing those
+          would read as falling on the picture instead of behind the window. */}
+      <defs>
+        {plateGlass.map((pane) => (
+          <clipPath key={pane.id} id={`clip-glass-${pane.id}`}>
+            <rect x={pane.x} y={pane.y} width={pane.w} height={pane.h} />
           </clipPath>
-          {RAIN.map((d, i) => (
-            <line
-              key={i}
-              x1={win.x + (win.w * d.t) / 100}
-              y1={win.y}
-              x2={win.x + (win.w * d.t) / 100 - 2}
-              y2={win.y + d.len}
-              stroke="#9fd4f0"
-              strokeWidth="0.9"
-              opacity="0.2"
-              className="raindrop"
-              style={{ animationDelay: `${d.delay}s`, animationDuration: `${d.dur}s` }}
-            />
+        ))}
+      </defs>
+
+      {plateGlass.map((pane) => (
+        <g key={pane.id} clipPath={`url(#clip-glass-${pane.id})`}>
+          {RAIN_BANDS.map((band, bi) => (
+            // The band's own opacity lives on the group, because the keyframes
+            // own the drops' opacity and would otherwise overwrite it.
+            <g key={band.id} opacity={band.opacity}>
+              {/* Counts are per unit of width, so the narrow pane does not end
+                  up raining twice as hard as the wide one. */}
+              {Array.from({ length: Math.round((band.count * pane.w) / 183) }, (_, i) => {
+                const seed = bi * 97 + i * 53;
+                const x = pane.x + (pane.w * ((seed * 37) % 100)) / 100;
+                const y = pane.y - RAIN_ENTRY;
+                const dur = band.dur[0] + (((seed * 7) % 13) / 12) * (band.dur[1] - band.dur[0]);
+                return (
+                  <line
+                    key={i}
+                    className="plate-raindrop"
+                    x1={x}
+                    y1={y}
+                    x2={x - 1.4}
+                    y2={y + band.len}
+                    stroke="#a9cfe8"
+                    strokeWidth={band.width}
+                    style={{
+                      animationDelay: `${(((seed * 13) % 53) / 10).toFixed(2)}s`,
+                      animationDuration: `${dur.toFixed(2)}s`,
+                    }}
+                  />
+                );
+              })}
+            </g>
           ))}
         </g>
-      )}
+      ))}
 
       {/* The lights that breathe. Screen-blue keeps going when the lamp is off;
           the warm sources are exactly what the easter egg switches out. */}

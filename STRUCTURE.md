@@ -165,18 +165,31 @@ accident:
 3. **To animate a light that is painted into the plate, subtract.** The room's
    lights live in the photograph, so an additive glow on top of a constantly-lit
    strip changes almost nothing — which is why the blooms read as completely
-   steady whatever drives them. `plateFlickers` puts a black rectangle over each
+   steady whatever drives them. `platePulses` puts a black rectangle over each
    light instead: at opacity `a` it leaves `(1 - a)` of the picture showing, so
    animating that dims and restores the painted light. Plain alpha, not
    `mix-blend-mode: multiply` — for a black fill the two are identical and one
    of them costs a blend pass.
 
-4. **Animate over the scene, not inside it.** Those rectangles began as SVG
+4. **Rain belongs to the glass, not the window.** `plateGlass` holds one
+   rectangle per pane and the rain is clipped to each separately. Clipping to
+   the window as a whole lets drops fall across the mullion and the frame,
+   which instantly reads as rain painted on the picture rather than weather
+   seen through it. Depth comes from three bands whose drops differ in speed,
+   length and brightness — on a flat plate that difference is the only cue
+   available.
+
+5. **Animate over the scene, not inside it.** Those rectangles began as SVG
    `<rect>`s in the plate group and cost five frames a second, because animating
    anything inside the scene repaints the scene, filters and all. As HTML
    siblings of the `<svg>` they are compositor layers animating only opacity:
-   measured at 59.7fps with the flicker against 60.0 without. They carry the
-   plate's `data-depth`, so the parallax still moves them with the light.
+   with the film grain off, the room holds 60fps whether the pulses and rain
+   are running or not. They carry the plate's `data-depth`, so the parallax
+   still moves them with the light.
+
+   (With the grain on it is 45.9fps against 46.7 — the difference is the grain
+   re-blending the viewport whenever anything beneath it changes, not the cost
+   of the animation. That remains the room's one expensive effect.)
 
 Canvas renderers follow the same spirit: `shadowBlur` is the most expensive
 call in any of them, so it is spent only where it reads — the ball, the snake's

@@ -21,7 +21,7 @@ file.
 The live scene is the plate at `src/assets/room-plate.jpg`, imported by
 `src/scene/plate.ts`. Hotspot boxes, the lamp blooms that breathe and the window
 rectangle the rain is clipped to are all measured against it in
-`plateHotspots`, `plateLights` and `plateWindow`.
+`plateHotspots`, `plateLights` and `plateGlass`.
 
 **It ships exactly as supplied — no resize, no re-encode.** That is deliberate,
 and the reason is worth keeping: it was briefly stored downscaled to 1600 × 900
@@ -43,7 +43,7 @@ If it needs replacing, replace it. Do not compress it.
    does not need to be 1600 × 900. Measure it against a 1600 × 900 grid, since
    that is the space every coordinate below is written in — for a 2000 × 1125
    image, scene units are image pixels × 0.8.
-2. Re-measure `plateHotspots`, `plateLights` and `plateWindow` in
+2. Re-measure `plateHotspots`, `plateLights` and `plateGlass` in
    `src/scene/plate.ts`. **These are per-image.** Swapping the picture without
    redoing them leaves every hotspot floating over the wrong object and the
    rain falling through a wall.

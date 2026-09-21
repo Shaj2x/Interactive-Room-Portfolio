@@ -76,7 +76,7 @@ export const plateLights: PlateLight[] = [
  */
 
 /**
- * Lights that flicker.
+ * Lights that pulse.
  *
  * The blooms above can only ADD light, and the light in this room is painted
  * into the photograph: the strip under the door is already bright before
@@ -90,44 +90,62 @@ export const plateLights: PlateLight[] = [
  * deliberately — compositing black over the picture gives exactly the same
  * result as multiplying by it, without a blend mode's cost.
  *
- * They are small on purpose, and the character is authored per light: a hall
- * fitting stutters, a laptop screen does not.
+ * The motion is a slow swell rather than a flicker: both lights rise and fall
+ * on a long cosine, far too gradually to catch in the act, so the room reads
+ * as breathing rather than faulty.
  */
-export interface PlateFlicker {
+export interface PlatePulse {
   id: string;
   x: number;
   y: number;
   w: number;
   h: number;
-  /** Dim held between flickers, 0..1. Also where reduced motion parks it. */
+  /** The dim at the bottom of the swell, 0..1. Also where reduced motion parks it. */
   rest: number;
   /** The keyframe class that drives it. */
   animation: string;
-  /** Corner rounding, so a hard rectangle edge never shows on a soft source. */
+  /** Corner rounding, for a source with a hard edge of its own. */
   rx?: number;
+  /**
+   * Fades out toward its own edges instead of stopping at them. For a light
+   * whose glow has no edge — a screen washing onto a desk — a rectangle that
+   * dims to its border would draw one.
+   */
+  soft?: boolean;
 }
 
-export const plateFlickers: PlateFlicker[] = [
-  // The strip of hall light under the door: the one thing in frame allowed to
-  // properly misbehave. Generous margins — everything either side of it is
-  // near-black already, so dimming that shows nothing.
-  { id: 'door-strip', x: 1462, y: 0, w: 40, h: 900, rest: 0.05, animation: 'flick-hall', rx: 6 },
-  // The laptop screen. Barely anything: a screen wavers, it does not gutter,
-  // and a monitor that visibly flickers just reads as broken.
-  { id: 'laptop-screen', x: 502, y: 474, w: 104, h: 128, rest: 0.03, animation: 'flick-screen', rx: 5 },
+export const platePulses: PlatePulse[] = [
+  // The strip of hall light under the door, swelling over eleven seconds.
+  // Generous margins — everything either side of it is near-black already, so
+  // dimming that shows nothing.
+  { id: 'door-strip', x: 1462, y: 0, w: 40, h: 900, rest: 0.03, animation: 'pulse-hall', rx: 6 },
+  // The laptop screen, slower and shallower still. It is the brightest thing
+  // in frame; anything more than a drift here reads as a fault.
+  { id: 'laptop-screen', x: 486, y: 458, w: 140, h: 164, rest: 0.02, animation: 'pulse-screen', soft: true },
 ];
 
 /**
- * The window glass, for the animated rain overlay — both panes and the mullion
- * between them. The painting already has rain on the glass; this rides on top
- * of it so the weather keeps moving.
+ * The glass, one entry per pane.
+ *
+ * Two rectangles rather than one, because the mullion between them and the
+ * frame around them are solid: rain drawn across those reads as rain falling
+ * on the picture rather than weather seen through a window. Clipping each pane
+ * separately is what puts the rain outside the glass.
+ *
+ * Measured off the plate at the edge of the bright glass, inside the frame.
  */
-export const plateWindow: { x: number; y: number; w: number; h: number } | null = {
-  x: 980,
-  y: 58,
-  w: 322,
-  h: 378,
-};
+export interface PlateGlass {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export const plateGlass: PlateGlass[] = [
+  { id: 'left', x: 980, y: 64, w: 183, h: 352 },
+  { id: 'right', x: 1196, y: 64, w: 94, h: 352 },
+];
 
 /**
  * Hotspot boxes measured off the plate, in its own 1600 x 900 pixel space.
