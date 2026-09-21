@@ -157,8 +157,10 @@ export const plateGlass: PlateGlass[] = [
  *
  * Same trick as the lights: black over the picture, and animating its opacity
  * takes brightness out and gives it back. It rests at nothing and swells to a
- * tenth, over nineteen seconds — long enough that the room reads as breathing
- * rather than dimming, and a period that shares no multiple with either light.
+ * little over a fifth, across nineteen seconds — so the room sits between 78%
+ * and 100% of the photograph, and at its lightest is exactly the photograph.
+ * Nineteen shares no multiple with the hall light's eleven or the screen's
+ * seventeen, so the three never resolve into one beat.
  */
 export const plateRoomBreath = { animation: 'pulse-room' } as const;
 

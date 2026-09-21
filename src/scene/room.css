@@ -293,13 +293,13 @@
 }
 @keyframes pulse-room {
   0%, 100% { opacity: 0; }
-  12.5%    { opacity: 0.019; }
-  25%      { opacity: 0.065; }
-  37.5%    { opacity: 0.111; }
-  50%      { opacity: 0.13; }
-  62.5%    { opacity: 0.111; }
-  75%      { opacity: 0.065; }
-  87.5%    { opacity: 0.019; }
+  12.5%    { opacity: 0.032; }
+  25%      { opacity: 0.11; }
+  37.5%    { opacity: 0.188; }
+  50%      { opacity: 0.22; }
+  62.5%    { opacity: 0.188; }
+  75%      { opacity: 0.11; }
+  87.5%    { opacity: 0.032; }
 }
 
 /* Driven by useWarmFlicker instead. The hook writes `style.opacity`, and a
