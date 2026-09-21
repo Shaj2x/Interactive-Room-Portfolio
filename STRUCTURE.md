@@ -162,6 +162,22 @@ accident:
    room's blur is baked into a 48x27 image (`scene/plateVeil.ts`) instead, and
    the arcade's overlays use a plain scrim. `PLAN.md` has the measurements.
 
+3. **To animate a light that is painted into the plate, subtract.** The room's
+   lights live in the photograph, so an additive glow on top of a constantly-lit
+   strip changes almost nothing — which is why the blooms read as completely
+   steady whatever drives them. `plateFlickers` puts a black rectangle over each
+   light instead: at opacity `a` it leaves `(1 - a)` of the picture showing, so
+   animating that dims and restores the painted light. Plain alpha, not
+   `mix-blend-mode: multiply` — for a black fill the two are identical and one
+   of them costs a blend pass.
+
+4. **Animate over the scene, not inside it.** Those rectangles began as SVG
+   `<rect>`s in the plate group and cost five frames a second, because animating
+   anything inside the scene repaints the scene, filters and all. As HTML
+   siblings of the `<svg>` they are compositor layers animating only opacity:
+   measured at 59.7fps with the flicker against 60.0 without. They carry the
+   plate's `data-depth`, so the parallax still moves them with the light.
+
 Canvas renderers follow the same spirit: `shadowBlur` is the most expensive
 call in any of them, so it is spent only where it reads — the ball, the snake's
 head, the platform the player just hit — and never on every element of a

@@ -176,6 +176,87 @@
 .lamp-bloom {
   animation: lamp-breathe 11s steps(28) infinite;
 }
+
+/* -------- Flickering lights ------------------------------------------------
+   These sit over a light that is painted into the plate and take brightness
+   away from it: black at opacity `a` leaves `(1 - a)` of the picture showing.
+   Plain alpha rather than `mix-blend-mode: multiply`, which for a black fill
+   produces the identical result and costs a blend pass to do it.
+
+   The timing is authored rather than random. A failing electric light is not a
+   candle: it holds steady for long stretches and then stutters, and that shape
+   is easier to write down than to generate. The two periods share no common
+   multiple, so the desk and the hallway never fall into step. */
+/* The container tracks the plate's parallax; useParallax writes its
+   transform, same as any other layer. */
+.plate-dims {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.plate-dim {
+  position: absolute;
+  background: #000;
+  /* Its own compositor layer, animating nothing but opacity. No blend mode,
+     no filter — this is the cheapest thing in the room. */
+  will-change: opacity;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.flick-hall {
+  animation-name: flick-hall;
+  animation-duration: 17s;
+}
+/* Two stutters and a sag, in 17 seconds. The gaps between keyframes are
+   fractions of a percent, so each step snaps rather than fades. */
+@keyframes flick-hall {
+  0%, 21%   { opacity: 0.05; }
+  21.4%     { opacity: 0.55; }
+  21.8%     { opacity: 0.09; }
+  22.3%     { opacity: 0.62; }
+  22.9%     { opacity: 0.06; }
+
+  53%       { opacity: 0.05; }
+  53.4%     { opacity: 0.48; }
+  53.8%     { opacity: 0.12; }
+  54.1%     { opacity: 0.58; }
+  54.7%     { opacity: 0.07; }
+  55.2%     { opacity: 0.40; }
+  55.8%     { opacity: 0.05; }
+
+  /* A slower sag: the circuit settling rather than dropping out. */
+  79%       { opacity: 0.05; }
+  81.5%     { opacity: 0.26; }
+  84%       { opacity: 0.06; }
+  100%      { opacity: 0.05; }
+}
+
+.flick-screen {
+  animation-name: flick-screen;
+  animation-duration: 23s;
+}
+/* A screen only ever wavers. Nothing here is meant to be caught in the act;
+   it is there so the brightest object in the frame is not perfectly static. */
+@keyframes flick-screen {
+  0%, 36%   { opacity: 0.03; }
+  36.5%     { opacity: 0.13; }
+  37.1%     { opacity: 0.04; }
+  68%       { opacity: 0.03; }
+  68.4%     { opacity: 0.10; }
+  68.7%     { opacity: 0.05; }
+  69.2%     { opacity: 0.11; }
+  69.8%     { opacity: 0.03; }
+  100%      { opacity: 0.03; }
+}
+
+/* Driven by useWarmFlicker instead. The hook writes `style.opacity`, and a
+   running CSS animation beats an inline style in the cascade — left on, the
+   breathe would simply overwrite every flicker step. */
+.lamp-bloom.is-flickering {
+  animation: none;
+}
 @keyframes lamp-breathe {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.82; }
@@ -605,6 +686,7 @@
   .lamp-bloom,
   .door-leak,
   .dust,
+  .plate-dim,
   .raindrop,
   .runnel,
   .flame,

@@ -6,6 +6,7 @@ import { DesktopLayer } from './layers/DesktopLayer';
 import { PersonLayer } from './layers/PersonLayer';
 import { ForegroundLayer } from './layers/ForegroundLayer';
 import { PlateLayer } from './layers/PlateLayer';
+import { PlateFlickers } from './PlateFlickers';
 import { CandleLayer } from './layers/CandleLayer';
 import { plateSrc } from './plate';
 import { plateVeil } from './plateVeil';
@@ -109,6 +110,7 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
         {/* Static plaster grain, composited under the scene. */}
         {!plateSrc && <WallTexture />}
 
+
         <svg
           className="scene"
           viewBox="0 0 1600 900"
@@ -156,6 +158,11 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
             <ForegroundLayer />
           </g>
         </svg>
+
+        {/* Lights that flicker: over the scene, not inside it. Inside, every
+            frame of the animation repaints the filtered SVG; out here each one
+            is a compositor layer animating only opacity. */}
+        <PlateFlickers lampOn={lampOn} />
 
         {/* Hotspots ride the same depth as the art they sit on, so they never
             drift away from their object as the room parallaxes. */}

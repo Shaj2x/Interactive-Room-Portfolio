@@ -39,6 +39,12 @@ export interface PlateLight {
   ry: number;
   /** 0..1. Kept low — this sits on top of light the painting already has. */
   intensity: number;
+  /**
+   * How far this light is allowed to dip when it flickers, as a fraction of
+   * its intensity. Only warm lights flicker; the city outside is too far away
+   * to do anything but sit there. Omitted means it holds steady.
+   */
+  swing?: number;
 }
 
 /**
@@ -48,9 +54,16 @@ export interface PlateLight {
  * the cold key light.
  */
 export const plateLights: PlateLight[] = [
-  { id: 'laptop', kind: 'warm', cx: 556, cy: 540, rx: 200, ry: 155, intensity: 0.3 },
-  { id: 'board', kind: 'warm', cx: 210, cy: 400, rx: 235, ry: 225, intensity: 0.24 },
-  { id: 'door', kind: 'warm', cx: 1482, cy: 440, rx: 46, ry: 430, intensity: 0.5 },
+  // The laptop is the key light and the steadiest thing here: a screen wavers,
+  // it does not gutter.
+  { id: 'laptop', kind: 'warm', cx: 556, cy: 540, rx: 200, ry: 155, intensity: 0.3, swing: 0.12 },
+  // The warm wash the desk throws onto the corkboard. It is lit by the laptop,
+  // so it moves with it and a little more, being further from the source.
+  { id: 'board', kind: 'warm', cx: 210, cy: 400, rx: 235, ry: 225, intensity: 0.26, swing: 0.2 },
+  // The hall light under the door — a different circuit, and the one thing in
+  // frame allowed to properly misbehave.
+  { id: 'door', kind: 'warm', cx: 1482, cy: 440, rx: 46, ry: 430, intensity: 0.5, swing: 0.3 },
+  // The city. Steady: those lights are a kilometre away.
   { id: 'window', kind: 'cool', cx: 1140, cy: 250, rx: 210, ry: 200, intensity: 0.22 },
 ];
 
@@ -61,6 +74,48 @@ export const plateLights: PlateLight[] = [
  * and a half each. Four earns its place; a fifth for a light already in the
  * picture does not.
  */
+
+/**
+ * Lights that flicker.
+ *
+ * The blooms above can only ADD light, and the light in this room is painted
+ * into the photograph: the strip under the door is already bright before
+ * anything renders on top of it. Brightening a glow that sits over a constant
+ * bright strip changes almost nothing, which is why the blooms alone read as
+ * completely steady no matter what drives them.
+ *
+ * So these take light away instead. Each is a black rectangle over one light
+ * source; at opacity `a` it leaves `(1 - a)` of the painting showing, so
+ * animating that opacity dims and restores the painted light. Plain alpha,
+ * deliberately — compositing black over the picture gives exactly the same
+ * result as multiplying by it, without a blend mode's cost.
+ *
+ * They are small on purpose, and the character is authored per light: a hall
+ * fitting stutters, a laptop screen does not.
+ */
+export interface PlateFlicker {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** Dim held between flickers, 0..1. Also where reduced motion parks it. */
+  rest: number;
+  /** The keyframe class that drives it. */
+  animation: string;
+  /** Corner rounding, so a hard rectangle edge never shows on a soft source. */
+  rx?: number;
+}
+
+export const plateFlickers: PlateFlicker[] = [
+  // The strip of hall light under the door: the one thing in frame allowed to
+  // properly misbehave. Generous margins — everything either side of it is
+  // near-black already, so dimming that shows nothing.
+  { id: 'door-strip', x: 1462, y: 0, w: 40, h: 900, rest: 0.05, animation: 'flick-hall', rx: 6 },
+  // The laptop screen. Barely anything: a screen wavers, it does not gutter,
+  // and a monitor that visibly flickers just reads as broken.
+  { id: 'laptop-screen', x: 502, y: 474, w: 104, h: 128, rest: 0.03, animation: 'flick-screen', rx: 5 },
+];
 
 /**
  * The window glass, for the animated rain overlay — both panes and the mullion
