@@ -262,9 +262,44 @@
 }
 @keyframes plate-rain {
   0%   { opacity: 0; transform: translate3d(0, 0, 0); }
-  10%  { opacity: 1; }
-  88%  { opacity: 1; }
-  100% { opacity: 0; transform: translate3d(-7px, 432px, 0); }
+  /* Full only once well clear of the top edge... */
+  16%  { opacity: 1; }
+  82%  { opacity: 1; }
+  /* ...and gone again before the bottom one. 400 carries a drop from 34 above
+     the pane to its bottom edge; fading out by 96% leaves it invisible for the
+     last twenty-odd units, so nothing is ever cut off against the frame. */
+  96%  { opacity: 0; }
+  100% { opacity: 0; transform: translate3d(-7px, 400px, 0); }
+}
+
+/* -------- The room, breathing -----------------------------------------------
+   The same idea as the lights, across the whole picture: black over it, and
+   animating the opacity takes brightness away and gives it back. It rests at
+   nothing, so the room at its lightest is exactly the photograph. */
+.room-dim {
+  position: absolute;
+  /* Oversized: the stage takes a parallax nudge, and an edge must never show. */
+  inset: -3%;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  animation-iteration-count: infinite;
+  animation-timing-function: steps(6);
+}
+.pulse-room {
+  animation-name: pulse-room;
+  animation-duration: 19s;
+}
+@keyframes pulse-room {
+  0%, 100% { opacity: 0; }
+  12.5%    { opacity: 0.019; }
+  25%      { opacity: 0.065; }
+  37.5%    { opacity: 0.111; }
+  50%      { opacity: 0.13; }
+  62.5%    { opacity: 0.111; }
+  75%      { opacity: 0.065; }
+  87.5%    { opacity: 0.019; }
 }
 
 /* Driven by useWarmFlicker instead. The hook writes `style.opacity`, and a
@@ -703,6 +738,7 @@
   .door-leak,
   .dust,
   .plate-dim,
+  .room-dim,
   .plate-raindrop,
   .raindrop,
   .runnel,

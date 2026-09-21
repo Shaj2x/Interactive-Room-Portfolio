@@ -34,7 +34,13 @@ const RAIN_BANDS = [
   { id: 'near', count: 8, width: 1.1, opacity: 0.2, len: 21, dur: [2.4, 3.1] },
 ] as const;
 
-/** Drops start above the pane so they are already falling when they appear. */
+/**
+ * Drops start this far above the pane, so they are already falling by the time
+ * the clip lets them show. The keyframe then carries them exactly to the
+ * bottom edge and fades them out before they get there — a drop still at full
+ * opacity when it crosses the clip is cut off on a hard line, and that line is
+ * what reads as rain running over the window frame.
+ */
 const RAIN_ENTRY = 34;
 
 export function PlateLayer({ lampOn }: Props) {

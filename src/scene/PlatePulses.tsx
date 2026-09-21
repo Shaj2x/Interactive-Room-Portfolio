@@ -1,8 +1,9 @@
 import { DEPTH } from './hotspots';
-import { platePulses, plateSrc } from './plate';
+import { plateRoomBreath, platePulses, plateSrc } from './plate';
 
 /**
- * The pulsing lights, as HTML over the stage rather than SVG inside it.
+ * The room's breath and its pulsing lights, as HTML over the stage rather
+ * than SVG inside it.
  *
  * They started life as `<rect>`s in the plate group, which worked and cost
  * about five frames a second: animating anything inside the scene makes the
@@ -18,25 +19,34 @@ import { platePulses, plateSrc } from './plate';
  * two spaces line up exactly.
  */
 export function PlatePulses({ lampOn }: { lampOn: boolean }) {
-  // Out with the lamp, like every other warm source in the room.
-  if (!plateSrc || !lampOn) return null;
+  if (!plateSrc) return null;
 
   return (
-    <div className="plate-dims" data-depth={DEPTH.wall} aria-hidden="true">
-      {platePulses.map((p) => (
-        <div
-          key={p.id}
-          className={`plate-dim ${p.animation}${p.soft ? ' is-soft' : ''}`}
-          style={{
-            left: `${(p.x / 1600) * 100}%`,
-            top: `${(p.y / 900) * 100}%`,
-            width: `${(p.w / 1600) * 100}%`,
-            height: `${(p.h / 900) * 100}%`,
-            borderRadius: p.rx ? `${p.rx}px` : undefined,
-            opacity: p.rest,
-          }}
-        />
-      ))}
-    </div>
+    <>
+      {/* The whole room, breathing. Outside the parallax container: it covers
+          everything, so it must not drift with the layers underneath it. It
+          stays when the lamp goes out — the room is still there. */}
+      <div className={`room-dim ${plateRoomBreath.animation}`} aria-hidden="true" />
+
+      {/* Out with the lamp, like every other warm source in the room. */}
+      {lampOn && (
+        <div className="plate-dims" data-depth={DEPTH.wall} aria-hidden="true">
+          {platePulses.map((p) => (
+            <div
+              key={p.id}
+              className={`plate-dim ${p.animation}${p.soft ? ' is-soft' : ''}`}
+              style={{
+                left: `${(p.x / 1600) * 100}%`,
+                top: `${(p.y / 900) * 100}%`,
+                width: `${(p.w / 1600) * 100}%`,
+                height: `${(p.h / 900) * 100}%`,
+                borderRadius: p.rx ? `${p.rx}px` : undefined,
+                opacity: p.rest,
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 }

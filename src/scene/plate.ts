@@ -129,10 +129,15 @@ export const platePulses: PlatePulse[] = [
  *
  * Two rectangles rather than one, because the mullion between them and the
  * frame around them are solid: rain drawn across those reads as rain falling
- * on the picture rather than weather seen through a window. Clipping each pane
- * separately is what puts the rain outside the glass.
+ * on the picture rather than weather seen through a window.
  *
- * Measured off the plate at the edge of the bright glass, inside the frame.
+ * The bright glass was found by luminance rather than by eye — the left pane
+ * runs x 980..1167, the right x 1191..1301, both y 56..432. These sit a few
+ * units inside that on every side, so the clip can never graze the frame even
+ * with the antialiasing along its edge.
+ *
+ * Both panes are the same height on purpose: the drops share one keyframe, and
+ * it has to carry them from above the top edge to the bottom one.
  */
 export interface PlateGlass {
   id: string;
@@ -143,9 +148,19 @@ export interface PlateGlass {
 }
 
 export const plateGlass: PlateGlass[] = [
-  { id: 'left', x: 980, y: 64, w: 183, h: 352 },
-  { id: 'right', x: 1196, y: 64, w: 94, h: 352 },
+  { id: 'left', x: 984, y: 60, w: 178, h: 366 },
+  { id: 'right', x: 1195, y: 60, w: 102, h: 366 },
 ];
+
+/**
+ * A slow breath across the whole room.
+ *
+ * Same trick as the lights: black over the picture, and animating its opacity
+ * takes brightness out and gives it back. It rests at nothing and swells to a
+ * tenth, over nineteen seconds — long enough that the room reads as breathing
+ * rather than dimming, and a period that shares no multiple with either light.
+ */
+export const plateRoomBreath = { animation: 'pulse-room' } as const;
 
 /**
  * Hotspot boxes measured off the plate, in its own 1600 x 900 pixel space.

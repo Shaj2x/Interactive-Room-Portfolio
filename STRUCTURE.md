@@ -171,13 +171,16 @@ accident:
    `mix-blend-mode: multiply` — for a black fill the two are identical and one
    of them costs a blend pass.
 
-4. **Rain belongs to the glass, not the window.** `plateGlass` holds one
-   rectangle per pane and the rain is clipped to each separately. Clipping to
-   the window as a whole lets drops fall across the mullion and the frame,
-   which instantly reads as rain painted on the picture rather than weather
-   seen through it. Depth comes from three bands whose drops differ in speed,
-   length and brightness — on a flat plate that difference is the only cue
-   available.
+4. **Rain belongs to the glass, not the window — and must never meet an edge.**
+   `plateGlass` holds one rectangle per pane and the rain is clipped to each
+   separately; clipping to the window as a whole lets drops fall across the
+   mullion and the frame, which reads as rain painted on the picture. But the
+   clip alone is not enough: a drop still at full opacity when it crosses the
+   clip is cut off on a hard line, and that line is what looks like rain
+   running over the frame. The keyframe fades each drop in well below the top
+   edge and out well above the bottom one, so nothing is ever severed. Depth
+   comes from three bands whose drops differ in speed, length and brightness —
+   on a flat plate that difference is the only cue available.
 
 5. **Animate over the scene, not inside it.** Those rectangles began as SVG
    `<rect>`s in the plate group and cost five frames a second, because animating
