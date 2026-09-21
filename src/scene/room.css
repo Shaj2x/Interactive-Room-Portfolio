@@ -210,11 +210,14 @@
   opacity: 0;
   animation: rain-fall linear infinite;
 }
+/* Nearly vertical, and quiet. The plate already has rain running down the
+   glass; this rides on it to keep it moving, so a hard diagonal at full
+   opacity reads as scratches on the picture rather than weather. */
 @keyframes rain-fall {
   0%   { opacity: 0; transform: translate3d(0, 0, 0); }
-  8%   { opacity: 0.55; }
-  88%  { opacity: 0.55; }
-  100% { opacity: 0; transform: translate3d(-34px, 440px, 0); }
+  10%  { opacity: 0.34; }
+  86%  { opacity: 0.34; }
+  100% { opacity: 0; transform: translate3d(-7px, 460px, 0); }
 }
 
 /* Drops clinging to the glass: they hang, then break and run down fast,

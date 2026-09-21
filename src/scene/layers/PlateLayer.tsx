@@ -14,12 +14,18 @@ interface Props {
   lampOn: boolean;
 }
 
-/** Deterministic rain, laid over wherever the painting's window is. */
-const RAIN = Array.from({ length: 26 }, (_, i) => ({
-  t: (i * 37) % 100,
-  delay: (i * 0.37) % 4.4,
+/**
+ * Deterministic rain, laid over wherever the painting's window is.
+ *
+ * Deterministic rather than random so the pattern is identical on every load
+ * and between the two art paths. The spread of delays and durations is what
+ * stops thirty-odd drops reading as a repeating band.
+ */
+const RAIN = Array.from({ length: 34 }, (_, i) => ({
+  t: (i * 29) % 100,
+  delay: (i * 0.31) % 4.6,
   dur: 2.4 + ((i * 7) % 13) / 10,
-  len: 14 + ((i * 11) % 20),
+  len: 10 + ((i * 11) % 16),
 }));
 
 export function PlateLayer({ lampOn }: Props) {
@@ -51,10 +57,10 @@ export function PlateLayer({ lampOn }: Props) {
               key={i}
               x1={win.x + (win.w * d.t) / 100}
               y1={win.y}
-              x2={win.x + (win.w * d.t) / 100 - 6}
+              x2={win.x + (win.w * d.t) / 100 - 2}
               y2={win.y + d.len}
               stroke="#9fd4f0"
-              strokeWidth="1.1"
+              strokeWidth="0.9"
               opacity="0.2"
               className="raindrop"
               style={{ animationDelay: `${d.delay}s`, animationDuration: `${d.dur}s` }}

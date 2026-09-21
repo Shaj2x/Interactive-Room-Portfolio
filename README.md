@@ -93,6 +93,9 @@ the number you write in `src/scene/plate.ts`. To swap the artwork:
    width, height in image pixels.
 3. Update `plateLights` (the blooms that breathe) and `plateWindow` (where the
    animated rain is clipped to) the same way.
+4. Regenerate `src/scene/plateVeil.ts`, the baked backdrop shown behind open
+   sections — it is a shrunk copy of the plate and will otherwise still show
+   the old room. See `ASSETS.md`, which spells the whole swap out.
 
 Nothing else needs to change: the parallax, the portrait reframing, the
 sections and the menus all read from those coordinates.

@@ -7,9 +7,10 @@ file.
 
 | Asset | Form | Location |
 | --- | --- | --- |
-| Room artwork | Painted plate, 1600 × 900 WebP, 51.8 kB | `src/assets/room-plate.webp` |
+| Room artwork | Painted plate, 1600 × 900 WebP, 53 kB | `src/assets/room-plate.webp` |
 | Room artwork (alternative) | Hand-built SVG, five parallax layers | `src/scene/layers/*.tsx` |
 | Arcade artwork | None — drawn at runtime on canvas | `src/game/*/`*Renderer*`.ts` |
+| Dimmed-room backdrop | 48 × 27 baked copy of the plate, inline, ~1.1 kB | `src/scene/plateVeil.ts` |
 | Favicon | Inline SVG data URI | `index.html` |
 | Fonts | Instrument Serif + Inter, Google Fonts | `index.html` |
 | S-mark logo | **Not present.** See below. | — |
@@ -22,10 +23,26 @@ The live scene is the painted plate at `src/assets/room-plate.webp`, imported by
 rectangle the rain is clipped to are all measured against that image in
 `plateHotspots`, `plateLights` and `plateWindow`.
 
-Swapping the artwork means resizing the new image to 1600 × 900, saving it to
-the same path, and re-measuring those three lists. Nothing downstream — the
-parallax, the portrait reframing, the menus, the keyboard order — needs to
-change. `README.md` has the full procedure.
+**Swapping the artwork is four steps, and the fourth is easy to miss:**
+
+1. Resize the new image to exactly 1600 × 900 and save it to the same path.
+   The plate is drawn into a 1600 × 900 space, so image pixels map 1:1 onto
+   scene coordinates — what you measure in the picture is what you write down.
+2. Re-measure `plateHotspots`, `plateLights` and `plateWindow` in
+   `src/scene/plate.ts`. **These are per-image.** Swapping the picture without
+   redoing them leaves every hotspot floating over the wrong object and the
+   rain falling through a wall.
+3. Regenerate `src/scene/plateVeil.ts` — the 48 × 27 baked backdrop shown
+   behind open sections. It is a copy of *this* plate; leave it and the room
+   behind a section will be the previous room. Its own file documents how, and
+   the grade needs checking against the new image: a darker picture needs a
+   higher `brightness()` to stay visible behind the panel at all.
+4. Check the result with the boxes drawn on. Hovering each object and seeing
+   the rim land on it is the only reliable test — the coordinates look fine in
+   a diff whether they are right or wrong.
+
+Nothing else downstream — the parallax, the portrait reframing, the menus, the
+keyboard order — needs to change. `README.md` has the same procedure in place.
 
 The hand-built SVG room is still in the tree as the alternative art path and
 takes over automatically if `plateSrc` is null or `plateHotspots` is empty.
