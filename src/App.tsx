@@ -74,7 +74,11 @@ export default function App() {
         <>
           <Signature away={route !== null} />
           <NavMenu onOpen={open} current={route} />
-          <SoundToggle enabled={roomTone.enabled} onToggle={roomTone.toggle} />
+          <SoundToggle
+            enabled={roomTone.enabled}
+            onToggle={roomTone.toggle}
+            tucked={route !== null}
+          />
           {compact ? (
             <CompactNav onOpen={open} current={route} />
           ) : (

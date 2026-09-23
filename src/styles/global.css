@@ -1,3 +1,4 @@
+@import './fonts.css';
 @import './tokens.css';
 
 *,
@@ -18,7 +19,7 @@ body {
   color: var(--c-text);
   font-family: var(--font-body);
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   overflow: hidden; /* the room is a fixed frame; sections scroll internally */
 }

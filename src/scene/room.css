@@ -649,6 +649,13 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
   animation: grain-shift 0.7s steps(1) infinite;
 }
+/* Behind an open section there is nothing for it to be grain ON: the room is a
+   48x27 image stretched to a blur. Merely pausing it is not enough — a
+   mix-blend-mode element keeps its whole subtree on a blended compositing path
+   whatever it is doing, and with a game running on top that cost 15fps
+   (45.1 -> 60.3, measured in the Play section). Take it off the page. */
+.room.is-dimmed .grain { display: none; }
+
 @keyframes grain-shift {
   0%   { transform: translate3d(0, 0, 0); }
   25%  { transform: translate3d(-14px, 8px, 0); }

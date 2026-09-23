@@ -45,8 +45,8 @@
 
 .arc-cabinet-kind {
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.2em;
+  font-size: 10px;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--c-text-faint);
 }
@@ -54,7 +54,10 @@
 
 .arc-cabinet-name {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-weight: 600;
+  font-stretch: 94%;
+  font-size: 19px;
+  letter-spacing: -0.018em;
   line-height: 1.12;
   color: var(--c-screen-core);
 }
@@ -95,16 +98,18 @@
 .arc-kind {
   margin: 0 0 3px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.2em;
+  font-size: 10px;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--c-accent);
 }
 .arc-name {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 24px;
+  font-weight: 600;
+  font-stretch: 92%;
+  font-size: 23px;
+  letter-spacing: -0.026em;
   line-height: 1;
   color: var(--c-screen-core);
 }
@@ -114,8 +119,8 @@
 .arc-hud-cell { text-align: right; }
 .arc-hud dt {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--c-text-faint);
 }

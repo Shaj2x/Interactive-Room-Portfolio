@@ -101,11 +101,21 @@ export function CompactNav({ onOpen, current }: NavProps) {
 }
 
 /** Room tone control. Off by default, and obvious — both required by the brief. */
-export function SoundToggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
+export function SoundToggle({
+  enabled,
+  onToggle,
+  tucked,
+}: {
+  enabled: boolean;
+  onToggle: () => void;
+  /** A section is open: the control sits under the menu instead of in the
+      bottom-left corner, where the chapter's way-back control now lives. */
+  tucked: boolean;
+}) {
   return (
     <button
       type="button"
-      className={`sound${enabled ? ' is-on' : ''}`}
+      className={`sound${enabled ? ' is-on' : ''}${tucked ? ' is-tucked' : ''}`}
       onClick={onToggle}
       aria-pressed={enabled}
       aria-label={enabled ? 'Mute room tone' : 'Play room tone (rain and hum)'}

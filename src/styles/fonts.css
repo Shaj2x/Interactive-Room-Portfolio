@@ -1,0 +1,62 @@
+/* -----------------------------------------------------------------------------
+   Type, served from the app rather than from Google.
+
+   Self-hosted for three reasons: the page no longer waits on a third-party
+   connection before it can set a word, the files are cached and versioned with
+   the build, and the design is guaranteed to render as drawn instead of falling
+   back to Georgia on a network nobody controls.
+
+   Latin only. Everything this site sets — including "Résumé" — lives inside
+   U+0000–00FF, so the latin-ext subsets were dropped and saved 105kB.
+----------------------------------------------------------------------------- */
+
+/* Display: a contemporary grotesque with a real width axis, so headings can be
+   drawn narrow and heavy without a second file. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url('../assets/fonts/bricolage-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Text: a newspaper grotesk — warmer and less mechanical than the usual
+   interface sans, and built to be read at length. */
+@font-face {
+  font-family: 'Schibsted Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../assets/fonts/schibsted-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Machine labels: every number, tag, kind and HUD readout on the site. Space
+   Mono's slab-ish terminals give the arcade and the room's controls a
+   nocturnal, instrument-panel voice that a developer default would not. */
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/spacemono-latin-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/spacemono-latin-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}

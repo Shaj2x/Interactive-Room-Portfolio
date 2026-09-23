@@ -6,28 +6,31 @@ const EXIT_MS = 220;
 
 interface Props {
   title: string;
-  /** Sits in the rail — the object in the room you clicked to get here. */
+  /** Sits in the chapter mark — the object in the room you clicked. */
   eyebrow: string;
-  /** Position in the room's tab order. Printed in the rail as 01–08. */
+  /** Position in the room's tab order. Printed as 01–08. */
   index: number;
   onClose: () => void;
   children: ReactNode;
 }
 
 /**
- * The frame every section shares: an editorial sheet that slides in against
- * the right edge of the room, with a left rail carrying the section number,
- * the object you clicked, and the way back.
+ * The frame every section shares: a chapter opening, split in two.
  *
- * It is deliberately not a centred rounded dialog. The rail gives the page a
- * spine, the asymmetric grid gives the prose a real measure, and the room
- * stays visible down the left-hand side so you never lose where you are.
+ * The left half is transparent. The room's blurred plate shows straight through
+ * it, and the chapter mark, the title and the way back sit on top of the
+ * photograph — you are still in the room, reading a page of it. The right half
+ * is a solid panel carrying the text, so the prose never has to fight an image
+ * for contrast.
  *
- * Motion, and only where it earns its place:
- *   - open: the sheet slides from the edge it is anchored to, and the title
- *     is wiped up from its own baseline rather than faded.
- *   - close: the same path reversed, at a third of the duration.
- *   - body: a 50ms stagger, once, on open.
+ * On a narrow screen the split collapses and the whole thing becomes one
+ * scrolling column, with the panel taking over as the scroll container.
+ *
+ * Motion is authored, not sprinkled:
+ *   - open: the panel arrives from the edge it is anchored to, the title is
+ *     wiped up from its own baseline, the chapter rule draws out, the body
+ *     staggers at 50ms.
+ *   - close: the same path reversed at roughly half the time.
  * Content stagger lives on `.stagger > *` in sections.css, not on inline
  * styles, so adding a paragraph needs no bookkeeping.
  */
@@ -42,7 +45,7 @@ export function SectionShell({ title, eyebrow, index, onClose, children }: Props
     headingRef.current?.focus();
   }, []);
 
-  // Play the exit before unmounting. Guarded, because Escape, the rail button
+  // Play the exit before unmounting. Guarded, because Escape, the back control
   // and a click on the room can all arrive inside the same 220ms.
   const requestClose = useCallback(() => {
     if (leaving.current) return;
@@ -95,31 +98,29 @@ export function SectionShell({ title, eyebrow, index, onClose, children }: Props
         aria-label={title}
         ref={panelRef}
       >
-        <div className="sheet-rail" aria-hidden="true">
-          <span className="rail-index">{String(index).padStart(2, '0')}</span>
-          <span className="rail-rule" />
-          <span className="rail-eyebrow">{eyebrow}</span>
-        </div>
+        <aside
+          className="chapter"
+          onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
+        >
+          <p className="chapter-mark">
+            <span className="chapter-no">{String(index).padStart(2, '0')}</span>
+            <span className="chapter-rule" aria-hidden="true" />
+            <span className="chapter-eyebrow">{eyebrow}</span>
+          </p>
 
-        <div className="section-scroll">
-          <header className="section-head">
-            <p className="eyebrow">
-              <span className="eyebrow-index">{String(index).padStart(2, '0')}</span>
-              {eyebrow}
-            </p>
-            <h1 className="section-title" tabIndex={-1} ref={headingRef}>
-              <span className="title-ink">{title}</span>
-            </h1>
-          </header>
-          {children}
-        </div>
+          <h1 className="section-title" tabIndex={-1} ref={headingRef}>
+            <span className="title-ink">{title}</span>
+          </h1>
 
-        <button type="button" className="back-btn" onClick={requestClose}>
-          <span className="back-arrow" aria-hidden="true">
-            ←
-          </span>
-          <span className="back-text">Back to the room</span>
-        </button>
+          <button type="button" className="back-btn" onClick={requestClose}>
+            <span className="back-arrow" aria-hidden="true">
+              ←
+            </span>
+            <span className="back-text">Back to the room</span>
+          </button>
+        </aside>
+
+        <div className="section-scroll">{children}</div>
       </div>
     </div>
   );

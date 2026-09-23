@@ -30,9 +30,19 @@
   --c-text-dim: #93a5b8;
   --c-text-faint: #5d7086;
 
-  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  /* Three voices, self-hosted in styles/fonts.css. The display face carries a
+     width axis, so headings are drawn narrow and heavy from the same file the
+     body is set from — the hierarchy comes from weight, width and scale rather
+     than from a second typeface shouting. */
+  --font-display: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Width and tracking for the display face at each scale. Big type wants to be
+     narrower and tighter; a label wants to be wide and open. */
+  --w-display: 88%;
+  --t-display: -0.035em;
+  --t-label: 0.14em;
 
   /* Motion. Built-in CSS easings are too weak for this; these are the only
      curves used on the site. */

@@ -136,3 +136,24 @@ download on.
 
 An inline SVG data URI in `index.html` — a rounded dark square with a lit
 laptop. No file, no extra request.
+
+## Typefaces
+
+`src/assets/fonts/` holds four woff2 files, served by `src/styles/fonts.css`.
+They are latin-subset builds pulled from Google's css2 endpoint and committed,
+not fetched at runtime — see the "Type" section of STRUCTURE.md for why and for
+which face does what.
+
+| File | Family | Axes |
+| --- | --- | --- |
+| `bricolage-latin.woff2` | Bricolage Grotesque | wght 200–800, wdth 75–100% |
+| `schibsted-latin.woff2` | Schibsted Grotesk | wght 400–700 |
+| `spacemono-latin-400.woff2` | Space Mono | 400 |
+| `spacemono-latin-700.woff2` | Space Mono | 700 |
+
+All four are SIL Open Font License 1.1, which permits bundling and
+redistribution. To refresh one, request the family from
+`https://fonts.googleapis.com/css2?family=…` with a browser User-Agent (the
+endpoint serves woff2 only to browsers), take the `/* latin */` block's URL,
+and replace the file in place — the `unicode-range` in `fonts.css` is already
+the latin one and does not need to change.

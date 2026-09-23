@@ -157,6 +157,15 @@ accident:
    and once the veil has faded in the live scene stops rendering entirely. If
    you add ambient motion to the room, it must respect `dimmed` the same way.
 
+   Pausing is not always enough. The film grain is `mix-blend-mode: overlay`,
+   and a blend-mode element keeps its whole subtree on a blended compositing
+   path whatever it is doing — paused or not. Behind an open section there is
+   nothing for it to be grain *on* (the room is a 48x27 image stretched to a
+   blur), and with a game running on top it was costing 15fps: 45.1 against
+   60.3, measured in the Play section. `.room.is-dimmed .grain` takes it off
+   the page entirely. Anything else with a blend mode or a filter needs the
+   same treatment, not just a pause.
+
 2. **No full-viewport `filter` or `backdrop-filter` on anything that sits over
    moving content.** Both are recomputed every frame the page composites. The
    room's blur is baked into a 48x27 image (`scene/plateVeil.ts`) instead, and
@@ -212,54 +221,99 @@ call in any of them, so it is spent only where it reads — the ball, the snake'
 head, the platform the player just hit — and never on every element of a
 collection.
 
+## Type
+
+Three voices, self-hosted in `src/styles/fonts.css` from files in
+`src/assets/fonts/`. Nothing is fetched from Google at load: the page never
+waits on a third-party connection before it can set a word, the files are
+cached and versioned with the build, and the design is guaranteed to render as
+drawn instead of falling back to Georgia on a network nobody controls.
+
+- **Bricolage Grotesque** (`--font-display`) — variable, 200–800 weight and
+  75–100% width. Every heading, figure and name. The width axis is the point:
+  headings are drawn narrow and heavy from the same file the lede is set from,
+  so the hierarchy comes from weight, width and scale rather than from a second
+  typeface shouting. Use `font-stretch` alongside `font-weight` — the tokens
+  `--w-display` and `--t-display` hold the display defaults.
+- **Schibsted Grotesk** (`--font-body`) — a newspaper grotesk for running text.
+  Warmer and less mechanical than an interface sans, and built to be read at
+  length.
+- **Space Mono** (`--font-mono`) — every machine label on the site: chapter
+  numbers, eyebrows, dates, tags, the arcade HUD, the room's controls. Its
+  slab-ish terminals give the instrument-panel voice. It is wide, so labels
+  are tracked at `--t-label` (0.14em) rather than the 0.2em+ the old mono
+  wanted, and set a point smaller.
+
+Latin only — everything this site sets, "Résumé" included, lives inside
+U+0000–00FF, so the latin-ext subsets were dropped and saved 105kB. If you add
+copy in another language, pull that subset back from Google's css2 endpoint and
+add the matching `@font-face`.
+
 ## The section sheets
 
-A section is not a dialog box. `SectionShell` draws an editorial sheet anchored
-to the right edge of the viewport at `min(1180px, 100%)`, so the room's blurred
-plate keeps showing down the left-hand side and the backdrop is graded left to
-right rather than radially — you never lose where you are standing.
+A section is not a dialog box. `SectionShell` draws a chapter opening split in
+two.
 
-The sheet is a two-column grid. The rail (`clamp(76px, 7vw, 112px)`) carries the
-section number, a hairline, the object you clicked set vertically, and the way
-back at its head. The page fills the second column, and from 1080px up any
-`<section>` that has an `<h2>` splits again: the heading hangs right-aligned in
-a 168px margin column and the prose keeps a 62ch measure beside it. Sections
-without a heading — the mastheads — stay full-bleed, which is what makes the
-opening of each page read differently from its body.
+The left column (`clamp(300px, 36vw, 540px)`) is **transparent**. The room's
+blurred plate shows straight through it, and the chapter mark, the title and
+the way back sit on the photograph — you are still in the room, reading a page
+of it. The right column is a solid panel carrying the text, so prose never has
+to fight an image for contrast. The backdrop is graded left-to-right and only
+needs to darken the half that shows the room.
 
-Everything in here is built from hairlines and type. There are no bordered,
-rounded, translucent boxes: stats are divided by rules, project entries are
-ruled-off index rows, tags are a mono run separated by middots, and CV dates
-hang in their own margin column. If you add a pattern, add it that way.
+The title is sized in `cqw` against that column, not in `vw` — `.chapter`
+declares `container-type: inline-size` for it. Sized off the viewport,
+"Projects shipped" set one line wider than the column and its final letter was
+painted over by the panel beside it. It is bounded by `8vh` as well, so
+"Leadership and community" still fits on a 700px-tall laptop.
+
+Below 900px the split collapses: `.section-panel` becomes a flex column and the
+scroll container, the chapter sits on top of the page, and `.section-scroll`
+takes `flex: 1 0 auto` so the panel stays opaque to the bottom of the screen
+even when a section is short. As a plain block it stopped at the end of the
+text and the room's own section list showed through underneath.
+
+Everything in the page is built from hairlines, scale and width. There are no
+bordered, rounded, translucent boxes: stats are divided by rules, project
+entries are ruled-off index rows, tags are a mono run separated by middots, CV
+dates hang in their own margin column, and the arcade's cabinet list is a ruled
+list with an amber bar marking the loaded machine. The big display voice is
+spent entirely on the chapter title, so headings inside the page are small,
+wide, tracked mono-ish markers rather than a second shout. If you add a
+pattern, add it that way.
 
 Four things move, and nothing else:
 
-1. **Open.** The sheet slides 44px from the edge it is anchored to (420ms), the
-   title is wiped up from its own baseline with `clip-path` rather than faded
-   (480ms at +220ms), the rail's hairline draws down and the masthead rule draws
-   across, and the body staggers at 50ms. `clip-path` is the one non-transform
-   property worth animating here: it composites, and a fade on display type that
-   size reads as something still loading.
+1. **Open.** The page panel arrives 40px from the edge it is anchored to
+   (420ms), the title is wiped up from its own baseline with `clip-path` rather
+   than faded (480ms at +200ms), the chapter rule draws out, and the body
+   staggers at 50ms. `clip-path` is the one non-transform property worth
+   animating here: it composites, and a fade on display type that size reads as
+   something still loading.
 
-2. **Close.** The same two animations played `reverse`, at roughly half the
-   time — 220ms for the sheet, 200ms for the backdrop. `SectionShell` holds the
-   component for `EXIT_MS` in a `closing` state to let it play, and cancels every
-   entrance inside the sheet while it does so nothing replays underneath. Exit
-   is deliberately faster than entry: the visitor has already decided to leave.
+2. **Close.** The same animations played `reverse`, at roughly half the time —
+   220ms for the panel, 200ms for the backdrop. `SectionShell` holds the
+   component for `EXIT_MS` in a `closing` state to let it play, and cancels
+   every entrance inside so nothing replays underneath. Exit is deliberately
+   faster than entry: the visitor has already decided to leave.
 
-3. **The back arrow** nudges 3px in the direction it will take you, 150ms.
+3. **The back arrow** nudges 4px in the direction it will take you, 150ms.
 
 4. **Project entries and cabinets** brighten their rule under the pointer,
    because they contain links and have to say so. That is the entire hover
-   budget for the sheets; nothing else moves on hover.
+   budget for the sheets.
 
 Under `prefers-reduced-motion` the sheet still announces itself but does not
 travel, wipe or draw — everything collapses to a 200-240ms fade, and the exit
 delay in `SectionShell` drops to zero so closing is immediate.
 
-The masthead heading is focused on open for screen readers, so its focus ring is
-suppressed explicitly; Escape, the rail button and a click on the room are the
-real controls, and Tab stays trapped inside while the sheet is up.
+Two pieces of room chrome step aside while a section is open, because the
+chapter column now stands where they did: the corner signature fades out
+(`.signature.is-away`) and the room-tone control moves under the menu button
+(`.sound.is-tucked`), the same place it lives on a narrow screen. The masthead
+heading is focused on open for screen readers, so its focus ring is suppressed
+explicitly; Escape, the back control and a click on the room are the real
+controls, and Tab stays trapped inside while the sheet is up.
 
 ## Copy
 

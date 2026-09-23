@@ -56,15 +56,15 @@
 .intro-name {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(42px, 9.5vw, 128px);
-  line-height: 0.88;
-  letter-spacing: -0.042em;
+  font-weight: 700;
+  font-stretch: 84%;
+  font-size: clamp(46px, 10.5vw, 146px);
+  line-height: 0.86;
+  letter-spacing: -0.045em;
   color: var(--c-screen-core);
 }
 .intro-line {
   display: block;
-  overflow: hidden;
 }
 .intro-word {
   display: block;
@@ -75,8 +75,8 @@
 .intro-sub {
   margin: clamp(16px, 2.4vh, 26px) 0 0;
   font-family: var(--font-mono);
-  font-size: clamp(11px, 1.5vw, 14px);
-  letter-spacing: 0.26em;
+  font-size: clamp(10px, 1.25vw, 12.5px);
+  letter-spacing: var(--t-label);
   text-transform: uppercase;
   color: var(--c-accent);
   opacity: 0;
@@ -87,8 +87,8 @@
   gap: 0;
   margin: 10px 0 0;
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.22em;
+  font-size: 10px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--c-text-faint);
   opacity: 0;
@@ -105,8 +105,8 @@
   background: transparent;
   color: var(--c-text-faint);
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: 10.5px;
+  letter-spacing: var(--t-label);
   text-transform: uppercase;
   cursor: pointer;
   transition:

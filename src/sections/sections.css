@@ -1,14 +1,14 @@
 /* -----------------------------------------------------------------------------
-   Section overlays — an editorial sheet, not a dialog box.
+   Section overlays — a chapter opening, split in two.
 
-   The sheet is anchored to the right edge of the room and never covers it
-   entirely: the blurred plate keeps showing down the left-hand side, so you
-   always know you are still standing in the room. Inside, a rail carries the
-   section number and the object you clicked, headings hang in the margin, and
-   the prose gets a real measure.
+   Left half: transparent. The room's blurred plate shows through it and the
+   chapter mark, the title and the way back sit on the photograph. Right half:
+   a solid panel carrying the text, so prose never fights an image for
+   contrast. The room is part of the layout rather than something hidden
+   behind it.
 
-   The whole thing is built from hairlines and type. There are no bordered,
-   rounded, translucent boxes anywhere in here — a rule and a change of scale
+   Everything in here is built from hairlines, scale and width. There are no
+   bordered, rounded, translucent boxes — a rule and a change of weight
    separate things just as well and look like someone chose it.
 ----------------------------------------------------------------------------- */
 
@@ -19,14 +19,12 @@
      furniture and were showing through — and on a phone, straight across an
      open panel. Still below the menu button (50), which stays reachable. */
   z-index: 48;
-  display: flex;
-  justify-content: flex-end;
-  /* Weighted: the room reads through on the left, the sheet sits in the dark. */
+  /* Only the left half needs grading; the right half carries its own panel. */
   background: linear-gradient(
     90deg,
-    rgba(2, 4, 7, 0.42) 0%,
-    rgba(2, 4, 7, 0.72) 42%,
-    rgba(2, 4, 7, 0.9) 100%
+    rgba(2, 4, 7, 0.58) 0%,
+    rgba(2, 4, 7, 0.78) 34%,
+    rgba(2, 4, 7, 0.86) 52%
   );
   animation: backdrop-in 260ms var(--ease-out) both;
 }
@@ -36,73 +34,90 @@
 }
 
 .section-panel {
-  --rail-w: clamp(76px, 7vw, 112px);
-  --rule: rgba(150, 186, 216, 0.15);
-  --rule-soft: rgba(150, 186, 216, 0.07);
+  --rule: rgba(150, 186, 216, 0.16);
+  --rule-soft: rgba(150, 186, 216, 0.08);
 
   position: relative;
-  width: min(1180px, 100%);
+  height: 100%;
   display: grid;
-  grid-template-columns: var(--rail-w) minmax(0, 1fr);
-  background: linear-gradient(180deg, #0a111a, #04070c);
-  border-left: 1px solid rgba(150, 186, 216, 0.16);
-  box-shadow: -60px 0 140px rgba(0, 0, 0, 0.62);
-  /* Comes in from the edge it is anchored to. Spatial consistency: the sheet
-     arrives from off-screen right, and leaves the same way. */
-  animation: sheet-in 420ms var(--ease-out) both;
-}
-@keyframes sheet-in {
-  from { opacity: 0; transform: translate3d(44px, 0, 0); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  grid-template-columns: clamp(300px, 36vw, 540px) minmax(0, 1fr);
 }
 
-/* -------- The rail ---------------------------------------------------------
-   Section number at the top, the object you clicked set vertically at the
-   bottom, a hairline drawn between them on open. */
-.sheet-rail {
+/* -------- Left: the chapter, standing on the photograph ---------------------
+   Mark, title and the way out are one block, set a little below the optical
+   centre of the column. Spread across the full height they left a void in the
+   middle of a near-black wall; held together they read as a card resting on
+   the photograph. */
+.chapter {
   position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: clamp(18px, 2.6vh, 30px);
+  padding: clamp(34px, 6vh, 76px) clamp(24px, 3vw, 52px) clamp(34px, 6vh, 64px);
+  min-height: 0;
+  /* A touch below centre: the room's own weight sits low in the frame. */
+  padding-top: max(clamp(34px, 6vh, 76px), 11vh);
+  /* The title is sized off this column, not off the viewport. Sized off `vw`,
+     "Projects shipped" set one line wider than the column and the final d was
+     painted over by the page panel beside it. */
+  container-type: inline-size;
+}
+
+.chapter-mark {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 20px;
-  /* Clears the back control, which floats over the top of the rail. */
-  padding: clamp(78px, 9vh, 104px) 0 clamp(24px, 4vh, 40px);
-  border-right: 1px solid var(--rule-soft);
-}
-
-.rail-index {
+  gap: 14px;
+  margin: 0 0 clamp(4px, 1.4vh, 14px);
   font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  color: var(--c-accent);
-  animation: fade-rise 340ms var(--ease-out) 240ms both;
-}
-
-.rail-rule {
-  flex: 1;
-  width: 1px;
-  min-height: 40px;
-  background: linear-gradient(to bottom, var(--rule), var(--rule-soft));
-  transform-origin: top;
-  animation: draw-down 520ms var(--ease-out) 280ms both;
-}
-@keyframes draw-down {
-  from { transform: scaleY(0); }
-  to   { transform: scaleY(1); }
-}
-
-.rail-eyebrow {
-  writing-mode: vertical-rl;
-  /* vertical-rl reads top-to-bottom; rotating it reads bottom-to-top, which is
-     the convention for a spine. */
-  transform: rotate(180deg);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.26em;
+  font-size: 10.5px;
+  letter-spacing: var(--t-label);
   text-transform: uppercase;
-  white-space: nowrap;
   color: var(--c-text-faint);
-  animation: fade-rise 340ms var(--ease-out) 340ms both;
+  animation: fade-rise 340ms var(--ease-out) 200ms both;
+}
+.chapter-no { color: var(--c-accent); }
+.chapter-rule {
+  width: clamp(18px, 3vw, 44px);
+  height: 1px;
+  background: var(--c-accent-dim);
+  transform-origin: left;
+  animation: draw-across 480ms var(--ease-out) 300ms both;
+}
+@keyframes draw-across {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-stretch: var(--w-display);
+  /* Bounded by the column it sits in AND by viewport height: this has to hold
+     "Leadership and community" on a 700px-tall laptop without clipping. */
+  font-size: clamp(32px, min(13cqw, 8vh), 68px);
+  line-height: 0.94;
+  letter-spacing: var(--t-display);
+  color: var(--c-screen-core);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+.section-title:focus,
+.section-title:focus-visible { outline: none; }
+
+/* The title is wiped up from its own baseline, not faded in. clip-path is the
+   one non-transform property worth animating here: it composites, and a fade
+   on type this size reads as a loading state rather than a reveal. */
+.title-ink {
+  display: block;
+  padding-bottom: 0.08em;
+  clip-path: inset(0 0 100% 0);
+  animation: title-wipe 480ms var(--ease-out) 200ms both;
+}
+@keyframes title-wipe {
+  from { clip-path: inset(0 0 100% 0); transform: translate3d(0, 0.1em, 0); }
+  to   { clip-path: inset(0 0 -18% 0); transform: translate3d(0, 0, 0); }
 }
 
 @keyframes fade-rise {
@@ -114,95 +129,83 @@
   to   { opacity: 1; }
 }
 
-/* -------- The page --------------------------------------------------------- */
+/* -------- The way back ------------------------------------------------------
+   A labelled control, not a glyph in a box. The arrow is the one piece of
+   hover motion in the sheets, and it points where it will take you. */
+.back-btn {
+  margin-top: clamp(6px, 1.6vh, 16px);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--c-text-dim);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: var(--t-label);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--d-hover) var(--ease-out);
+  animation: fade-rise 340ms var(--ease-out) 420ms both;
+}
+.back-arrow {
+  display: block;
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 150ms var(--ease-out);
+}
+.back-text {
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--rule);
+  transition: border-color var(--d-hover) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .back-btn:hover { color: var(--c-accent); }
+  .back-btn:hover .back-arrow { transform: translate3d(-4px, 0, 0); }
+  .back-btn:hover .back-text { border-bottom-color: var(--c-accent); }
+}
+
+/* -------- Right: the page --------------------------------------------------- */
 .section-scroll {
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: clamp(40px, 7vh, 88px) clamp(28px, 5.5vw, 88px) clamp(56px, 8vh, 96px);
+  padding: clamp(40px, 7vh, 84px) clamp(28px, 4vw, 72px) clamp(56px, 8vh, 96px);
+  background: linear-gradient(180deg, #080d15, #04070c);
+  border-left: 1px solid var(--rule);
+  box-shadow: -40px 0 90px rgba(0, 0, 0, 0.5);
+  /* Arrives from the edge it is anchored to: spatial consistency, in and out. */
+  animation: panel-in 420ms var(--ease-out) both;
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translate3d(40px, 0, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-/* -------- Stagger ---------------------------------------------------------
+/* -------- Stagger -----------------------------------------------------------
    Children of .stagger fade and rise in sequence, once, on open. 50ms apart:
    close enough to read as one gesture, far enough apart to be a sequence. */
 .stagger > * {
   animation: fade-rise 380ms var(--ease-out) both;
 }
-.stagger > *:nth-child(1) { animation-delay: 260ms; }
-.stagger > *:nth-child(2) { animation-delay: 310ms; }
-.stagger > *:nth-child(3) { animation-delay: 360ms; }
-.stagger > *:nth-child(4) { animation-delay: 410ms; }
-.stagger > *:nth-child(5) { animation-delay: 460ms; }
-.stagger > *:nth-child(n + 6) { animation-delay: 500ms; }
+.stagger > *:nth-child(1) { animation-delay: 250ms; }
+.stagger > *:nth-child(2) { animation-delay: 300ms; }
+.stagger > *:nth-child(3) { animation-delay: 350ms; }
+.stagger > *:nth-child(4) { animation-delay: 400ms; }
+.stagger > *:nth-child(5) { animation-delay: 450ms; }
+.stagger > *:nth-child(n + 6) { animation-delay: 490ms; }
 
-/* -------- Masthead --------------------------------------------------------- */
-.section-head {
-  margin: 0 0 clamp(34px, 5vh, 58px);
-  padding-bottom: clamp(22px, 3vh, 34px);
-  position: relative;
-}
-/* The hairline under the title draws itself rather than appearing. It is the
-   last beat of the open sequence — the page ruling itself off. */
-.section-head::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: linear-gradient(to right, var(--rule), var(--rule-soft) 62%, transparent);
-  transform-origin: left;
-  animation: draw-across 560ms var(--ease-out) 300ms both;
-}
-@keyframes draw-across {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
+/* The eyebrow lives in the chapter mark; it is only drawn in the page where
+   the split has collapsed and there is no chapter column. */
+.eyebrow { display: none; }
 
-/* Shown only where the rail is not: below the sheet's breakpoint. */
-.eyebrow {
-  display: none;
-  margin: 0 0 14px;
-  color: var(--c-accent);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-.eyebrow-index { color: var(--c-text-faint); margin-right: 10px; }
-
-.section-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(46px, 8.4vw, 104px);
-  line-height: 0.92;
-  letter-spacing: -0.035em;
-  color: var(--c-screen-core);
-  text-wrap: balance;
-}
-.section-title:focus,
-.section-title:focus-visible { outline: none; }
-/* The title is wiped up from its own baseline, not faded in. clip-path is the
-   one non-transform property worth animating: it composites, and a fade on
-   type this size reads as a loading state rather than a reveal. */
-.title-ink {
-  display: block;
-  padding-bottom: 0.08em;
-  clip-path: inset(0 0 100% 0);
-  animation: title-wipe 480ms var(--ease-out) 220ms both;
-}
-@keyframes title-wipe {
-  from { clip-path: inset(0 0 100% 0); transform: translate3d(0, 0.1em, 0); }
-  to   { clip-path: inset(0 0 -18% 0); transform: translate3d(0, 0, 0); }
-}
-
-/* -------- Sections: headings hang in the margin -----------------------------
-   A wide measure for the prose, a narrow right-aligned column for the heading
-   that labels it. This is the composition doing the work that a box and a
-   border were doing before. */
+/* -------- Sections and headings ---------------------------------------------
+   Each section is a ruled band opened by a machine label. The big voice is
+   already spent on the chapter title, so headings inside the page are small,
+   wide and quiet — markers, not shouts. */
 .section-scroll > section {
-  margin-top: clamp(44px, 6vh, 72px);
-  padding-top: clamp(28px, 4vh, 44px);
+  margin-top: clamp(40px, 5.5vh, 64px);
+  padding-top: clamp(26px, 3.6vh, 40px);
   border-top: 1px solid var(--rule-soft);
 }
 .section-scroll > section:first-of-type {
@@ -212,40 +215,24 @@
 }
 
 .section-scroll h2 {
-  margin: 0 0 20px;
+  margin: 0 0 24px;
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(21px, 2.1vw, 26px);
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-  color: var(--c-screen);
-  text-wrap: balance;
-}
-
-@media (min-width: 1080px) {
-  .section-scroll > section:has(> h2) {
-    display: grid;
-    grid-template-columns: 168px minmax(0, 1fr);
-    column-gap: clamp(32px, 3.4vw, 56px);
-  }
-  .section-scroll > section:has(> h2) > * {
-    grid-column: 2;
-  }
-  .section-scroll > section > h2 {
-    grid-column: 1;
-    grid-row: 1;
-    margin: 0;
-    text-align: right;
-    color: var(--c-text-dim);
-  }
+  font-weight: 600;
+  font-stretch: 100%;
+  font-size: 12px;
+  line-height: 1.3;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--c-accent);
 }
 
 .section-scroll h3 {
   margin: 0 0 8px;
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 1.2;
+  font-weight: 600;
+  font-stretch: 94%;
+  font-size: 19px;
+  line-height: 1.18;
   letter-spacing: -0.012em;
   color: var(--c-text);
 }
@@ -259,82 +246,84 @@
   border-top-color: transparent;
 }
 
-/* -------- Body copy --------------------------------------------------------- */
+/* -------- Body copy ---------------------------------------------------------- */
 .lede {
   margin: 0 0 24px;
-  /* Sized for the long ledes as well as the short ones: at the old 38px the
-     Play section's opening paragraph ran to six lines of display serif. */
-  max-width: 32ch;
+  max-width: 30ch;
   font-family: var(--font-display);
-  font-size: clamp(23px, 2.7vw, 33px);
-  line-height: 1.2;
-  letter-spacing: -0.022em;
+  font-weight: 500;
+  font-stretch: 96%;
+  font-size: clamp(22px, 2.3vw, 30px);
+  line-height: 1.26;
+  letter-spacing: -0.024em;
   color: var(--c-screen-core);
   text-wrap: pretty;
 }
 
 .body-lg {
   margin: 0 0 18px;
-  max-width: 62ch;
-  font-size: 16.5px;
-  line-height: 1.66;
+  max-width: 66ch;
+  font-size: 16px;
+  line-height: 1.7;
   color: var(--c-text-dim);
 }
 .quiet { color: var(--c-text-faint); font-size: 15px; }
 
 .punchline {
   margin: 34px 0 0;
-  max-width: 34ch;
+  max-width: 32ch;
   padding-left: 22px;
-  border-left: 1px solid var(--c-accent-dim);
+  border-left: 2px solid var(--c-accent-dim);
   font-family: var(--font-display);
-  font-size: clamp(22px, 2.6vw, 30px);
-  line-height: 1.22;
-  letter-spacing: -0.018em;
+  font-weight: 600;
+  font-stretch: 92%;
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.24;
+  letter-spacing: -0.026em;
   color: var(--c-screen-core);
 }
 
 .prompt {
   margin: 26px 0 8px;
   font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.16em;
+  font-size: 11px;
+  letter-spacing: var(--t-label);
   text-transform: uppercase;
   color: var(--c-text-faint);
 }
 
-/* -------- Stats: figures divided by rules, not parked in boxes -------------- */
+/* -------- Stats: figures divided by rules, not parked in boxes ---------------- */
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  margin-top: 38px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-top: 36px;
   border-top: 1px solid var(--rule);
 }
-.stat {
-  padding: 24px 24px 24px 0;
-}
+.stat { padding: 24px 22px 24px 0; }
 .stat + .stat {
-  padding-left: 26px;
+  padding-left: 24px;
   border-left: 1px solid var(--rule-soft);
 }
 .stat-figure {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(42px, 4.6vw, 60px);
-  line-height: 0.94;
-  letter-spacing: -0.035em;
+  font-weight: 700;
+  font-stretch: 86%;
+  font-size: clamp(40px, 4.2vw, 56px);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
   color: var(--c-screen-core);
 }
 .stat-claim {
   display: block;
-  margin-top: 12px;
+  margin-top: 13px;
   max-width: 24ch;
-  font-size: 14px;
+  font-size: 13.5px;
   line-height: 1.5;
   color: var(--c-text-dim);
 }
 
-/* -------- Numbered lists ---------------------------------------------------- */
+/* -------- Numbered lists ------------------------------------------------------ */
 .three,
 .steps {
   list-style: none;
@@ -343,13 +332,13 @@
 }
 .three {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  column-gap: clamp(24px, 2.6vw, 40px);
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  column-gap: clamp(22px, 2.4vw, 36px);
   row-gap: 26px;
 }
 .three li { padding-top: 16px; border-top: 1px solid var(--rule); }
 .three p,
-.steps p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--c-text-dim); }
+.steps p { margin: 0; font-size: 14.5px; line-height: 1.62; color: var(--c-text-dim); }
 
 .steps li {
   display: flex;
@@ -363,8 +352,8 @@
   display: block;
   margin-bottom: 10px;
   font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.18em;
+  font-size: 10.5px;
+  letter-spacing: var(--t-label);
   color: var(--c-accent-dim);
 }
 .steps .num { margin: 0; min-width: 34px; padding-top: 5px; }
@@ -379,8 +368,8 @@
   margin: 36px 0 0;
   padding: 0;
   font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.14em;
+  font-size: 10.5px;
+  letter-spacing: var(--t-label);
   color: var(--c-text-dim);
   text-transform: uppercase;
 }
@@ -391,26 +380,26 @@
   color: var(--c-accent-dim);
 }
 
-/* -------- Entries (was: cards) ----------------------------------------------
+/* -------- Entries (was: cards) ------------------------------------------------
    Rule above, type below. The only hover is the rule waking up, because these
    entries contain links and need to say so. */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  column-gap: clamp(28px, 3vw, 48px);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  column-gap: clamp(24px, 2.8vw, 44px);
 }
 .card {
   padding: 22px 0 26px;
   border-top: 1px solid var(--rule);
   transition: border-top-color var(--d-hover) var(--ease-out);
 }
-.card p { margin: 0 0 14px; font-size: 15px; line-height: 1.6; color: var(--c-text-dim); }
+.card p { margin: 0 0 14px; font-size: 14.5px; line-height: 1.62; color: var(--c-text-dim); }
 .card h3 { transition: color var(--d-hover) var(--ease-out); }
 .card .meta {
   margin-bottom: 10px;
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
+  font-size: 10px;
+  letter-spacing: var(--t-label);
   text-transform: uppercase;
   color: var(--c-text-faint);
 }
@@ -428,8 +417,8 @@
   margin: 0;
   padding: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-size: 10px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--c-text-faint);
 }
@@ -440,85 +429,88 @@
   color: var(--c-accent-dim);
 }
 
-/* -------- Timeline: dates hang in the margin -------------------------------- */
+/* -------- Timeline: dates hang in the margin ----------------------------------- */
 .timeline { list-style: none; margin: 0; padding: 0; }
 .timeline li {
   padding: 22px 0 26px;
   border-top: 1px solid var(--rule-soft);
 }
 .timeline li:first-child { border-top-color: var(--rule); }
-.timeline p { margin: 0 0 8px; max-width: 62ch; font-size: 15px; line-height: 1.6; color: var(--c-text-dim); }
+.timeline p { margin: 0 0 8px; max-width: 62ch; font-size: 14.5px; line-height: 1.62; color: var(--c-text-dim); }
 .timeline .dates {
   margin-bottom: 8px;
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
+  font-size: 10px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--c-text-faint);
 }
-.timeline .org { margin-bottom: 12px; color: var(--c-screen); font-size: 14.5px; }
+.timeline .org { margin-bottom: 12px; color: var(--c-screen); font-size: 14px; }
 
 @media (min-width: 720px) {
   .timeline li {
     display: grid;
-    grid-template-columns: 134px minmax(0, 1fr);
-    column-gap: 28px;
+    grid-template-columns: 120px minmax(0, 1fr);
+    column-gap: 26px;
   }
   .timeline li > * { grid-column: 2; }
   .timeline .dates { grid-column: 1; grid-row: 1; margin: 0; padding-top: 5px; }
 }
 
-/* -------- Definition lists --------------------------------------------------- */
+/* -------- Definition lists ------------------------------------------------------ */
 .facts {
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  column-gap: clamp(24px, 2.6vw, 44px);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  column-gap: clamp(22px, 2.4vw, 40px);
   border-top: 1px solid var(--rule);
 }
 .facts > div { padding: 18px 0 20px; }
 .facts dt {
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: 10px;
+  letter-spacing: var(--t-label);
   text-transform: uppercase;
   color: var(--c-text-faint);
 }
-.facts dd { margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: var(--c-text); }
-.toolkit { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.facts dd { margin: 11px 0 0; font-size: 15.5px; line-height: 1.5; color: var(--c-text); }
+.toolkit { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 
 .faq { margin: 0; }
 .faq > div { padding: 22px 0; border-bottom: 1px solid var(--rule-soft); }
 .faq > div:last-child { border-bottom: 0; }
 .faq dt {
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 400;
+  font-weight: 600;
+  font-stretch: 94%;
+  font-size: 19px;
+  line-height: 1.2;
   letter-spacing: -0.012em;
   color: var(--c-text);
 }
-.faq dd { margin: 10px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.62; color: var(--c-text-dim); }
+.faq dd { margin: 11px 0 0; max-width: 64ch; font-size: 14.5px; line-height: 1.68; color: var(--c-text-dim); }
 
-/* -------- Games --------------------------------------------------------------- */
+/* -------- Games ------------------------------------------------------------------ */
 .games {
   list-style: none;
   margin: 30px 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  column-gap: clamp(24px, 2.6vw, 40px);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  column-gap: clamp(22px, 2.4vw, 36px);
   row-gap: 22px;
 }
 .games li { padding-top: 14px; border-top: 1px solid var(--rule); }
-.games p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--c-text-dim); }
+.games p { margin: 0; font-size: 14px; line-height: 1.58; color: var(--c-text-dim); }
 
-/* -------- Links and buttons ---------------------------------------------------- */
+/* -------- Links and buttons -------------------------------------------------------- */
 .links { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 14px 0 0; }
 .cta-row { margin-top: 30px; align-items: center; }
 
 .out {
   position: relative;
-  font-size: 14.5px;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--c-accent);
   text-decoration: none;
 }
@@ -541,12 +533,14 @@
 
 .btn {
   display: inline-block;
-  padding: 14px 26px;
+  padding: 14px 24px;
   border-radius: 2px;
   border: 1px solid rgba(95, 231, 224, 0.38);
   background: transparent;
   color: var(--c-screen-core);
-  font-size: 15px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
   text-decoration: none;
   transition:
     background-color var(--d-hover) var(--ease-out),
@@ -558,106 +552,73 @@
 }
 .btn:active { transform: scale(0.985); }
 
-/* -------- Back control ---------------------------------------------------------
-   Sits at the head of the rail, where a way out is looked for. The arrow is
-   the one piece of hover motion in here, and it points the way it will go. */
-.back-btn {
-  position: absolute;
-  top: clamp(22px, 3vh, 34px);
-  left: 0;
-  width: var(--rail-w);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--c-text-dim);
-  font-size: 18px;
-  font-family: var(--font-mono);
-  cursor: pointer;
-  transition: color var(--d-hover) var(--ease-out);
-}
-.back-arrow {
-  display: block;
-  width: 40px;
-  height: 40px;
-  line-height: 38px;
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  transition:
-    transform 150ms var(--ease-out),
-    border-color var(--d-hover) var(--ease-out);
-}
-.back-text {
-  /* Named for screen readers, drawn only where there is room for it. */
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-@media (hover: hover) and (pointer: fine) {
-  .back-btn:hover { color: var(--c-accent); }
-  .back-btn:hover .back-arrow {
-    transform: translate3d(-3px, 0, 0);
-    border-color: rgba(95, 231, 224, 0.45);
-  }
-}
-
-/* -------- Closing ---------------------------------------------------------------
+/* -------- Closing -------------------------------------------------------------------
    Out the way it came in, at half the time. Every entrance inside the sheet is
    cancelled so nothing replays under the exit. */
 .section-backdrop[data-state='closing'] {
   animation: backdrop-in 200ms var(--ease-out) reverse both;
 }
-.section-backdrop[data-state='closing'] .section-panel {
-  animation: sheet-in 220ms var(--ease-out) reverse both;
+.section-backdrop[data-state='closing'] .section-scroll {
+  animation: panel-in 220ms var(--ease-out) reverse both;
+}
+.section-backdrop[data-state='closing'] .chapter {
+  animation: fade-in 180ms var(--ease-out) reverse both;
 }
 .section-backdrop[data-state='closing'] .stagger > *,
 .section-backdrop[data-state='closing'] .title-ink,
-.section-backdrop[data-state='closing'] .section-head::after,
-.section-backdrop[data-state='closing'] .sheet-rail > * {
+.section-backdrop[data-state='closing'] .chapter > *,
+.section-backdrop[data-state='closing'] .chapter-rule {
   animation: none;
   opacity: 1;
   transform: none;
   clip-path: none;
 }
 
-/* -------- Narrow screens ---------------------------------------------------------
-   No room for a rail: the sheet takes the whole width, the object you clicked
-   moves into the masthead, and the way back becomes a labelled control. */
+/* -------- Narrow screens -------------------------------------------------------------
+   No room for a split: the chapter sits on top of the page and the panel
+   becomes the scroll container, so it all reads as one column. */
 @media (max-width: 900px) {
+  .section-backdrop {
+    background: linear-gradient(180deg, rgba(2, 4, 7, 0.5), rgba(2, 4, 7, 0.8) 38%);
+  }
+  /* A flex column, not a block: `flex: 1 0 auto` on the page lets it grow to
+     fill a short section without ever shrinking below its content, so the
+     panel is opaque all the way to the bottom of the screen. As a plain block
+     it stopped at the end of the text and the room's own section list showed
+     through underneath. */
   .section-panel {
-    grid-template-columns: minmax(0, 1fr);
-    border-left: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    animation: panel-in 380ms var(--ease-out) both;
   }
-  .sheet-rail { display: none; }
-  .eyebrow { display: block; }
-  .section-scroll { padding-top: 74px; }
+  .chapter { flex: 0 0 auto; }
+  .section-scroll { flex: 1 0 auto; }
+  .chapter {
+    display: block;
+    padding: clamp(60px, 10vh, 92px) clamp(22px, 5vw, 36px) clamp(26px, 4vh, 40px);
+  }
+  .chapter-mark { margin-bottom: 18px; }
+  .section-title { font-size: clamp(38px, 11vw, 62px); }
   .back-btn {
-    top: 16px;
-    left: clamp(20px, 5vw, 32px);
-    width: auto;
-    gap: 10px;
-    font-size: 13px;
-    letter-spacing: 0.06em;
+    position: absolute;
+    top: clamp(18px, 3vh, 26px);
+    left: clamp(22px, 5vw, 36px);
   }
-  .back-arrow {
-    width: auto;
-    height: auto;
-    line-height: 1;
-    border: 0;
-    font-size: 15px;
+  .section-scroll {
+    overflow: visible;
+    padding: clamp(28px, 4vh, 40px) clamp(22px, 5vw, 36px) clamp(64px, 9vh, 96px);
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+    box-shadow: none;
+    animation: none;
   }
-  .back-text {
-    position: static;
-    width: auto;
-    height: auto;
-    clip-path: none;
+  .section-backdrop[data-state='closing'] .section-panel {
+    animation: panel-in 200ms var(--ease-out) reverse both;
   }
+  .section-backdrop[data-state='closing'] .section-scroll { animation: none; }
   .stat { padding-right: 18px; }
   .stat + .stat { padding-left: 18px; }
 }
@@ -674,18 +635,17 @@
   .flow li + li::before { margin: 0 9px; }
 }
 
-/* -------- Reduced motion -----------------------------------------------------
+/* -------- Reduced motion ---------------------------------------------------------
    Fewer and gentler, not zero: the sheet still announces itself, it just does
    not travel, wipe or draw. */
 @media (prefers-reduced-motion: reduce) {
   .section-backdrop,
-  .section-panel { animation: fade-in 200ms var(--ease-out) both; }
+  .section-panel,
+  .section-scroll { animation: fade-in 200ms var(--ease-out) both; }
   .stagger > *,
-  .rail-index,
-  .rail-eyebrow { animation: fade-in 220ms var(--ease-out) both; animation-delay: 0ms; }
+  .chapter-mark,
+  .back-btn { animation: fade-in 220ms var(--ease-out) both; animation-delay: 0ms; }
   .title-ink { animation: fade-in 240ms var(--ease-out) both; clip-path: none; }
-  .rail-rule,
-  .section-head::after { animation: none; transform: none; }
-  .back-arrow,
-  .btn { transition-property: color, border-color, background-color; }
+  .chapter-rule { animation: none; transform: none; }
+  .back-arrow { transition: none; }
 }
