@@ -72,7 +72,7 @@ export default function App() {
 
       {roomReady && (
         <>
-          <Signature />
+          <Signature away={route !== null} />
           <NavMenu onOpen={open} current={route} />
           <SoundToggle enabled={roomTone.enabled} onToggle={roomTone.toggle} />
           {compact ? (

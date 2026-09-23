@@ -212,6 +212,55 @@ call in any of them, so it is spent only where it reads — the ball, the snake'
 head, the platform the player just hit — and never on every element of a
 collection.
 
+## The section sheets
+
+A section is not a dialog box. `SectionShell` draws an editorial sheet anchored
+to the right edge of the viewport at `min(1180px, 100%)`, so the room's blurred
+plate keeps showing down the left-hand side and the backdrop is graded left to
+right rather than radially — you never lose where you are standing.
+
+The sheet is a two-column grid. The rail (`clamp(76px, 7vw, 112px)`) carries the
+section number, a hairline, the object you clicked set vertically, and the way
+back at its head. The page fills the second column, and from 1080px up any
+`<section>` that has an `<h2>` splits again: the heading hangs right-aligned in
+a 168px margin column and the prose keeps a 62ch measure beside it. Sections
+without a heading — the mastheads — stay full-bleed, which is what makes the
+opening of each page read differently from its body.
+
+Everything in here is built from hairlines and type. There are no bordered,
+rounded, translucent boxes: stats are divided by rules, project entries are
+ruled-off index rows, tags are a mono run separated by middots, and CV dates
+hang in their own margin column. If you add a pattern, add it that way.
+
+Four things move, and nothing else:
+
+1. **Open.** The sheet slides 44px from the edge it is anchored to (420ms), the
+   title is wiped up from its own baseline with `clip-path` rather than faded
+   (480ms at +220ms), the rail's hairline draws down and the masthead rule draws
+   across, and the body staggers at 50ms. `clip-path` is the one non-transform
+   property worth animating here: it composites, and a fade on display type that
+   size reads as something still loading.
+
+2. **Close.** The same two animations played `reverse`, at roughly half the
+   time — 220ms for the sheet, 200ms for the backdrop. `SectionShell` holds the
+   component for `EXIT_MS` in a `closing` state to let it play, and cancels every
+   entrance inside the sheet while it does so nothing replays underneath. Exit
+   is deliberately faster than entry: the visitor has already decided to leave.
+
+3. **The back arrow** nudges 3px in the direction it will take you, 150ms.
+
+4. **Project entries and cabinets** brighten their rule under the pointer,
+   because they contain links and have to say so. That is the entire hover
+   budget for the sheets; nothing else moves on hover.
+
+Under `prefers-reduced-motion` the sheet still announces itself but does not
+travel, wipe or draw — everything collapses to a 200-240ms fade, and the exit
+delay in `SectionShell` drops to zero so closing is immediate.
+
+The masthead heading is focused on open for screen readers, so its focus ring is
+suppressed explicitly; Escape, the rail button and a click on the room are the
+real controls, and Tab stays trapped inside while the sheet is up.
+
 ## Copy
 
 Game names, kinds and taglines live in `play.games` in `src/content/profile.ts`,

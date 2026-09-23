@@ -9,9 +9,13 @@ interface Props {
 }
 
 /**
- * First load: the room powers on. Near-black, the wall resolves, the name
- * settles, and the laptop glow blooms in last — the light the whole scene is
- * lit by should be the last thing to arrive.
+ * First load: the room powers on. Near-black, a rule draws across the top of
+ * the frame, the name is wiped up a line at a time, and the laptop glow blooms
+ * in last — the light the whole scene is lit by should be the last thing to
+ * arrive.
+ *
+ * The title card is set into the bottom-left corner rather than the middle of
+ * the screen, so it reads as a masthead over the room instead of a splash.
  *
  * ~2.6s and skippable by click, key or the explicit control. GSAP is here
  * because this is an orchestrated sequence across several elements with
@@ -39,21 +43,41 @@ export function Intro({ onDone, reducedMotion }: Props) {
       const tl = gsap.timeline({ onComplete: finish });
       tl.to('.intro-veil', { opacity: 0.55, duration: 0.7, ease: 'power2.out' })
         .fromTo(
-          '.intro-name',
-          { opacity: 0, filter: 'blur(14px)', y: 10 },
-          { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.9, ease: 'power3.out' },
-          0.25,
+          '.intro-rule',
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.7, ease: 'power3.out' },
+          0.1,
+        )
+        // Wiped up from the baseline, a word at a time. A fade on type this
+        // size reads as something still loading; a wipe reads as a reveal.
+        .fromTo(
+          '.intro-word',
+          { clipPath: 'inset(0 0 100% 0)', yPercent: 8 },
+          {
+            clipPath: 'inset(0 0 -20% 0)',
+            yPercent: 0,
+            duration: 0.78,
+            ease: 'power3.out',
+            stagger: 0.09,
+          },
+          0.3,
         )
         .fromTo(
           '.intro-sub',
           { opacity: 0, y: 8 },
-          { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' },
-          0.7,
+          { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
+          0.85,
+        )
+        .fromTo(
+          '.intro-meta',
+          { opacity: 0 },
+          { opacity: 1, duration: 0.5, ease: 'power2.out' },
+          1.05,
         )
         // The bloom: the laptop coming on, and the cue to leave.
-        .to('.intro-bloom', { opacity: 1, scale: 1, duration: 1.0, ease: 'power2.out' }, 0.9)
-        .to('.intro-name, .intro-sub', { opacity: 0, duration: 0.45, ease: 'power2.in' }, 1.95)
-        .to('.intro', { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 2.1);
+        .to('.intro-bloom', { opacity: 1, scale: 1, duration: 1.0, ease: 'power2.out' }, 0.95)
+        .to('.intro-copy', { opacity: 0, duration: 0.45, ease: 'power2.out' }, 2.05)
+        .to('.intro', { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 2.2);
     }, root);
 
     return () => ctx.revert();
@@ -75,14 +99,32 @@ export function Intro({ onDone, reducedMotion }: Props) {
     };
   }, [onDone]);
 
+  const words = identity.name.split(' ');
+
   return (
     <div className="intro" ref={root} role="presentation">
       <div className="intro-veil" />
       <div className="intro-bloom" />
+
       <div className="intro-copy">
-        <p className="intro-name">{identity.name}</p>
+        <div className="intro-rule" />
+        <p className="intro-name" aria-label={identity.name}>
+          {words.map((word) => (
+            <span className="intro-line" key={word}>
+              <span className="intro-word">{word}</span>
+            </span>
+          ))}
+        </p>
         <p className="intro-sub">{identity.positioning}</p>
+        <p className="intro-meta">
+          <span>{identity.location}</span>
+          <span className="intro-meta-sep" aria-hidden="true">
+            /
+          </span>
+          <span>Portfolio</span>
+        </p>
       </div>
+
       <button type="button" className="intro-skip" onClick={onDone}>
         Skip
       </button>

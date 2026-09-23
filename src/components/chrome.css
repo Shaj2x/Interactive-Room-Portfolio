@@ -115,11 +115,14 @@
 /* -------- Signature --------------------------------------------------------- */
 .signature {
   position: fixed;
+  transition: opacity var(--d-ui) var(--ease-out);
   left: clamp(16px, 2.4vw, 28px);
   top: clamp(16px, 2.4vw, 28px);
   z-index: 45;
   pointer-events: none;
 }
+.signature.is-away { opacity: 0; }
+
 .sig-name {
   margin: 0;
   font-family: var(--font-display);

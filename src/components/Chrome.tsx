@@ -121,10 +121,14 @@ export function SoundToggle({ enabled, onToggle }: { enabled: boolean; onToggle:
   );
 }
 
-/** Corner signature. Quiet, and the only chrome the room carries at rest. */
-export function Signature() {
+/**
+ * Corner signature. Quiet, and the only chrome the room carries at rest — it
+ * steps aside when a section sheet slides over the top of it rather than
+ * running underneath and being sliced in half.
+ */
+export function Signature({ away }: { away: boolean }) {
   return (
-    <div className="signature">
+    <div className={`signature${away ? ' is-away' : ''}`} aria-hidden={away}>
       <p className="sig-name">{identity.name}</p>
       <p className="sig-line">{identity.positioning}</p>
     </div>

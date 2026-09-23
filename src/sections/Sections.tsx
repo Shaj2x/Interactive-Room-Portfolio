@@ -32,7 +32,7 @@ function Out({ href, children }: { href: string; children: React.ReactNode }) {
 /* --------------------------------------------------------------- What I build */
 function Build({ onClose }: { onClose: () => void }) {
   return (
-    <SectionShell eyebrow="The laptop" title="What I build" onClose={onClose}>
+    <SectionShell eyebrow="The laptop" title="What I build" index={1} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{identity.heroLine}</p>
         <p className="body-lg">{identity.subline}</p>
@@ -116,7 +116,7 @@ function Build({ onClose }: { onClose: () => void }) {
 /* ---------------------------------------------------------------------- About */
 function About({ onClose }: { onClose: () => void }) {
   return (
-    <SectionShell eyebrow="The corkboard" title="About" onClose={onClose}>
+    <SectionShell eyebrow="The corkboard" title="About" index={4} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{about.headline}</p>
         {about.paragraphs.map((p) => (
@@ -143,7 +143,7 @@ function About({ onClose }: { onClose: () => void }) {
 /* --------------------------------------------------------------------- Record */
 function Record({ onClose }: { onClose: () => void }) {
   return (
-    <SectionShell eyebrow="The bookshelf" title="Record" onClose={onClose}>
+    <SectionShell eyebrow="The bookshelf" title="Record" index={3} onClose={onClose}>
       <section className="stagger">
         <h2>Education</h2>
         <ul className="timeline">
@@ -188,7 +188,7 @@ function Record({ onClose }: { onClose: () => void }) {
 /* ----------------------------------------------------------------- Leadership */
 function Leadership({ onClose }: { onClose: () => void }) {
   return (
-    <SectionShell eyebrow="The sticky notes" title="Leadership and community" onClose={onClose}>
+    <SectionShell eyebrow="The sticky notes" title="Leadership and community" index={5} onClose={onClose}>
       <section className="stagger">
         <ul className="timeline">
           {leadership.map((l) => (
@@ -213,7 +213,7 @@ function Leadership({ onClose }: { onClose: () => void }) {
 /* ------------------------------------------------------------------- Projects */
 function Projects({ onClose }: { onClose: () => void }) {
   return (
-    <SectionShell eyebrow="The poster" title="Projects shipped" onClose={onClose}>
+    <SectionShell eyebrow="The poster" title="Projects shipped" index={2} onClose={onClose}>
       <section className="stagger">
         <p className="lede">Six builds. Repositories and demos below.</p>
         <div className="cards project-cards">
@@ -240,7 +240,7 @@ function Projects({ onClose }: { onClose: () => void }) {
 /* ----------------------------------------------------------------------- Play */
 function Play({ onClose }: { onClose: () => void }) {
   return (
-    <SectionShell eyebrow="The mug" title="Play" onClose={onClose}>
+    <SectionShell eyebrow="The mug" title="Play" index={6} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{play.intro}</p>
       </section>
@@ -274,7 +274,7 @@ function Play({ onClose }: { onClose: () => void }) {
 function Contact({ onClose }: { onClose: () => void }) {
   const subject = encodeURIComponent('Thirty minutes — where my time goes');
   return (
-    <SectionShell eyebrow="The phone" title="Book a call" onClose={onClose}>
+    <SectionShell eyebrow="The phone" title="Book a call" index={7} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{contact.cta}</p>
         <p className="body-lg">{contact.body}</p>
@@ -295,7 +295,7 @@ function Contact({ onClose }: { onClose: () => void }) {
 /* --------------------------------------------------------------------- Résumé */
 function Resume({ onClose }: { onClose: () => void }) {
   return (
-    <SectionShell eyebrow="The door" title="Résumé" onClose={onClose}>
+    <SectionShell eyebrow="The door" title="Résumé" index={8} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{identity.summary}</p>
         {resumeUrl ? (
