@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { HOTSPOTS } from '../scene/hotspots';
 import { identity, type SectionId } from '../content/profile';
+import { originOf, type OpenOrigin } from '../scene/openOrigin';
 import './chrome.css';
 
 interface NavProps {
-  onOpen: (id: SectionId) => void;
+  onOpen: (id: SectionId, origin: OpenOrigin | null) => void;
   current: SectionId | null;
 }
 
@@ -56,12 +57,15 @@ export function NavMenu({ onOpen, current }: NavProps) {
                 <button
                   type="button"
                   aria-current={current === h.id ? 'page' : undefined}
-                  onClick={() => {
-                    onOpen(h.id);
+                  onClick={(e) => {
+                    onOpen(h.id, originOf(e.currentTarget));
                     setOpen(false);
                   }}
                 >
-                  {h.label}
+                  <span className="nav-no" aria-hidden="true">
+                    {String(h.order).padStart(2, '0')}
+                  </span>
+                  <span className="nav-label">{h.label}</span>
                 </button>
               </li>
             ))}
@@ -88,9 +92,12 @@ export function CompactNav({ onOpen, current }: NavProps) {
                 <button
                   type="button"
                   aria-current={current === h.id ? 'page' : undefined}
-                  onClick={() => onOpen(h.id)}
+                  onClick={(e) => onOpen(h.id, originOf(e.currentTarget))}
                 >
-                  {h.label}
+                  <span className="nav-no" aria-hidden="true">
+                    {String(h.order).padStart(2, '0')}
+                  </span>
+                  <span className="nav-label">{h.label}</span>
                 </button>
               </li>
             ))}

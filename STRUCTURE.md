@@ -249,43 +249,50 @@ U+0000–00FF, so the latin-ext subsets were dropped and saved 105kB. If you add
 copy in another language, pull that subset back from Google's css2 endpoint and
 add the matching `@font-face`.
 
-## Colour, and the two lights
+## Colour, and the three lights
 
-The site is lit by two sources and they are not the same colour.
+The site is lit by three sources and they are not the same colour.
 
 **The room is the window.** Cold blue night, rain, city glass. Those values
 live in `tokens.css` as `--c-void`, `--c-navy`, `--c-screen*` and the blue-grey
 `--c-text*`, and they are the photograph's own light — do not warm them.
 
-**A section sheet is the lamp.** Paper, brass and ember on a brown-black
-ground. The warm set is `--w-*` in `tokens.css`, and the switch happens exactly
-once: `.section-backdrop` rebinds the semantic tokens to it —
+**The room's furniture is the lamp.** The menu button, the room-tone control,
+the signature, the hotspot rims and the intro are warm: `--c-accent` is amber
+globally, because the room is lit amber from the left and an amber rim sits on
+that photograph as if it belonged to it. The `--w-*` set holds the warm darks.
+
+**A section is paper under that lamp.** Warm cream, dark ink. The `--p-*` set.
+
+The switch happens exactly once per surface, by rebinding the semantic tokens:
 
 ```css
-.section-backdrop {
-  --c-void: var(--w-void);
-  --c-screen-core: var(--w-paper);
-  --c-text-dim: var(--w-text-dim);
+.section-backdrop {          /* ink on paper      */
+  --c-screen-core: var(--p-ink);
+  --c-text-dim: var(--p-ink-soft);
+  --c-accent: var(--p-accent);
   /* …and the rest */
+}
+.arc-stage {                 /* …but the game screen is lit by itself */
+  --c-screen-core: var(--w-paper);
+  --c-accent: #e8a465;
 }
 ```
 
-Everything inside a sheet — the page, the chapter, the arcade shell, the
-scrollbars, `:focus-visible`, `::selection` — reads those through the cascade
-and warms up without being rewritten. **So write section CSS against the
-semantic `--c-*` tokens, never against a literal.** A hardcoded `rgba()` in
-here is a colour that will not follow the lamp.
+Everything inside a surface — its type, its rules, its scrollbars,
+`:focus-visible`, `::selection` — reads those through the cascade. **So write
+CSS against the semantic `--c-*` tokens, never against a literal.** A
+hardcoded `rgba()` is a colour that cannot follow the light, and there are none
+left in the section, arcade, chrome or room stylesheets.
 
-`--c-accent` is warm globally, not just in the sheets: the room is lit amber
-from the left, and an amber hotspot rim sits on that photograph as if it
-belonged to it. `--c-accent-dim` is the one token a sheet lifts on its own
-(`#bd8049`), because it carries the 01/02/03 numerals and the room's darker
-value read 3.8:1 on the panel.
+The one deliberate exception is `.intro-bloom`, which stays blue: it is the
+laptop screen coming on, and that light really is cold.
 
-Measured against the panel, warm text lands at: titles 16.9:1, body
-`--w-text-dim` 7.7:1, accent 8.9:1, and the 10px mono labels
-(`--w-text-faint`) 5.7:1 — that last one was 4.2:1 before and is the number to
-re-check if you darken anything.
+Every paper value was picked against `--p-paper-lo`, the darkest corner of the
+sheet, not against the average — the corner is where a label is hardest to read
+and it is the only number worth tuning to. Measured there: titles 12.7:1, body
+8.3:1, 10px mono labels 5.1:1, links 4.9:1, numerals 4.6:1. The same exercise
+on the warm-dark set gives body 7.7:1 and labels 5.7:1.
 
 The canvases cannot read CSS per frame, so `src/game/palette.ts` mirrors the
 warm values by hand; change a colour and change it in both places. The
@@ -295,74 +302,94 @@ had to stay warm while staying apart — so the old teal is terracotta
 against clay is far enough in hue and value to read at speed, which is the only
 job that pair has.
 
-The one cold thing left inside the warm half is `.intro-bloom`. It is the
-laptop screen coming on, and that light really is blue.
-
 ## The section sheets
 
-A section is not a dialog box. `SectionShell` draws a chapter opening split in
-two.
+A section is not a dialog box. `SectionShell` draws a sheet of paper pulled
+under the lamp, and it **grows out of whatever you clicked**.
 
-The left column (`clamp(300px, 36vw, 540px)`) is **transparent**. The room's
-blurred plate shows straight through it, and the chapter mark, the title and
-the way back sit on the photograph — you are still in the room, reading a page
-of it. The right column is a solid panel carrying the text, so prose never has
-to fight an image for contrast. The backdrop is graded left-to-right and only
-needs to darken the half that shows the room.
+### Where it comes from
 
-The title is sized in `cqw` against that column, not in `vw` — `.chapter`
-declares `container-type: inline-size` for it. Sized off the viewport,
-"Projects shipped" set one line wider than the column and its final letter was
-painted over by the panel beside it. It is bounded by `8vh` as well, so
-"Leadership and community" still fits on a 700px-tall laptop.
+Every control that opens a section reports its own centre in viewport pixels —
+`Hotspot`, the menu, the phone's section list, all via `originOf()` in
+`scene/openOrigin.ts`. App holds it while the section is open and hands it to
+the shell, which writes it as `--ox` / `--oy`. The growing itself is pure CSS:
 
-Below 900px the split collapses: `.section-panel` becomes a flex column and the
-scroll container, the chapter sits on top of the page, and `.section-scroll`
-takes `flex: 1 0 auto` so the panel stays opaque to the bottom of the screen
-even when a section is short. As a plain block it stopped at the end of the
-text and the room's own section list showed through underneath.
+```css
+.paper-stack {
+  transform-origin:
+    calc(var(--ox, 50vw) - (100vw - 100%) / 2)
+    calc(var(--oy, 50vh) - (100vh - 100%) / 2);
+}
+```
 
-Everything in the page is built from hairlines, scale and width. There are no
-bordered, rounded, translucent boxes: stats are divided by rules, project
-entries are ruled-off index rows, tags are a mono run separated by middots, CV
-dates hang in their own margin column, and the arcade's cabinet list is a ruled
-list with an amber bar marking the loaded machine. The big display voice is
-spent entirely on the chapter title, so headings inside the page are small,
-wide, tracked mono-ish markers rather than a second shout. If you add a
-pattern, add it that way.
+The stack is centred, so its left edge is at `(100vw - width) / 2`, and `100%`
+in `transform-origin` resolves against the element's own box — which makes that
+a legal value. No layout read, no measuring pass, no frame of the sheet in the
+wrong place while JavaScript catches up. `null` origin falls back to dead
+centre, which is the honest answer for a deep link or a browser Back: it did
+not come from anywhere.
 
-Four things move, and nothing else:
+### What moves, and what does not
 
-1. **Open.** The page panel arrives 40px from the edge it is anchored to
-   (420ms), the title is wiped up from its own baseline with `clip-path` rather
-   than faded (480ms at +200ms), the chapter rule draws out, and the body
-   staggers at 50ms. `clip-path` is the one non-transform property worth
-   animating here: it composites, and a fade on display type that size reads as
-   something still loading.
+**The frame scales; the type does not.** Scaling a page of text from 0.3 renders
+it blurred for the whole flight, so `.paper-stack` travels alone and the head
+band, the page and the title fade in behind it once it has landed. The title is
+then wiped up from its own baseline with `clip-path` — it composites, and a
+fade on display type that size reads as something still loading.
 
-2. **Close.** The same animations played `reverse`, at roughly half the time —
-   220ms for the panel, 200ms for the backdrop. `SectionShell` holds the
-   component for `EXIT_MS` in a `closing` state to let it play, and cancels
-   every entrance inside so nothing replays underneath. Exit is deliberately
-   faster than entry: the visitor has already decided to leave.
+**The page stays square; only the blank sheet behind it tilts.** Half a degree
+of rotation on a column of body text costs crisp glyph rasterisation, so
+`.paper-under` carries the whole off-square idea and the sheet you read does
+not. The same rule is why the hotspot tags can be tilted and the sheets cannot:
+tiny type on a chip has nothing to lose.
 
-3. **The back arrow** nudges 4px in the direction it will take you, 150ms.
+**Close is the entrance reversed at roughly half the time** — 260ms, back into
+the object it came out of. `SectionShell` holds the component in a `closing`
+state to let it play and cancels every entrance inside so nothing replays.
 
-4. **Project entries and cabinets** brighten their rule under the pointer,
-   because they contain links and have to say so. That is the entire hover
-   budget for the sheets.
+**Back sits top-left at every width.** It is where a way out is looked for, it
+puts the control first in the tab order, and it keeps the top-right corner free
+for the room's menu button — which the two of them were fighting over on a
+phone when the control was on the right.
 
-Under `prefers-reduced-motion` the sheet still announces itself but does not
-travel, wipe or draw — everything collapses to a 200-240ms fade, and the exit
-delay in `SectionShell` drops to zero so closing is immediate.
+### Two layout traps worth knowing
 
-Two pieces of room chrome step aside while a section is open, because the
-chapter column now stands where they did: the corner signature fades out
-(`.signature.is-away`) and the room-tone control moves under the menu button
-(`.sound.is-tucked`), the same place it lives on a narrow screen. The masthead
-heading is focused on open for screen readers, so its focus ring is suppressed
-explicitly; Escape, the back control and a click on the room are the real
-controls, and Tab stays trapped inside while the sheet is up.
+`.section-backdrop` uses an explicit `grid-template: minmax(0,1fr) /
+minmax(0,1fr)`, not `place-items` on an auto track. With an auto row the grid
+measured the sheet's max-content contribution — a percentage height is
+indefinite during intrinsic sizing, so the row grew to the full 2774px of the
+page inside and centred the sheet 958px below the fold. The definite track also
+gives `height: min(920px, 100%)` something real to resolve against.
+
+Headings hang in the margin and the timeline's dates hang beside their entries,
+both via `@container` queries on `.paper` — measured against the sheet, which is
+not the same thing as the viewport. The title is likewise sized in `cqw`.
+
+### The popups
+
+All four speak the same language:
+
+- **The menu** is the same paper, torn small, revealed by a `clip-path` wipe
+  down from its trigger with the lines arriving behind it. A menu that scales
+  from 0.96 is the most generic entrance on the web.
+- **The hotspot tags** are paper tags pinned to the room a degree off-square,
+  with an amber top edge. No `backdrop-filter` — it samples the room underneath
+  and forces the whole viewport to be re-read whenever anything moves.
+- **The arcade overlays** stay on the screen's own light: a ruled plate, with
+  hairlines drawing out from the kicker and the title wiped up like every other
+  title on the site.
+- **The intro** is the lamp coming on *across* the name rather than a curtain
+  lifting off it — a narrow bright band travelling through
+  `background-clip: text`. `backgroundPosition` is not a compositor property,
+  but this is a one-off 2.6s sequence on two words and the cost never repeats;
+  nothing else can light type from a moving source without stacking a second
+  copy of the word. The band is deliberately narrow (45%–54% of a 300%-wide
+  gradient): the first version ramped over 70% of the word and read as the
+  whole name brightening at once rather than an edge you can watch move.
+
+Under `prefers-reduced-motion` every surface still announces itself but nothing
+grows, wipes, draws or sweeps — all of it collapses to a 200–240ms fade, the
+exit delay drops to zero, and the intro's name is simply lit where it stands.
 
 ## Copy
 

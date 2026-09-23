@@ -50,7 +50,6 @@
   text-transform: uppercase;
   color: var(--c-text-faint);
 }
-.arc-cabinet.is-active .arc-cabinet-kind { color: var(--c-amber); }
 
 .arc-cabinet-name {
   font-family: var(--font-display);
@@ -71,11 +70,24 @@
   color: var(--c-accent-dim);
 }
 
-/* -------- Stage ------------------------------------------------------------- */
+/* -------- Stage -------------------------------------------------------------
+   The page around this is paper now, so the stage has to put the dark set back:
+   it is a screen resting on the desk, and everything drawn inside it — the HUD,
+   the overlays, the controls — is lit by the screen rather than by the lamp. */
 .arc-stage {
+  --c-screen-core: var(--w-paper);
+  --c-screen: var(--w-paper-dim);
+  --c-text: var(--w-text);
+  --c-text-dim: var(--w-text-dim);
+  --c-text-faint: var(--w-text-faint);
+  --c-accent: #e8a465;
+  --c-accent-dim: #bd8049;
+  --rule: var(--w-rule);
+  --rule-soft: var(--w-rule-soft);
+
   border: 1px solid var(--w-rule);
   border-radius: 4px;
-  background: linear-gradient(168deg, rgba(28, 19, 12, 0.82), rgba(12, 7, 4, 0.94));
+  background: linear-gradient(168deg, #1c130c, #0a0603);
   overflow: hidden;
   /* Switching cabinets re-keys this element, so the swap reads as a cut to a
      new machine rather than a silent content change. */
@@ -169,30 +181,63 @@
      be re-read every frame — measured at 46fps with it and 120fps without, on
      the ready overlay every visitor sees first. A slightly heavier scrim does
      the same separating job for nothing. */
-  background: radial-gradient(ellipse at 50% 50%, rgba(4, 7, 12, 0.74), rgba(3, 5, 9, 0.93));
-  animation: arc-overlay-in 260ms var(--ease-out) both;
+  background: radial-gradient(ellipse at 50% 46%, rgba(20, 12, 6, 0.78), rgba(5, 3, 1, 0.95));
+  animation: arc-overlay-in 220ms var(--ease-out) both;
 }
 @keyframes arc-overlay-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
+/* The kicker is a ruled plate, not a floating word: two hairlines running out
+   from the label, so the overlay reads as something stamped onto the screen. */
 .arc-overlay-kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--c-accent);
+  animation: fade-rise 300ms var(--ease-out) 60ms both;
 }
+.arc-overlay-kicker::before,
+.arc-overlay-kicker::after {
+  content: '';
+  width: clamp(20px, 6vw, 54px);
+  height: 1px;
+  background: var(--c-accent-dim);
+  transform-origin: right;
+  animation: arc-rule-out 360ms var(--ease-out) 120ms both;
+}
+.arc-overlay-kicker::after { transform-origin: left; }
+@keyframes arc-rule-out {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Wiped up from its baseline like every other title on the site. */
 .arc-overlay-title {
   margin: 0;
+  overflow: hidden;
   font-family: var(--font-display);
-  font-size: clamp(34px, 5vw, 52px);
-  line-height: 1;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  font-stretch: 86%;
+  font-size: clamp(32px, 4.6vw, 50px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
   color: var(--c-screen-core);
+  clip-path: inset(0 0 100% 0);
+  animation: arc-title-wipe 420ms var(--ease-out) 110ms both;
 }
+@keyframes arc-title-wipe {
+  from { clip-path: inset(0 0 100% 0); transform: translate3d(0, 0.12em, 0); }
+  to   { clip-path: inset(0 0 -20% 0); transform: translate3d(0, 0, 0); }
+}
+.arc-overlay-line,
+.arc-overlay-actions { animation: fade-rise 320ms var(--ease-out) 200ms both; }
 .arc-overlay-line {
   margin: 0;
   max-width: 44ch;
@@ -204,8 +249,8 @@
 
 /* One accent per outcome: amber won it, teal came close, warm grey did not. */
 .arc-overlay-result.tone-win .arc-overlay-title { color: var(--c-amber); }
-.arc-overlay-result.tone-near .arc-overlay-title { color: var(--c-accent); }
-.arc-overlay-result.tone-loss .arc-overlay-title { color: #b6a99a; }
+.arc-overlay-result.tone-near .arc-overlay-title { color: #e0745a; }
+.arc-overlay-result.tone-loss .arc-overlay-title { color: var(--c-text-dim); }
 
 /* -------- Controls ---------------------------------------------------------- */
 .arc-controls {
@@ -222,7 +267,7 @@
 .arc-btn {
   padding: 8px 15px;
   border-radius: 7px;
-  border: 1px solid rgba(226, 190, 148, 0.24);
+  border: 1px solid var(--rule);
   background: rgba(10, 18, 28, 0.85);
   color: var(--c-text);
   font-family: var(--font-mono);
@@ -293,4 +338,11 @@
   .arc-stage { animation: arc-overlay-in 180ms var(--ease-out) both; }
   .arc-overlay { animation-duration: 120ms; }
   .arc-btn:active:not(:disabled) { transform: none; }
+}
+
+/* The stage carries its own copy: it is inside a section sheet, but its
+   keyframes must not depend on one existing. */
+@keyframes fade-rise {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }

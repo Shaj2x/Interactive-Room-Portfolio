@@ -1,41 +1,44 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import type { OpenOrigin } from '../scene/openOrigin';
 
 /** Exit is faster than entry — the user has already decided to leave. */
-const EXIT_MS = 220;
+const EXIT_MS = 260;
 
 interface Props {
   title: string;
-  /** Sits in the chapter mark — the object in the room you clicked. */
+  /** The object in the room you clicked to get here. */
   eyebrow: string;
   /** Position in the room's tab order. Printed as 01–08. */
   index: number;
+  /** Where on screen the open came from, if it came from anywhere. */
+  origin: OpenOrigin | null;
   onClose: () => void;
   children: ReactNode;
 }
 
 /**
- * The frame every section shares: a chapter opening, split in two.
+ * The frame every section shares: a sheet of paper pulled under the lamp.
  *
- * The left half is transparent. The room's blurred plate shows straight through
- * it, and the chapter mark, the title and the way back sit on top of the
- * photograph — you are still in the room, reading a page of it. The right half
- * is a solid panel carrying the text, so the prose never has to fight an image
- * for contrast.
+ * Warm cream, dark ink, a blank sheet sitting a degree off-square behind it,
+ * and a long soft shadow onto the dark room. It grows out of whatever you
+ * clicked — the bookshelf, the mug, a line in the menu — and collapses back
+ * into it when you leave.
  *
- * On a narrow screen the split collapses and the whole thing becomes one
- * scrolling column, with the panel taking over as the scroll container.
+ * The growing is done entirely in CSS. `--ox` / `--oy` are the press point in
+ * viewport pixels; the stack is centred, so its own left edge is at
+ * `(100vw - width) / 2` and the press point inside it is
+ * `--ox - (100vw - 100%) / 2`. That is a legal `transform-origin`, which means
+ * no layout read, no measuring pass, and no frame of the sheet in the wrong
+ * place before JavaScript catches up. Without an origin it falls back to the
+ * middle of the screen, which is the honest answer for a deep link.
  *
- * Motion is authored, not sprinkled:
- *   - open: the panel arrives from the edge it is anchored to, the title is
- *     wiped up from its own baseline, the chapter rule draws out, the body
- *     staggers at 50ms.
- *   - close: the same path reversed at roughly half the time.
- * Content stagger lives on `.stagger > *` in sections.css, not on inline
- * styles, so adding a paragraph needs no bookkeeping.
+ * The frame scales; the type does not. Scaling a page of text from a third of
+ * its size renders it blurred for the whole flight, so the paper travels alone
+ * and the words fade in once it has landed.
  */
-export function SectionShell({ title, eyebrow, index, onClose, children }: Props) {
-  const panelRef = useRef<HTMLDivElement>(null);
+export function SectionShell({ title, eyebrow, index, origin, onClose, children }: Props) {
+  const paperRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const reduced = useReducedMotion();
   const [closing, setClosing] = useState(false);
@@ -46,7 +49,7 @@ export function SectionShell({ title, eyebrow, index, onClose, children }: Props
   }, []);
 
   // Play the exit before unmounting. Guarded, because Escape, the back control
-  // and a click on the room can all arrive inside the same 220ms.
+  // and a click on the room can all arrive inside the same 260ms.
   const requestClose = useCallback(() => {
     if (leaving.current) return;
     leaving.current = true;
@@ -67,7 +70,7 @@ export function SectionShell({ title, eyebrow, index, onClose, children }: Props
       }
       if (e.key !== 'Tab') return;
       // Keep Tab inside the open section — behind it the room is inert.
-      const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
+      const focusables = paperRef.current?.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
       if (!focusables || focusables.length === 0) return;
@@ -85,42 +88,56 @@ export function SectionShell({ title, eyebrow, index, onClose, children }: Props
     return () => document.removeEventListener('keydown', onKey);
   }, [requestClose]);
 
+  const originVars = origin
+    ? ({ '--ox': `${origin.x}px`, '--oy': `${origin.y}px` } as CSSProperties)
+    : undefined;
+
   return (
     <div
       className="section-backdrop"
       data-state={closing ? 'closing' : 'open'}
       onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
     >
-      <div
-        className="section-panel"
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        ref={panelRef}
-      >
-        <aside
-          className="chapter"
-          onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
+      <div className="paper-stack" style={originVars}>
+        {/* The sheet underneath. Blank, a degree off-square, and the reason the
+            page reads as a physical thing rather than a rectangle of UI. The
+            page itself stays square: half a degree of rotation on a column of
+            body text costs you crisp glyph rasterisation. */}
+        <div className="paper-under" aria-hidden="true" />
+
+        <div
+          className="paper"
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
+          ref={paperRef}
         >
-          <p className="chapter-mark">
-            <span className="chapter-no">{String(index).padStart(2, '0')}</span>
-            <span className="chapter-rule" aria-hidden="true" />
-            <span className="chapter-eyebrow">{eyebrow}</span>
-          </p>
+          {/* Back first, on the left, at every width. It is where a way out is
+              looked for, it puts the control first in the tab order, and it
+              keeps the top-right corner clear for the room's own menu button —
+              which the two of them were fighting over on a phone. */}
+          <header className="paper-head">
+            <button type="button" className="back-btn" onClick={requestClose}>
+              <span className="back-arrow" aria-hidden="true">
+                ←
+              </span>
+              <span className="back-text">Back to the room</span>
+            </button>
 
-          <h1 className="section-title" tabIndex={-1} ref={headingRef}>
-            <span className="title-ink">{title}</span>
-          </h1>
+            <p className="chapter-mark">
+              <span className="chapter-no">{String(index).padStart(2, '0')}</span>
+              <span className="chapter-rule" aria-hidden="true" />
+              <span className="chapter-eyebrow">{eyebrow}</span>
+            </p>
+          </header>
 
-          <button type="button" className="back-btn" onClick={requestClose}>
-            <span className="back-arrow" aria-hidden="true">
-              ←
-            </span>
-            <span className="back-text">Back to the room</span>
-          </button>
-        </aside>
-
-        <div className="section-scroll">{children}</div>
+          <div className="section-scroll">
+            <h1 className="section-title" tabIndex={-1} ref={headingRef}>
+              <span className="title-ink">{title}</span>
+            </h1>
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );

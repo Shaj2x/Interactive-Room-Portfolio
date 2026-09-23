@@ -18,10 +18,11 @@ import { useParallax } from '../hooks/useParallax';
 import { useWarmFlicker } from '../hooks/useWarmFlicker';
 import { useQualityGuard } from '../hooks/useQualityGuard';
 import { screenLines, type SectionId } from '../content/profile';
+import type { OpenOrigin } from './openOrigin';
 import './room.css';
 
 interface Props {
-  onOpen: (id: SectionId) => void;
+  onOpen: (id: SectionId, origin: OpenOrigin | null) => void;
   /** True once a section is open: the room dims and stops taking clicks. */
   dimmed: boolean;
   reducedMotion: boolean;

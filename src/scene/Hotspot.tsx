@@ -1,11 +1,12 @@
 import type { HotspotDef } from './hotspots';
+import { originOf, type OpenOrigin } from './openOrigin';
 
 const VB_W = 1600;
 const VB_H = 900;
 
 interface Props {
   spot: HotspotDef;
-  onOpen: (id: HotspotDef['id']) => void;
+  onOpen: (id: HotspotDef['id'], origin: OpenOrigin | null) => void;
   /** The one hotspot that pulses once on first load to teach the interaction. */
   hinting: boolean;
   /** Labels stay visible on touch, where there is no hover to reveal them. */
@@ -40,7 +41,7 @@ export function Hotspot({ spot, onOpen, hinting, alwaysLabel, disabled }: Props)
         height: `${(spot.h / VB_H) * 100}%`,
       }}
       aria-label={spot.description}
-      onClick={() => onOpen(spot.id)}
+      onClick={(e) => onOpen(spot.id, originOf(e.currentTarget))}
     >
       <span className="hotspot-rim" aria-hidden="true" />
       <span className="hotspot-label" data-anchor={anchor} aria-hidden="true">

@@ -8,6 +8,7 @@ import { useIsCompact, useReducedMotion } from './hooks/useReducedMotion';
 import { useRoomTone } from './hooks/useRoomTone';
 import { HOTSPOT_BY_ID } from './scene/hotspots';
 import { identity, type SectionId } from './content/profile';
+import type { OpenOrigin } from './scene/openOrigin';
 
 const BASE_TITLE = `${identity.name} — ${identity.positioning}`;
 
@@ -24,9 +25,18 @@ export default function App() {
   // Deep links skip the intro: arriving at #projects should land on projects.
   const [skipIntro] = useState(() => route !== null);
 
+  /**
+   * Where the open came from, so the sheet can grow out of it. Cleared on
+   * close, and never set for a deep link or a browser Back — in those cases
+   * there genuinely was no object, and the sheet says so by arriving from the
+   * middle of the screen instead.
+   */
+  const [origin, setOrigin] = useState<OpenOrigin | null>(null);
+
   const open = useCallback(
-    (id: SectionId) => {
+    (id: SectionId, from: OpenOrigin | null = null) => {
       setNeedsHint(false);
+      setOrigin(from);
       navigate(id);
     },
     [navigate],
@@ -87,7 +97,7 @@ export default function App() {
         </>
       )}
 
-      {route && <Section key={route} id={route} onClose={close} />}
+      {route && <Section key={route} id={route} origin={origin} onClose={close} />}
 
       {showIntro && (
         <Intro onDone={() => setIntroDone(true)} reducedMotion={reducedMotion} />

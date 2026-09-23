@@ -15,6 +15,27 @@
   opacity: 1;
 }
 
+/* The lamp, over the corkboard corner where it actually stands. It comes on
+   first and it is what the name is read by. */
+.intro-lamp {
+  position: absolute;
+  left: 12%;
+  top: 46%;
+  width: 62vmax;
+  height: 62vmax;
+  transform: translate(-50%, -50%) scale(0.6);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(232, 164, 101, 0.2) 0%,
+    rgba(160, 96, 42, 0.09) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  filter: blur(34px);
+  pointer-events: none;
+}
+
 /* The laptop coming on — positioned over where the screen actually sits. */
 .intro-bloom {
   position: absolute;
@@ -66,10 +87,36 @@
 .intro-line {
   display: block;
 }
+
+/* The lamp coming on ACROSS the letters rather than a curtain lifting off
+   them. The gradient is three times the width of the word and slides left, so
+   a warm edge travels through the type and leaves it lit — which is the same
+   thing the room's own lamp does to the wall behind the desk.
+
+   `background-clip: text` is the only way to light type from a moving source
+   without a second copy of the word stacked on top of it. It is one pass on a
+   one-off 2.6s sequence, so the cost never repeats. */
 .intro-word {
   display: block;
   padding-bottom: 0.06em;
-  clip-path: inset(0 0 100% 0);
+  background-image: linear-gradient(
+    98deg,
+    var(--c-screen-core) 0%,
+    var(--c-screen-core) 45%,
+    #ffc98a 48.5%,
+    #e8a465 50.5%,
+    rgba(122, 98, 74, 0.28) 54%,
+    rgba(122, 98, 74, 0.2) 100%
+  );
+  /* A narrow band, not a long ramp. At 320% wide the first version's 34%-56%
+     transition spanned 70% of the word and read as the whole name brightening
+     at once; 45%-54% is a 29%-of-the-word edge you can actually watch move. */
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .intro-sub {
@@ -90,7 +137,7 @@
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--c-text-faint);
+  color: var(--w-text-faint);
   opacity: 0;
 }
 .intro-meta-sep { margin: 0 10px; color: var(--c-accent-dim); }
@@ -103,7 +150,7 @@
   border-radius: 2px;
   border: 1px solid rgba(198, 168, 136, 0.26);
   background: transparent;
-  color: var(--c-text-faint);
+  color: var(--w-text-faint);
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: var(--t-label);
@@ -114,14 +161,20 @@
     border-color var(--d-hover) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .intro-skip:hover { color: var(--c-text); border-color: var(--c-text-faint); }
+  .intro-skip:hover { color: var(--w-paper); border-color: var(--w-text-faint); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-bloom { display: none; }
+  .intro-bloom,
+  .intro-lamp { display: none; }
   /* GSAP never runs in this mode, so nothing would take these off their
-     starting values. */
-  .intro-word { clip-path: none; }
+     starting values — the name has to be lit where it stands. */
+  .intro-word {
+    background-image: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--c-screen-core);
+  }
   .intro-sub,
   .intro-meta { opacity: 1; }
 }

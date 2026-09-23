@@ -9,10 +9,11 @@ interface Props {
 }
 
 /**
- * First load: the room powers on. Near-black, a rule draws across the top of
- * the frame, the name is wiped up a line at a time, and the laptop glow blooms
- * in last — the light the whole scene is lit by should be the last thing to
- * arrive.
+ * First load: the room powers on, one light at a time. Near-black, the desk
+ * lamp warms up, a rule draws across the card, and then the lamp travels
+ * through the name and leaves it lit. The laptop blooms last — the cold light
+ * the scene is actually lit by should be the final thing to arrive, and the
+ * cue to leave.
  *
  * The title card is set into the bottom-left corner rather than the middle of
  * the screen, so it reads as a masthead over the room instead of a splash.
@@ -42,25 +43,31 @@ export function Intro({ onDone, reducedMotion }: Props) {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ onComplete: finish });
       tl.to('.intro-veil', { opacity: 0.55, duration: 0.7, ease: 'power2.out' })
+        // The lamp, before anything can be read by it.
+        .to('.intro-lamp', { opacity: 1, scale: 1, duration: 1.1, ease: 'power2.out' }, 0)
         .fromTo(
           '.intro-rule',
           { scaleX: 0 },
           { scaleX: 1, duration: 0.7, ease: 'power3.out' },
-          0.1,
+          0.15,
         )
-        // Wiped up from the baseline, a word at a time. A fade on type this
-        // size reads as something still loading; a wipe reads as a reveal.
+        // The light travelling through the letters. `backgroundPosition` is
+        // not a compositor property, but this is a one-off sequence on two
+        // words and the cost never repeats — and nothing else can light type
+        // from a moving source without stacking a second copy of the word.
         .fromTo(
           '.intro-word',
-          { clipPath: 'inset(0 0 100% 0)', yPercent: 8 },
+          { backgroundPositionX: '100%', yPercent: 5 },
           {
-            clipPath: 'inset(0 0 -20% 0)',
+            backgroundPositionX: '0%',
             yPercent: 0,
-            duration: 0.78,
-            ease: 'power3.out',
-            stagger: 0.09,
+            duration: 1.25,
+            // power1, not power3: a strong ease-out spends the whole travel in
+            // the first few frames, which is exactly the part nobody sees.
+            ease: 'power1.out',
+            stagger: 0.16,
           },
-          0.3,
+          0.35,
         )
         .fromTo(
           '.intro-sub',
@@ -75,7 +82,7 @@ export function Intro({ onDone, reducedMotion }: Props) {
           1.05,
         )
         // The bloom: the laptop coming on, and the cue to leave.
-        .to('.intro-bloom', { opacity: 1, scale: 1, duration: 1.0, ease: 'power2.out' }, 0.95)
+        .to('.intro-bloom', { opacity: 1, scale: 1, duration: 1.0, ease: 'power2.out' }, 1.15)
         .to('.intro-copy', { opacity: 0, duration: 0.45, ease: 'power2.out' }, 2.05)
         .to('.intro', { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 2.2);
     }, root);
@@ -104,6 +111,7 @@ export function Intro({ onDone, reducedMotion }: Props) {
   return (
     <div className="intro" ref={root} role="presentation">
       <div className="intro-veil" />
+      <div className="intro-lamp" />
       <div className="intro-bloom" />
 
       <div className="intro-copy">

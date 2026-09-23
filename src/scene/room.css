@@ -426,7 +426,7 @@
 .lamp-hit { cursor: pointer; }
 .lamp-hit:focus-visible {
   outline: none;
-  fill: rgba(95, 231, 224, 0.05);
+  fill: rgba(232, 164, 101, 0.07);
   stroke: var(--c-accent);
   stroke-width: 2;
 }
@@ -520,20 +520,29 @@
     box-shadow var(--d-hover) var(--ease-out);
 }
 
+/* A paper tag tied to the object — the same cream the sections are printed on,
+   pinned to the room a degree off-square. Tiny type on a small chip can be
+   rotated freely; a column of body text cannot, which is why the sheets stay
+   square and these do not.
+
+   No `backdrop-filter`: it samples the room underneath and forces the whole
+   viewport to be re-read whenever anything moves. The tag is opaque, so it
+   separates from the photograph without one. */
 .hotspot-label {
   position: absolute;
   left: 50%;
-  bottom: -34px;
-  transform: translate3d(-50%, 6px, 0);
-  padding: 4px 11px;
-  border-radius: 999px;
-  border: 1px solid rgba(95, 231, 224, 0.28);
-  background: rgba(6, 12, 18, 0.82);
-  backdrop-filter: blur(6px);
-  color: var(--c-accent);
-  font-size: 12px;
+  bottom: -36px;
+  transform: translate3d(-50%, 6px, 0) rotate(-1.4deg);
+  padding: 5px 12px 6px;
+  border-radius: 2px;
+  border: 0;
+  border-top: 2px solid var(--c-accent);
+  background: linear-gradient(170deg, var(--p-paper-hi), var(--p-paper-lo));
+  box-shadow: 0 8px 20px rgba(3, 2, 1, 0.55);
+  color: var(--p-ink);
+  font-size: 10.5px;
   font-family: var(--font-mono);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--t-label);
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 0;
@@ -548,15 +557,15 @@
 @media (hover: hover) and (pointer: fine) {
   .hotspot:hover .hotspot-rim {
     opacity: 1;
-    border-color: rgba(95, 231, 224, 0.42);
+    border-color: rgba(232, 164, 101, 0.5);
     box-shadow:
-      0 0 0 1px rgba(95, 231, 224, 0.12),
-      0 0 26px 4px rgba(95, 231, 224, 0.16),
-      inset 0 0 30px rgba(95, 231, 224, 0.09);
+      0 0 0 1px rgba(232, 164, 101, 0.16),
+      0 0 26px 4px rgba(232, 164, 101, 0.2),
+      inset 0 0 30px rgba(232, 164, 101, 0.12);
   }
   .hotspot:hover .hotspot-label {
     opacity: 1;
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-50%, 0, 0) rotate(-1.4deg);
   }
 }
 
@@ -566,42 +575,46 @@
 .hotspot:focus-visible .hotspot-rim {
   opacity: 1;
   border-color: var(--c-accent);
-  box-shadow: 0 0 22px 3px rgba(95, 231, 224, 0.2);
+  box-shadow: 0 0 22px 3px rgba(232, 164, 101, 0.26);
 }
 .hotspot:focus-visible .hotspot-label {
   opacity: 1;
-  transform: translate3d(-50%, 0, 0);
+  transform: translate3d(-50%, 0, 0) rotate(-1.4deg);
 }
 
 /* Edge-anchored labels, so nothing runs off the side of the frame. */
 .hotspot-label[data-anchor='left'] {
   left: 0;
-  transform: translate3d(0, 6px, 0);
+  transform: translate3d(0, 6px, 0) rotate(-1.4deg);
 }
 .hotspot-label[data-anchor='right'] {
   left: auto;
   right: 0;
-  transform: translate3d(0, 6px, 0);
+  transform: translate3d(0, 6px, 0) rotate(1.4deg);
 }
 @media (hover: hover) and (pointer: fine) {
-  .hotspot:hover .hotspot-label[data-anchor='left'],
+  .hotspot:hover .hotspot-label[data-anchor='left'] {
+    transform: translate3d(0, 0, 0) rotate(-1.4deg);
+  }
   .hotspot:hover .hotspot-label[data-anchor='right'] {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) rotate(1.4deg);
   }
 }
 .hotspot:focus-visible .hotspot-label[data-anchor='left'],
+.hotspot.is-labelled .hotspot-label[data-anchor='left'] {
+  transform: translate3d(0, 0, 0) rotate(-1.4deg);
+}
 .hotspot:focus-visible .hotspot-label[data-anchor='right'],
-.hotspot.is-labelled .hotspot-label[data-anchor='left'],
 .hotspot.is-labelled .hotspot-label[data-anchor='right'] {
-  transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0) rotate(1.4deg);
 }
 
 /* Touch has no hover, so the label is simply always on. */
 .hotspot.is-labelled .hotspot-label {
-  opacity: 0.82;
-  transform: translate3d(-50%, 0, 0);
-  bottom: -28px;
-  font-size: 11px;
+  opacity: 0.95;
+  transform: translate3d(-50%, 0, 0) rotate(-1.4deg);
+  bottom: -30px;
+  font-size: 10px;
 }
 
 /* First-load teaching pulse. One hotspot, three beats, then it stops for good
@@ -615,8 +628,8 @@
   animation: hint-pulse 2.6s var(--ease-out) 3;
 }
 @keyframes hint-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(95, 231, 224, 0); }
-  45%      { box-shadow: 0 0 46px 14px rgba(95, 231, 224, 0.16); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 164, 101, 0); }
+  45%      { box-shadow: 0 0 46px 14px rgba(232, 164, 101, 0.2); }
 }
 
 /* -------- Atmosphere ------------------------------------------------------ */
@@ -732,17 +745,21 @@
   width: 100%;
   min-height: 52px;
   padding: 14px 16px;
-  border-radius: 9px;
-  border: 1px solid rgba(95, 231, 224, 0.18);
-  background: rgba(9, 17, 26, 0.8);
-  color: var(--c-text);
-  font-family: var(--font-body);
-  font-size: 14.5px;
+  border-radius: 2px;
+  border: 0;
+  background: linear-gradient(168deg, var(--p-paper-hi), var(--p-paper-lo));
+  box-shadow: 0 6px 18px rgba(3, 2, 1, 0.45);
+  color: var(--p-ink-soft);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-stretch: 96%;
+  font-size: 15px;
+  letter-spacing: -0.012em;
   text-align: left;
   cursor: pointer;
-  transition: border-color var(--d-hover) var(--ease-out);
+  transition: transform 110ms var(--ease-out);
 }
-.compact-nav button:active { border-color: var(--c-accent); }
+.compact-nav button:active { transform: scale(0.985); }
 
 /* -------- Reduced motion --------------------------------------------------
    Gentler and fewer, not zero. The cross-fade into a section stays, because it

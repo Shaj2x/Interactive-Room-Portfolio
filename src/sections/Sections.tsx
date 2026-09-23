@@ -1,4 +1,5 @@
 import { Arcade } from '../arcade/Arcade';
+import type { OpenOrigin } from '../scene/openOrigin';
 import { SectionShell } from './SectionShell';
 import {
   about,
@@ -19,6 +20,12 @@ import {
 } from '../content/profile';
 import './sections.css';
 
+interface SectionProps {
+  onClose: () => void;
+  /** Where the open came from, so the sheet grows out of it. */
+  origin: OpenOrigin | null;
+}
+
 /** Small helper so every outbound link gets the same safety attributes. */
 function Out({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -30,9 +37,9 @@ function Out({ href, children }: { href: string; children: React.ReactNode }) {
 }
 
 /* --------------------------------------------------------------- What I build */
-function Build({ onClose }: { onClose: () => void }) {
+function Build({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The laptop" title="What I build" index={1} onClose={onClose}>
+    <SectionShell eyebrow="The laptop" title="What I build" index={1} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{identity.heroLine}</p>
         <p className="body-lg">{identity.subline}</p>
@@ -114,9 +121,9 @@ function Build({ onClose }: { onClose: () => void }) {
 }
 
 /* ---------------------------------------------------------------------- About */
-function About({ onClose }: { onClose: () => void }) {
+function About({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The corkboard" title="About" index={4} onClose={onClose}>
+    <SectionShell eyebrow="The corkboard" title="About" index={4} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{about.headline}</p>
         {about.paragraphs.map((p) => (
@@ -141,9 +148,9 @@ function About({ onClose }: { onClose: () => void }) {
 }
 
 /* --------------------------------------------------------------------- Record */
-function Record({ onClose }: { onClose: () => void }) {
+function Record({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The bookshelf" title="Record" index={3} onClose={onClose}>
+    <SectionShell eyebrow="The bookshelf" title="Record" index={3} origin={origin} onClose={onClose}>
       <section className="stagger">
         <h2>Education</h2>
         <ul className="timeline">
@@ -186,9 +193,9 @@ function Record({ onClose }: { onClose: () => void }) {
 }
 
 /* ----------------------------------------------------------------- Leadership */
-function Leadership({ onClose }: { onClose: () => void }) {
+function Leadership({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The sticky notes" title="Leadership and community" index={5} onClose={onClose}>
+    <SectionShell eyebrow="The sticky notes" title="Leadership and community" index={5} origin={origin} onClose={onClose}>
       <section className="stagger">
         <ul className="timeline">
           {leadership.map((l) => (
@@ -211,9 +218,9 @@ function Leadership({ onClose }: { onClose: () => void }) {
 }
 
 /* ------------------------------------------------------------------- Projects */
-function Projects({ onClose }: { onClose: () => void }) {
+function Projects({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The poster" title="Projects shipped" index={2} onClose={onClose}>
+    <SectionShell eyebrow="The poster" title="Projects shipped" index={2} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">Six builds. Repositories and demos below.</p>
         <div className="cards project-cards">
@@ -238,9 +245,9 @@ function Projects({ onClose }: { onClose: () => void }) {
 }
 
 /* ----------------------------------------------------------------------- Play */
-function Play({ onClose }: { onClose: () => void }) {
+function Play({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The mug" title="Play" index={6} onClose={onClose}>
+    <SectionShell eyebrow="The mug" title="Play" index={6} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{play.intro}</p>
       </section>
@@ -271,10 +278,10 @@ function Play({ onClose }: { onClose: () => void }) {
 }
 
 /* -------------------------------------------------------------------- Contact */
-function Contact({ onClose }: { onClose: () => void }) {
+function Contact({ onClose, origin }: SectionProps) {
   const subject = encodeURIComponent('Thirty minutes — where my time goes');
   return (
-    <SectionShell eyebrow="The phone" title="Book a call" index={7} onClose={onClose}>
+    <SectionShell eyebrow="The phone" title="Book a call" index={7} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{contact.cta}</p>
         <p className="body-lg">{contact.body}</p>
@@ -293,9 +300,9 @@ function Contact({ onClose }: { onClose: () => void }) {
 }
 
 /* --------------------------------------------------------------------- Résumé */
-function Resume({ onClose }: { onClose: () => void }) {
+function Resume({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The door" title="Résumé" index={8} onClose={onClose}>
+    <SectionShell eyebrow="The door" title="Résumé" index={8} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{identity.summary}</p>
         {resumeUrl ? (
@@ -326,7 +333,7 @@ function Resume({ onClose }: { onClose: () => void }) {
   );
 }
 
-const REGISTRY: Record<SectionId, (p: { onClose: () => void }) => JSX.Element> = {
+const REGISTRY: Record<SectionId, (p: SectionProps) => JSX.Element> = {
   build: Build,
   about: About,
   record: Record,
@@ -337,7 +344,15 @@ const REGISTRY: Record<SectionId, (p: { onClose: () => void }) => JSX.Element> =
   resume: Resume,
 };
 
-export function Section({ id, onClose }: { id: SectionId; onClose: () => void }) {
+export function Section({
+  id,
+  origin,
+  onClose,
+}: {
+  id: SectionId;
+  origin: OpenOrigin | null;
+  onClose: () => void;
+}) {
   const Body = REGISTRY[id];
-  return <Body onClose={onClose} />;
+  return <Body onClose={onClose} origin={origin} />;
 }
