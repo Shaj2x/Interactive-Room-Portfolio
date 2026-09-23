@@ -15,7 +15,7 @@ const BAND_COLOUR: Record<Band, string> = {
   perfect: PALETTE.amber,
   sharp: PALETTE.teal,
   close: PALETTE.tealDim,
-  missed: '#8d8378',
+  missed: '#8a7360',
 };
 
 export function renderTimeIt(

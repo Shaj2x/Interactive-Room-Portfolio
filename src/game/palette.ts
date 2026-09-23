@@ -6,26 +6,32 @@
  * token changes, change it in both places.
  */
 export const PALETTE = {
-  void: '#04060a',
-  ink: '#070b12',
-  navy: '#0c1622',
-  navyHi: '#132234',
+  void: '#0a0603',
+  ink: '#120c07',
+  navy: '#1c130c',
+  navyHi: '#241708',
   /** The player, and anything the player directly drives. */
-  amber: '#ffb567',
+  amber: '#ffc98a',
   amberDeep: '#8a4f1c',
-  /** System, opponent, live state. */
-  teal: '#5fe7e0',
-  tealDim: '#2b8c8c',
-  screen: '#bfe4ff',
-  screenCore: '#eaf6ff',
-  text: '#dfe9f4',
-  textDim: '#93a5b8',
-  faint: '#5d7086',
+  /**
+   * System, opponent, live state. Still named `teal` because every renderer
+   * calls it that; it is terracotta now. The cabinets read warm like the rest
+   * of the site, but the player's gold and the machine's clay stay far enough
+   * apart in hue and value to be told apart at speed — which is the only
+   * thing this pair has to do.
+   */
+  teal: '#e0745a',
+  tealDim: '#94402d',
+  screen: '#e9d7bf',
+  screenCore: '#fbf1e3',
+  text: '#ecdfcd',
+  textDim: '#b8a28c',
+  faint: '#8a735c',
 } as const;
 
-export const FONT_DISPLAY = "'Instrument Serif', Georgia, 'Times New Roman', serif";
-export const FONT_MONO = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
-export const FONT_BODY = "'Inter', system-ui, -apple-system, sans-serif";
+export const FONT_DISPLAY = "'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif";
+export const FONT_MONO = "'Space Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
+export const FONT_BODY = "'Schibsted Grotesk', system-ui, -apple-system, sans-serif";
 
 /** `#rrggbb` plus an alpha, as an rgba() string. */
 export function alpha(hex: string, a: number): string {
@@ -65,7 +71,7 @@ export function withGlow(
   ctx.restore();
 }
 
-/** The dark glass every stage sits on: deep vignette over a cool base. */
+/** The dark glass every stage sits on: deep vignette over a warm base. */
 export function paintStageBackground(
   ctx: CanvasRenderingContext2D,
   w: number,

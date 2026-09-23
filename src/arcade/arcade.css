@@ -26,7 +26,7 @@
   text-align: left;
   cursor: pointer;
   border: 0;
-  border-left: 2px solid rgba(143, 210, 245, 0.16);
+  border-left: 2px solid var(--w-rule);
   border-radius: 0;
   background: transparent;
   color: var(--c-text);
@@ -34,9 +34,9 @@
     background-color var(--d-ui) var(--ease-out),
     border-color var(--d-ui) var(--ease-out);
 }
-.arc-cabinet + .arc-cabinet { border-top: 1px solid rgba(143, 210, 245, 0.08); }
+.arc-cabinet + .arc-cabinet { border-top: 1px solid var(--w-rule-soft); }
 @media (hover: hover) and (pointer: fine) {
-  .arc-cabinet:hover { border-left-color: rgba(95, 231, 224, 0.45); }
+  .arc-cabinet:hover { border-left-color: rgba(232, 164, 101, 0.5); }
 }
 .arc-cabinet.is-active {
   border-left-color: var(--c-amber);
@@ -73,9 +73,9 @@
 
 /* -------- Stage ------------------------------------------------------------- */
 .arc-stage {
-  border: 1px solid rgba(95, 231, 224, 0.13);
+  border: 1px solid var(--w-rule);
   border-radius: 4px;
-  background: linear-gradient(168deg, rgba(12, 22, 34, 0.78), rgba(4, 7, 12, 0.92));
+  background: linear-gradient(168deg, rgba(28, 19, 12, 0.82), rgba(12, 7, 4, 0.94));
   overflow: hidden;
   /* Switching cabinets re-keys this element, so the swap reads as a cut to a
      new machine rather than a silent content change. */
@@ -93,7 +93,7 @@
   justify-content: space-between;
   gap: 14px;
   padding: 14px 18px 12px;
-  border-bottom: 1px solid rgba(143, 210, 245, 0.1);
+  border-bottom: 1px solid var(--w-rule-soft);
 }
 .arc-kind {
   margin: 0 0 3px;
@@ -215,14 +215,14 @@
   justify-content: space-between;
   gap: 10px 16px;
   padding: 13px 18px 15px;
-  border-top: 1px solid rgba(143, 210, 245, 0.1);
+  border-top: 1px solid var(--w-rule-soft);
 }
 .arc-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .arc-btn {
   padding: 8px 15px;
   border-radius: 7px;
-  border: 1px solid rgba(143, 210, 245, 0.2);
+  border: 1px solid rgba(226, 190, 148, 0.24);
   background: rgba(10, 18, 28, 0.85);
   color: var(--c-text);
   font-family: var(--font-mono);
@@ -248,7 +248,7 @@
 @media (hover: hover) and (pointer: fine) {
   .arc-btn.primary:hover { background: rgba(255, 181, 103, 0.2); border-color: var(--c-amber); }
 }
-.arc-btn.quiet { border-color: rgba(143, 210, 245, 0.12); color: var(--c-text-dim); }
+.arc-btn.quiet { border-color: var(--w-rule); color: var(--c-text-dim); }
 
 .arc-hint {
   margin: 0;

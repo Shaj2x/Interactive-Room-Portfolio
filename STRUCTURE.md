@@ -249,6 +249,55 @@ U+0000–00FF, so the latin-ext subsets were dropped and saved 105kB. If you add
 copy in another language, pull that subset back from Google's css2 endpoint and
 add the matching `@font-face`.
 
+## Colour, and the two lights
+
+The site is lit by two sources and they are not the same colour.
+
+**The room is the window.** Cold blue night, rain, city glass. Those values
+live in `tokens.css` as `--c-void`, `--c-navy`, `--c-screen*` and the blue-grey
+`--c-text*`, and they are the photograph's own light — do not warm them.
+
+**A section sheet is the lamp.** Paper, brass and ember on a brown-black
+ground. The warm set is `--w-*` in `tokens.css`, and the switch happens exactly
+once: `.section-backdrop` rebinds the semantic tokens to it —
+
+```css
+.section-backdrop {
+  --c-void: var(--w-void);
+  --c-screen-core: var(--w-paper);
+  --c-text-dim: var(--w-text-dim);
+  /* …and the rest */
+}
+```
+
+Everything inside a sheet — the page, the chapter, the arcade shell, the
+scrollbars, `:focus-visible`, `::selection` — reads those through the cascade
+and warms up without being rewritten. **So write section CSS against the
+semantic `--c-*` tokens, never against a literal.** A hardcoded `rgba()` in
+here is a colour that will not follow the lamp.
+
+`--c-accent` is warm globally, not just in the sheets: the room is lit amber
+from the left, and an amber hotspot rim sits on that photograph as if it
+belonged to it. `--c-accent-dim` is the one token a sheet lifts on its own
+(`#bd8049`), because it carries the 01/02/03 numerals and the room's darker
+value read 3.8:1 on the panel.
+
+Measured against the panel, warm text lands at: titles 16.9:1, body
+`--w-text-dim` 7.7:1, accent 8.9:1, and the 10px mono labels
+(`--w-text-faint`) 5.7:1 — that last one was 4.2:1 before and is the number to
+re-check if you darken anything.
+
+The canvases cannot read CSS per frame, so `src/game/palette.ts` mirrors the
+warm values by hand; change a colour and change it in both places. The
+arcade's grammar is *amber = the player, the second hue = the system*, and both
+had to stay warm while staying apart — so the old teal is terracotta
+(`#e0745a`), still called `teal` because every renderer names it that. Gold
+against clay is far enough in hue and value to read at speed, which is the only
+job that pair has.
+
+The one cold thing left inside the warm half is `.intro-bloom`. It is the
+laptop screen coming on, and that light really is blue.
+
 ## The section sheets
 
 A section is not a dialog box. `SectionShell` draws a chapter opening split in

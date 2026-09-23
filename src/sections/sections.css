@@ -10,21 +10,43 @@
    Everything in here is built from hairlines, scale and width. There are no
    bordered, rounded, translucent boxes — a rule and a change of weight
    separate things just as well and look like someone chose it.
+
+   And it is lit by the lamp, not the window. The room outside is a cold blue
+   night; a page of it is warm — paper, brass and ember, on a brown-black
+   ground. That switch is done once, by rebinding the semantic tokens on
+   `.section-backdrop` below, so every rule further down inherits it.
 ----------------------------------------------------------------------------- */
 
 .section-backdrop {
+  /* The whole warm theme, in one place. Everything inside a sheet — the page,
+     the chapter, the arcade shell — reads these rather than the room's. */
+  --c-void: var(--w-void);
+  --c-ink: var(--w-ink);
+  --c-navy: var(--w-panel);
+  --c-navy-hi: var(--w-panel-hi);
+  --c-screen-core: var(--w-paper);
+  --c-screen: var(--w-paper-dim);
+  --c-text: var(--w-text);
+  --c-text-dim: var(--w-text-dim);
+  --c-text-faint: var(--w-text-faint);
+  /* Lifted only in here. The room's dim accent sits on a lit photograph and
+     can afford to be dark; on this panel it carried the 01/02/03 numerals at
+     3.8:1, which is not a colour you can read a number in. */
+  --c-accent-dim: #bd8049;
+
   position: fixed;
   inset: 0;
   /* Above the signature (45) and the compact section list (46), which are room
      furniture and were showing through — and on a phone, straight across an
      open panel. Still below the menu button (50), which stays reachable. */
   z-index: 48;
-  /* Only the left half needs grading; the right half carries its own panel. */
+  /* Only the left half needs grading; the right half carries its own panel.
+     Warm-black, so the room cools toward the lamp rather than away from it. */
   background: linear-gradient(
     90deg,
-    rgba(2, 4, 7, 0.58) 0%,
-    rgba(2, 4, 7, 0.78) 34%,
-    rgba(2, 4, 7, 0.86) 52%
+    rgba(14, 8, 4, 0.56) 0%,
+    rgba(12, 7, 4, 0.78) 34%,
+    rgba(10, 6, 3, 0.87) 52%
   );
   animation: backdrop-in 260ms var(--ease-out) both;
 }
@@ -34,8 +56,8 @@
 }
 
 .section-panel {
-  --rule: rgba(150, 186, 216, 0.16);
-  --rule-soft: rgba(150, 186, 216, 0.08);
+  --rule: var(--w-rule);
+  --rule-soft: var(--w-rule-soft);
 
   position: relative;
   height: 100%;
@@ -171,9 +193,9 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: clamp(40px, 7vh, 84px) clamp(28px, 4vw, 72px) clamp(56px, 8vh, 96px);
-  background: linear-gradient(180deg, #080d15, #04070c);
+  background: linear-gradient(180deg, var(--w-panel), var(--w-void));
   border-left: 1px solid var(--rule);
-  box-shadow: -40px 0 90px rgba(0, 0, 0, 0.5);
+  box-shadow: -40px 0 90px rgba(6, 3, 1, 0.58);
   /* Arrives from the edge it is anchored to: spatial consistency, in and out. */
   animation: panel-in 420ms var(--ease-out) both;
 }
@@ -535,7 +557,7 @@
   display: inline-block;
   padding: 14px 24px;
   border-radius: 2px;
-  border: 1px solid rgba(95, 231, 224, 0.38);
+  border: 1px solid rgba(232, 164, 101, 0.42);
   background: transparent;
   color: var(--c-screen-core);
   font-family: var(--font-mono);
@@ -548,7 +570,7 @@
     transform 110ms var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .btn:hover { background: rgba(95, 231, 224, 0.11); border-color: var(--c-accent); }
+  .btn:hover { background: rgba(232, 164, 101, 0.13); border-color: var(--c-accent); }
 }
 .btn:active { transform: scale(0.985); }
 
@@ -579,7 +601,7 @@
    becomes the scroll container, so it all reads as one column. */
 @media (max-width: 900px) {
   .section-backdrop {
-    background: linear-gradient(180deg, rgba(2, 4, 7, 0.5), rgba(2, 4, 7, 0.8) 38%);
+    background: linear-gradient(180deg, rgba(14, 8, 4, 0.5), rgba(10, 6, 3, 0.82) 38%);
   }
   /* A flex column, not a block: `flex: 1 0 auto` on the page lets it grow to
      fill a short section without ever shrinking below its content, so the

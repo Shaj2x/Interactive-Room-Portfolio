@@ -41,7 +41,7 @@
 .intro-rule {
   height: 1px;
   margin-bottom: clamp(20px, 3vh, 34px);
-  background: linear-gradient(to right, rgba(150, 186, 216, 0.22), transparent 78%);
+  background: linear-gradient(to right, rgba(226, 190, 148, 0.26), transparent 78%);
   transform-origin: left;
 }
 
@@ -101,7 +101,7 @@
   top: clamp(20px, 3vw, 32px);
   padding: 9px 16px;
   border-radius: 2px;
-  border: 1px solid rgba(143, 165, 184, 0.24);
+  border: 1px solid rgba(198, 168, 136, 0.26);
   background: transparent;
   color: var(--c-text-faint);
   font-family: var(--font-mono);

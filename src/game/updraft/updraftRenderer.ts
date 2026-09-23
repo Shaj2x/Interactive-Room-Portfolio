@@ -62,9 +62,9 @@ function skyGradient(ctx: CanvasRenderingContext2D, height: number, tier: number
   if (skyCache && skyCache.key === key) return skyCache.gradient;
   const t = tier / 32;
   const sky = ctx.createLinearGradient(0, 0, 0, height);
-  sky.addColorStop(0, mix(PALETTE.navy, '#020409', 0.25 + t * 0.55));
-  sky.addColorStop(0.55, mix(PALETTE.ink, '#050b16', 0.3));
-  sky.addColorStop(1, mix('#0d1a28', PALETTE.void, t * 0.5));
+  sky.addColorStop(0, mix(PALETTE.navy, '#060301', 0.25 + t * 0.55));
+  sky.addColorStop(0.55, mix(PALETTE.ink, '#160d06', 0.3));
+  sky.addColorStop(1, mix('#2a1a0f', PALETTE.void, t * 0.5));
   skyCache = { key, gradient: sky };
   return sky;
 }

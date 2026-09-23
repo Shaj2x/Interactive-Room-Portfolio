@@ -21,9 +21,30 @@
   --c-amber: #ffb567;
   --c-amber-deep: #8a4f1c;
 
-  /* The one accent. Interactive only. Never decorative. */
-  --c-accent: #5fe7e0;
-  --c-accent-dim: #2b8c8c;
+  /* The one accent. Interactive only. Never decorative.
+     Lamplight, not a cursor blink: the room is lit warm from the left, and an
+     amber rim sits on that photograph as if it belonged to it. */
+  --c-accent: #e8a465;
+  --c-accent-dim: #9b6337;
+
+  /* -------- Warm set -------------------------------------------------------
+     The section sheets are lit by the lamp, not the window. These are the raw
+     values; `.section-backdrop` in sections.css rebinds the semantic tokens
+     above to them, so every rule inside a sheet warms up without being
+     rewritten. Nothing here is used directly outside that rebinding. */
+  --w-void: #0a0603;
+  --w-ink: #120c07;
+  --w-panel: #17100a;
+  --w-panel-hi: #1f1710;
+
+  --w-paper: #fbf1e3;       /* the brightest thing on a page   */
+  --w-paper-dim: #e9d7bf;   /* secondary headings, names       */
+  --w-text: #ecdfcd;
+  --w-text-dim: #b8a28c;
+  --w-text-faint: #a08a70;   /* 5.7:1 on the panel: it sets 10px labels */
+
+  --w-rule: rgba(226, 190, 148, 0.17);
+  --w-rule-soft: rgba(226, 190, 148, 0.085);
 
   /* Type */
   --c-text: #dfe9f4;
