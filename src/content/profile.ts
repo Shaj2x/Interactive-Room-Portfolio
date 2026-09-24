@@ -13,7 +13,6 @@ export type SectionId =
   | 'build'
   | 'record'
   | 'about'
-  | 'leadership'
   | 'projects'
   | 'play'
   | 'contact'
@@ -244,6 +243,10 @@ export const work = [
   },
 ] as const;
 
+/**
+ * Leadership and community. No longer a section of its own — it is the third
+ * band inside Record, on the bookshelf, where the rest of the history lives.
+ */
 export const leadership = [
   {
     role: 'Lead Election Canvasser',

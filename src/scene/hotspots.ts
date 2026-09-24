@@ -65,28 +65,22 @@ const SVG_HOTSPOTS: HotspotDef[] = [
     x: 24, y: 54, w: 258, h: 384, depth: 0.15, order: 4,
   },
   {
-    id: 'leadership',
-    label: 'Leadership',
-    description: 'Leadership and community roles',
-    x: 300, y: 64, w: 132, h: 140, depth: 0.15, order: 5,
-  },
-  {
     id: 'play',
     label: 'Play',
     description: 'Play — browser games and the toolkit',
-    x: 638, y: 578, w: 70, h: 68, depth: 0.55, order: 6,
+    x: 638, y: 578, w: 70, h: 68, depth: 0.55, order: 5,
   },
   {
     id: 'contact',
     label: 'Contact',
     description: 'Contact — book a thirty minute call',
-    x: 680, y: 650, w: 86, h: 46, depth: 0.55, order: 7,
+    x: 680, y: 650, w: 86, h: 46, depth: 0.55, order: 6,
   },
   {
     id: 'resume',
     label: 'Résumé',
     description: 'Résumé and links out',
-    x: 1400, y: 0, w: 200, h: 800, depth: 0.15, order: 8,
+    x: 1400, y: 0, w: 200, h: 800, depth: 0.15, order: 7,
   },
 ];
 

@@ -188,15 +188,9 @@ function Record({ onClose, origin }: SectionProps) {
           ))}
         </ul>
       </section>
-    </SectionShell>
-  );
-}
 
-/* ----------------------------------------------------------------- Leadership */
-function Leadership({ onClose, origin }: SectionProps) {
-  return (
-    <SectionShell eyebrow="The sticky notes" title="Leadership and community" index={5} origin={origin} onClose={onClose}>
       <section className="stagger">
+        <h2>Leadership and community</h2>
         <ul className="timeline">
           {leadership.map((l) => (
             <li key={`${l.org}-${l.role}`}>
@@ -247,7 +241,7 @@ function Projects({ onClose, origin }: SectionProps) {
 /* ----------------------------------------------------------------------- Play */
 function Play({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The mug" title="Play" index={6} origin={origin} onClose={onClose}>
+    <SectionShell eyebrow="The mug" title="Play" index={5} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{play.intro}</p>
       </section>
@@ -281,7 +275,7 @@ function Play({ onClose, origin }: SectionProps) {
 function Contact({ onClose, origin }: SectionProps) {
   const subject = encodeURIComponent('Thirty minutes — where my time goes');
   return (
-    <SectionShell eyebrow="The phone" title="Book a call" index={7} origin={origin} onClose={onClose}>
+    <SectionShell eyebrow="The phone" title="Book a call" index={6} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{contact.cta}</p>
         <p className="body-lg">{contact.body}</p>
@@ -302,7 +296,7 @@ function Contact({ onClose, origin }: SectionProps) {
 /* --------------------------------------------------------------------- Résumé */
 function Resume({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The door" title="Résumé" index={8} origin={origin} onClose={onClose}>
+    <SectionShell eyebrow="The door" title="Résumé" index={7} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{identity.summary}</p>
         {resumeUrl ? (
@@ -337,7 +331,6 @@ const REGISTRY: Record<SectionId, (p: SectionProps) => JSX.Element> = {
   build: Build,
   about: About,
   record: Record,
-  leadership: Leadership,
   projects: Projects,
   play: Play,
   contact: Contact,

@@ -356,6 +356,24 @@ read eight names off, and `CompactNav` already lists every section in the open
 underneath it. The trigger is also hidden while a section is showing, where it
 would open a menu nobody can see.
 
+## Retiring a section
+
+Leadership and community is no longer a section of its own — it is the third
+band inside Record, on the bookshelf, with the rest of the history. Folding one
+in touches more than the component:
+
+- `SectionId` in `profile.ts` loses the id. The content array stays; it is
+  rendered by whichever section now carries it.
+- Both hotspot tables (`hotspots.ts` for the SVG room, `plate.ts` for the
+  photograph) drop their entry, and **every `order` after it renumbers** —
+  those numbers are the tab ring, the pinned menu's 01–07 and the phone list,
+  and a gap in them shows up in all three.
+- `index` on the remaining `<SectionShell>` calls has to match the new order,
+  because that is the number printed in the chapter mark.
+- `useHashRoute` keeps a `MOVED` map. A shared or bookmarked `#leadership`
+  still opens Record instead of silently landing on the room — a retired hash
+  is not a dead one.
+
 ## The section sheets
 
 A section is not a dialog box, and it is not a card either. The room drops

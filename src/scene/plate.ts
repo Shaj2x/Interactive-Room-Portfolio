@@ -193,25 +193,18 @@ export const plateHotspots: HotspotDef[] = [
     x: 100, y: 118, w: 220, h: 158, depth: 0.15, order: 4,
   },
   {
-    id: 'leadership',
-    label: 'Leadership',
-    description: 'Leadership and community roles',
-    // The two photographs pinned below the notes.
-    x: 98, y: 284, w: 118, h: 102, depth: 0.15, order: 5,
-  },
-  {
     id: 'play',
     label: 'Play',
     description: 'Play — browser games and the toolkit',
     // The mug.
-    x: 654, y: 556, w: 62, h: 58, depth: 0.15, order: 6,
+    x: 654, y: 556, w: 62, h: 58, depth: 0.15, order: 5,
   },
   {
     id: 'contact',
     label: 'Contact',
     description: 'Contact — book a thirty minute call',
     // The phone face-up on the desk, the one cool light in the room.
-    x: 692, y: 616, w: 74, h: 38, depth: 0.15, order: 7,
+    x: 692, y: 616, w: 74, h: 38, depth: 0.15, order: 6,
   },
   {
     id: 'resume',
@@ -220,6 +213,6 @@ export const plateHotspots: HotspotDef[] = [
     // The door: the strip of hall light, its handle, and the leaf around them.
     // Wide on purpose — at portrait width the scene renders about a quarter
     // size, so a box hugging the 25px strip would be a 6px tap target.
-    x: 1396, y: 56, w: 200, h: 788, depth: 0.15, order: 8,
+    x: 1396, y: 56, w: 200, h: 788, depth: 0.15, order: 7,
   },
 ];

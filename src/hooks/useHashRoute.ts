@@ -5,16 +5,23 @@ const VALID: SectionId[] = [
   'build',
   'record',
   'about',
-  'leadership',
   'projects',
   'play',
   'contact',
   'resume',
 ];
 
+/**
+ * Hashes that no longer name a section of their own, and where they went.
+ * Leadership was folded into Record — on the bookshelf, with the rest of the
+ * history — so an old link still lands on the page that now carries it.
+ */
+const MOVED: Record<string, SectionId> = { leadership: 'record' };
+
 function read(): SectionId | null {
   const raw = window.location.hash.replace(/^#\/?/, '');
-  return (VALID as string[]).includes(raw) ? (raw as SectionId) : null;
+  if ((VALID as string[]).includes(raw)) return raw as SectionId;
+  return MOVED[raw] ?? null;
 }
 
 /**
