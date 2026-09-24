@@ -39,12 +39,17 @@ export const identity = {
 } as const;
 
 /**
- * Résumé PDF. The master profile lists this as an asset still to be gathered,
- * so it is `null` until the file exists. Drop `resume.pdf` into `public/` and
- * set this to `${import.meta.env.BASE_URL}resume.pdf` to turn on the download.
- * While it is null the door shows the live links instead of a dead button.
+ * Résumé PDF, served from `public/resume.pdf`.
+ *
+ * Built through `BASE_URL` rather than written as a literal path, because the
+ * site is deployed under `/Interactive-Room-Portfolio/` on GitHub Pages and at
+ * `./` when it is published as an artifact. A hardcoded `/resume.pdf` is a
+ * 404 on both.
+ *
+ * Set this back to `null` and the door shows the live links instead of a dead
+ * button — the section is written to work either way.
  */
-export const resumeUrl: string | null = null;
+export const resumeUrl: string | null = `${import.meta.env.BASE_URL}resume.pdf`;
 
 export const about = {
   headline: 'Engineering, business, and a habit of finishing what I start.',

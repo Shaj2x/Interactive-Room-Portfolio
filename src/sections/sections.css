@@ -631,15 +631,16 @@
   .out:hover::after { opacity: 1; }
 }
 
-/* Ink on paper wants a solid stamp, not an outline — an unfilled box reads as
-   a form field on a light ground. */
+/* The one solid thing on the page: a lit stamp, dark type on amber. It kept
+   paper's cream lettering when the sheets went dark, which put it at 1.9:1 —
+   a label you could not read. Dark ink on the same amber is 8.8:1. */
 .btn {
   display: inline-block;
   padding: 13px 22px;
   border-radius: 2px;
   border: 0;
   background: var(--c-accent);
-  color: var(--p-paper-hi);
+  color: #1c1108;
   font-family: var(--font-mono);
   font-size: 12.5px;
   letter-spacing: 0.02em;
@@ -649,7 +650,7 @@
     transform 110ms var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .btn:hover { background: var(--p-ink); }
+  .btn:hover { background: #ffc98a; }
 }
 .btn:active { transform: scale(0.985); }
 

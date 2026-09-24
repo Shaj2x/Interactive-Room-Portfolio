@@ -301,14 +301,17 @@ function Resume({ onClose, origin }: SectionProps) {
         <p className="lede">{identity.summary}</p>
         {resumeUrl ? (
           <p className="links cta-row">
-            <a className="btn" href={resumeUrl} download>
-              Download résumé (PDF)
+            {/* Opened rather than `download`d: a download attribute is inert
+                inside the artifact preview's sandbox, so the button would do
+                nothing there. Opening it works everywhere, and saving from
+                the browser's own PDF viewer is one more click. */}
+            <a className="btn" href={resumeUrl} target="_blank" rel="noreferrer noopener">
+              Open résumé (PDF)
             </a>
           </p>
         ) : (
-          /* No dead button: the PDF is listed in the master profile as an
-             asset still to be gathered. Drop it into public/ and set
-             `resumeUrl` in src/content/profile.ts to switch this on. */
+          /* No dead button: if the PDF is ever taken down, set `resumeUrl`
+             back to null and this stands in for it. */
           <p className="body-lg quiet">
             The PDF is not posted yet. Until it is, the record is in full behind the bookshelf,
             and the links below are current.
