@@ -26,6 +26,9 @@ interface Props {
  * It still grows out of whatever you clicked — the bookshelf, the mug, a line
  * in the menu — and collapses back into it when you leave.
  *
+ * Opening is a lamp coming on: the warmth swells out of the exact point you
+ * pressed, settles to a resting glow, and the words come up inside it.
+ *
  * The growing is done entirely in CSS. `--ox` / `--oy` are the press point in
  * viewport pixels; the stack is centred, so its own left edge is at
  * `(100vw - width) / 2` and the press point inside it is
@@ -97,9 +100,14 @@ export function SectionShell({ title, eyebrow, index, origin, onClose, children 
     <div
       className="section-backdrop"
       data-state={closing ? 'closing' : 'open'}
+      style={originVars}
       onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
     >
-      <div className="paper-stack" style={originVars}>
+      {/* A lamp being turned on. The warmth swells out of the exact spot you
+          pressed, settles, and the words come up inside it. */}
+      <div className="section-glow" aria-hidden="true" />
+
+      <div className="paper-stack">
         <div
           className="paper"
           role="dialog"

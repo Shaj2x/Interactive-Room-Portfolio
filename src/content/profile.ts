@@ -23,9 +23,9 @@ export const identity = {
   name: 'Shajith Sasikumar',
   location: 'Ontario, Canada',
   positioning: 'Success comes with Discipline',
-  heroLine: 'It answers the call you would have missed.',
+  heroLine: 'Someone picks up, even on the days you cannot.',
   subline:
-    'AI receptionists, voice agents and automation for small businesses. Electrical Engineering at Western University, pursuing the Ivey HBA.',
+    'I build AI receptionists, voice agents and quiet automation for small businesses. Electrical Engineering at Western University, working toward the Ivey HBA.',
   programme: 'Electrical Engineering, pursuing Ivey HBA',
   institution: 'Western University',
   secondaryAverage: '96.3%',
@@ -36,7 +36,7 @@ export const identity = {
   linkedin: 'https://www.linkedin.com/in/shajith-sasikumar-5080a5344/',
   sourcePortfolio: 'https://shaj2x.github.io/ShajithSasikumarPortfolio/?fps',
   summary:
-    'Electrical Engineering student at Western (pursuing Ivey HBA) who builds AI receptionists, voice agents, and automation for small businesses — so they never miss the call that would have paid them.',
+    'An Electrical Engineering student at Western, working toward the Ivey HBA, who builds AI receptionists, voice agents and automation for small businesses — so the call that would have paid them never goes to voicemail.',
 } as const;
 
 /**
@@ -48,11 +48,11 @@ export const identity = {
 export const resumeUrl: string | null = null;
 
 export const about = {
-  headline: 'Electrical engineering, the Ivey HBA, and a practice that pays for itself.',
+  headline: 'Engineering, business, and a habit of finishing what I start.',
   paragraphs: [
-    'I am an Electrical Engineering student at Western University, working toward the Ivey HBA dual degree. It suits how I already worked: build the thing, then figure out how it pays for itself.',
-    'At fifteen I co-founded a streetwear label and grew it past ten thousand followers, which taught me more about operations than any course has. Since then I have run a school’s student council, organised cultural events for the Tamil Student Association, and managed a polling station for a federal election.',
-    'Now I build automated systems for businesses that need the work done without hiring for it.',
+    'I am an Electrical Engineering student at Western University, working toward the Ivey HBA dual degree. The two together suit the way I have always worked — build the thing first, then sit down and work out how it pays for itself.',
+    'At fifteen I co-founded a streetwear label with a friend and grew it past ten thousand followers. Packing orders at midnight taught me more about running something than any course has. Since then I have led a school’s student council, put on cultural events for the Tamil Student Association, and looked after a polling station through a federal election.',
+    'These days I build quiet, dependable systems for small businesses that need the work handled without taking on another salary. Most of my clients are people who would rather be doing the part they love.',
   ],
   facts: [
     { label: 'Based in', value: 'Ontario, Canada' },
@@ -65,7 +65,7 @@ export const about = {
 } as const;
 
 export const problem = {
-  title: 'You do not have a lead problem. You have a pickup problem.',
+  title: 'You are not short of customers. You are short of someone to answer them.',
   stats: [
     { figure: '62%', claim: 'of calls to a small business go unanswered' },
     { figure: '85%', claim: 'of those callers never ring back — they ring someone else' },
@@ -73,15 +73,15 @@ export const problem = {
   threeThings: [
     {
       title: 'It answers',
-      body: 'Picks up and books them into your real calendar, on the first ring, every time.',
+      body: 'Picks up on the first ring and books them straight into the calendar you already use — at nine in the morning or nine at night.',
     },
     {
       title: 'It remembers',
-      body: 'Logs transcript, contact, next step. Nothing dropped. Follows up.',
+      body: 'Keeps the transcript, the contact and the next step, then follows up so nothing quietly slips through.',
     },
     {
-      title: 'It knows when to hand you the phone',
-      body: 'Calls that genuinely need you still reach you, with context already gathered.',
+      title: 'It knows when to fetch you',
+      body: 'The calls that genuinely need a person still reach you — with the background already gathered, so you start halfway through.',
     },
   ],
   flow: ['A call comes in', 'Answered', 'Booked', 'Logged', 'Handed to you'],
@@ -90,32 +90,32 @@ export const problem = {
 export const services = [
   {
     title: 'AI Receptionist',
-    body: 'Answers every call, books into your real calendar, answers the questions you get twenty times a week, and hands the rest to you with a summary.',
+    body: 'Answers every call, books into the calendar you already keep, handles the questions you get twenty times a week, and passes anything else to you with a short summary.',
     tags: ['Answers 24/7', 'Books appointments', 'Escalates with context'],
   },
   {
     title: 'Voice Agents',
-    body: 'Inbound and outbound agents that hold a real conversation. Screening enquiries, confirming appointments, chasing the follow-ups nobody gets around to.',
+    body: 'Agents that hold a real conversation, both directions. They screen enquiries, confirm appointments and chase the follow-ups everyone means to get to and never does.',
     tags: ['Screens enquiries', 'Confirms bookings', 'Runs follow ups'],
   },
   {
     title: 'Workflow Automation',
-    body: 'Pipelines that move information for you. Intake forms into the CRM, enquiries into follow-up sequences, reports generated and filed without anyone opening a spreadsheet.',
+    body: 'Quiet pipelines that carry information for you — intake forms into the CRM, enquiries into follow-up sequences, reports written and filed without anyone opening a spreadsheet on a Sunday.',
     tags: ['Intake to CRM', 'Automatic follow up', 'Reports on a schedule'],
   },
   {
     title: 'Websites',
-    body: 'Landing pages, storefronts, dashboards and full platforms. Designed, built, deployed, with analytics wired up.',
+    body: 'Landing pages, storefronts, dashboards and full platforms — designed, built and put live, with the analytics wired up so you can see what is working.',
     tags: ['Designed and built', 'Deployed and measured', 'Yours to keep'],
   },
   {
     title: 'Brand Identity',
-    body: 'Logo, colour system, typography and guidelines that keep it consistent once other people start using it.',
+    body: 'A logo, a colour system, typefaces and a short set of rules that keep everything looking like itself once other people start using it.',
     tags: ['Marks', 'Colour and type', 'Usage rules'],
   },
   {
     title: 'Custom Builds',
-    body: 'Chatbots trained on your documents, internal tools, data analysers. Scoped against what you actually need rather than what is fashionable.',
+    body: 'Chatbots trained on your own documents, internal tools, data analysers. Scoped around what you actually need rather than whatever happens to be fashionable this year.',
     tags: ['Scoped with you', 'Built and handed over', 'Supported after launch'],
   },
 ] as const;
@@ -123,49 +123,49 @@ export const services = [
 export const engagement = [
   {
     step: 'Call',
-    body: 'Thirty minutes. You describe where your time goes. Honest take on whether automation helps or you just need a better form.',
+    body: 'Half an hour, just talking. You walk me through where the week actually goes, and I will tell you honestly whether automation helps here or whether you simply need a better form.',
   },
   {
     step: 'Scope',
-    body: 'Written proposal: what gets built, what it costs, what it will and will not do. No retainer before written scope.',
+    body: 'A written proposal — what gets built, what it costs, and what it will and will not do. Nothing starts, and nothing is charged, before that is agreed in writing.',
   },
   {
     step: 'Build',
-    body: 'Working pieces as they land, not a reveal at the end. Changes cheapest while still building.',
+    body: 'You see working pieces as they land rather than one reveal at the end. Changes are cheapest while the thing is still warm, so say so early and often.',
   },
   {
     step: 'Hand over',
-    body: 'Runs on your accounts, documented, with a month of support so it survives contact with real customers.',
+    body: 'It runs on your accounts, written down in plain language, with a month of support beside you while it meets real customers for the first time.',
   },
 ] as const;
 
 export const faq = [
   {
     q: 'Where does my customer data go?',
-    a: 'Onto your own accounts, not mine. Infrastructure you own and can revoke. Exact services listed before anything is built; you approve that list.',
+    a: 'Onto your own accounts, never mine — infrastructure you hold the keys to and can revoke whenever you like. You get the exact list of services before anything is built, and nothing goes ahead until you have approved it.',
   },
   {
     q: 'What does it cost to set up?',
-    a: 'Quoted per project after the first call. No honest flat number without call volume and scope. Written scope with price before you commit.',
+    a: 'Quoted per project once we have had the first call. I would rather not give you a flat number before I know your call volume and what you need, because it would not be an honest one. You will have the scope and the price in writing before you commit to anything.',
   },
   {
     q: 'Will it sound like a robot?',
-    a: 'Voices are good now; failures are staying calm and scripted when a person is needed (emergency, complaint, someone upset). Before launch we agree those moments and it hands the call to you.',
+    a: 'The voices are genuinely good now. Where these things fail is staying calm and scripted at the moment a person is needed — an emergency, a complaint, somebody having a bad day. We agree on those moments before launch, and when one arrives it hands the call straight to you.',
   },
   {
     q: 'What happens when it gets something wrong?',
-    a: 'Every call logged with a transcript. Anything unsure escalates to you with context instead of being answered badly.',
+    a: 'Every call is logged with a transcript, so you can see exactly what was said. Anything it is unsure about comes to you with the context attached rather than being answered badly and quietly.',
   },
   {
     q: 'Do I own it?',
-    a: 'Yes. Runs on your accounts, documented, portable. Not a subscription you cannot leave.',
+    a: 'Yes, properly. It runs on your accounts, it is documented, and you can take it with you. This is not a subscription you have to stay in to keep what you paid for.',
   },
 ] as const;
 
 export const contact = {
-  cta: 'Tell me where your time goes.',
-  body: 'Thirty minutes, no pitch. If automation is not the answer, I will say so on the call.',
-  formPrompt: 'What eats your week?',
+  cta: 'Tell me where your week goes, and I will listen.',
+  body: 'Half an hour, no pitch, no obligation. If automation is not the right answer for you, I will say so on the call and point you at what is.',
+  formPrompt: 'What is eating your week?',
   email: identity.email,
 } as const;
 
@@ -334,7 +334,7 @@ export const projects = [
  */
 export const play = {
   intro:
-    'Four games written instead of sleeping. All four run inside this page — no engine, no library, no framework. Three canvases and a game loop; one is nothing but a clock and your nerve.',
+    'Four small games, written on nights I should have been asleep. They all run right here in the page — no engine, no library, no framework behind them. Three canvases and a game loop, and one that is nothing but a clock and your nerve. Stay a while.',
   games: [
     {
       id: 'pong',

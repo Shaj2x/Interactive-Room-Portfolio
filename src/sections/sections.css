@@ -64,6 +64,48 @@
   to   { opacity: 1; }
 }
 
+/* -------- The lamp ----------------------------------------------------------
+   Pressing an object turns a light on over it. A warm pool swells out of the
+   press point, overshoots, and settles — so a section does not merely appear,
+   it is lit.
+
+   Transform and opacity only, on one element. The resting breath afterwards is
+   sampled in `steps(5)` over eighteen seconds, the same trick the room's own
+   breath uses: across a step the opacity moves by about six thousandths, which
+   nobody can see, and the page recomposites five times a minute instead of
+   sixty times a second. That matters because a game can be running on top of
+   this. */
+.section-glow {
+  position: absolute;
+  left: var(--ox, 50vw);
+  top: var(--oy, 50vh);
+  width: 150vmax;
+  height: 150vmax;
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(232, 164, 101, 0.26) 0%,
+    rgba(186, 112, 48, 0.13) 26%,
+    rgba(120, 66, 26, 0.05) 46%,
+    transparent 64%
+  );
+  animation:
+    lamp-on 900ms var(--ease-out) both,
+    lamp-breath 18s steps(5) 900ms infinite;
+}
+@keyframes lamp-on {
+  0%   { opacity: 0; transform: scale(0.06); }
+  /* Brighter than it rests at: a filament overshoots before it settles. */
+  55%  { opacity: 1; }
+  100% { opacity: 0.82; transform: scale(1); }
+}
+@keyframes lamp-breath {
+  0%, 100% { opacity: 0.82; }
+  50%      { opacity: 0.95; }
+}
+
 /* -------- The stack, and where it grows from --------------------------------
    `--ox` / `--oy` are the press point in viewport pixels, set inline by
    <SectionShell>. The stack is centred, so its left edge sits at
@@ -620,6 +662,9 @@
 .section-backdrop[data-state='closing'] .paper-stack {
   animation: paper-grow 260ms var(--ease-out) reverse both;
 }
+.section-backdrop[data-state='closing'] .section-glow {
+  animation: lamp-on 260ms var(--ease-out) reverse both;
+}
 .section-backdrop[data-state='closing'] .paper-head,
 .section-backdrop[data-state='closing'] .section-scroll,
 .section-backdrop[data-state='closing'] .stagger > *,
@@ -670,6 +715,11 @@
   .paper-head,
   .section-scroll { animation: fade-in 200ms var(--ease-out) both; }
   .stagger > * { animation: fade-in 220ms var(--ease-out) both; animation-delay: 0ms; }
+  .section-glow {
+    animation: fade-in 240ms var(--ease-out) both;
+    opacity: 0.82;
+    transform: scale(1);
+  }
   .title-ink { animation: fade-in 240ms var(--ease-out) both; clip-path: none; }
   .chapter-rule { animation: none; transform: none; }
   .back-arrow { transition: none; }
