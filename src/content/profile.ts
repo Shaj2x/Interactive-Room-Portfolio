@@ -22,7 +22,7 @@ export type SectionId =
 export const identity = {
   name: 'Shajith Sasikumar',
   location: 'Ontario, Canada',
-  positioning: 'AI systems that keep running',
+  positioning: 'Success comes with Discipline',
   heroLine: 'It answers the call you would have missed.',
   subline:
     'AI receptionists, voice agents and automation for small businesses. Electrical Engineering at Western University, pursuing the Ivey HBA.',
