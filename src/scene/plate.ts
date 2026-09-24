@@ -196,7 +196,7 @@ export const plateHotspots: HotspotDef[] = [
     id: 'play',
     label: 'Play',
     description: 'Play — browser games and the toolkit',
-    // The mug.
+    // The Rubik's cube.
     x: 654, y: 556, w: 62, h: 58, depth: 0.15, order: 5,
   },
   {

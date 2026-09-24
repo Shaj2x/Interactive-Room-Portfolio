@@ -241,7 +241,7 @@ function Projects({ onClose, origin }: SectionProps) {
 /* ----------------------------------------------------------------------- Play */
 function Play({ onClose, origin }: SectionProps) {
   return (
-    <SectionShell eyebrow="The mug" title="Play" index={5} origin={origin} onClose={onClose}>
+    <SectionShell eyebrow="The cube" title="Play" index={5} origin={origin} onClose={onClose}>
       <section className="stagger">
         <p className="lede">{play.intro}</p>
       </section>
