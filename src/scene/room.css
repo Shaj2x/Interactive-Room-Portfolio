@@ -63,8 +63,15 @@
    `animation-play-state` leaves transitions alone, so the camera push on
    `.stage` below still runs. */
 .room.is-dimmed,
-.room.is-dimmed * {
+.room.is-dimmed *,
+.room.is-menu .stage,
+.room.is-menu .stage * {
   animation-play-state: paused;
+}
+/* …but not the menu that was just opened over it. */
+.room.is-menu .pinned-menu,
+.room.is-menu .pinned-menu * {
+  animation-play-state: running;
 }
 .room.is-dimmed .stage {
   transform: scale(1.06);
@@ -297,7 +304,11 @@
    was nine frames a second taken from the game for a room nobody can see.
    Pausing the animation is not enough — the paused value is still a filter —
    so it comes off entirely. */
-.room.is-dimmed .stage {
+.room.is-dimmed .stage,
+/* A declared filter keeps the subtree on a filtered path whatever it is
+   doing, so the breath comes off entirely rather than being paused — the
+   same reason it comes off behind a section. */
+.room.is-menu .stage {
   animation: none;
   filter: none;
 }
@@ -520,36 +531,37 @@
     box-shadow var(--d-hover) var(--ease-out);
 }
 
-/* A paper tag tied to the object — the same cream the sections are printed on,
-   pinned to the room a degree off-square. Tiny type on a small chip can be
-   rotated freely; a column of body text cannot, which is why the sheets stay
-   square and these do not.
-
-   No `backdrop-filter`: it samples the room underneath and forces the whole
-   viewport to be re-read whenever anything moves. The tag is opaque, so it
-   separates from the photograph without one. */
+/* A hover label is one pin from the menu, shown on its own — same name, same
+   leader line, nothing drawn around it. A chip here would be the one container
+   the rest of this navigation refuses to draw. */
 .hotspot-label {
   position: absolute;
   left: 50%;
-  bottom: -36px;
-  transform: translate3d(-50%, 6px, 0) rotate(-1.4deg);
-  padding: 5px 12px 6px;
-  border-radius: 2px;
-  border: 0;
-  border-top: 2px solid var(--c-accent);
-  background: linear-gradient(170deg, var(--p-paper-hi), var(--p-paper-lo));
-  box-shadow: 0 8px 20px rgba(3, 2, 1, 0.55);
-  color: var(--p-ink);
-  font-size: 10.5px;
-  font-family: var(--font-mono);
-  letter-spacing: var(--t-label);
-  text-transform: uppercase;
+  bottom: -30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translate3d(-50%, 5px, 0);
+  color: var(--c-screen);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-stretch: 92%;
+  font-size: clamp(11px, 1.15vw, 16px);
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 14px rgba(4, 2, 1, 0.92);
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
   transition:
     opacity var(--d-hover) var(--ease-out),
     transform var(--d-hover) var(--ease-out);
+}
+.hotspot-label::before {
+  content: '';
+  width: clamp(12px, 1.6vw, 24px);
+  height: 1px;
+  background: var(--c-accent);
+  flex: none;
 }
 
 /* Hover motion is gated: a tap on touch fires a phantom :hover that would
@@ -565,7 +577,7 @@
   }
   .hotspot:hover .hotspot-label {
     opacity: 1;
-    transform: translate3d(-50%, 0, 0) rotate(-1.4deg);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -579,42 +591,42 @@
 }
 .hotspot:focus-visible .hotspot-label {
   opacity: 1;
-  transform: translate3d(-50%, 0, 0) rotate(-1.4deg);
+  transform: translate3d(-50%, 0, 0);
 }
 
 /* Edge-anchored labels, so nothing runs off the side of the frame. */
 .hotspot-label[data-anchor='left'] {
   left: 0;
-  transform: translate3d(0, 6px, 0) rotate(-1.4deg);
+  transform: translate3d(0, 6px, 0);
 }
 .hotspot-label[data-anchor='right'] {
   left: auto;
   right: 0;
-  transform: translate3d(0, 6px, 0) rotate(1.4deg);
+  flex-direction: row-reverse;
+  transform: translate3d(0, 6px, 0);
 }
 @media (hover: hover) and (pointer: fine) {
   .hotspot:hover .hotspot-label[data-anchor='left'] {
-    transform: translate3d(0, 0, 0) rotate(-1.4deg);
+    transform: translate3d(0, 0, 0);
   }
   .hotspot:hover .hotspot-label[data-anchor='right'] {
-    transform: translate3d(0, 0, 0) rotate(1.4deg);
+    transform: translate3d(0, 0, 0);
   }
 }
 .hotspot:focus-visible .hotspot-label[data-anchor='left'],
 .hotspot.is-labelled .hotspot-label[data-anchor='left'] {
-  transform: translate3d(0, 0, 0) rotate(-1.4deg);
+  transform: translate3d(0, 0, 0);
 }
 .hotspot:focus-visible .hotspot-label[data-anchor='right'],
 .hotspot.is-labelled .hotspot-label[data-anchor='right'] {
-  transform: translate3d(0, 0, 0) rotate(1.4deg);
+  transform: translate3d(0, 0, 0);
 }
 
 /* Touch has no hover, so the label is simply always on. */
 .hotspot.is-labelled .hotspot-label {
   opacity: 0.95;
-  transform: translate3d(-50%, 0, 0) rotate(-1.4deg);
-  bottom: -30px;
-  font-size: 10px;
+  transform: translate3d(-50%, 0, 0);
+  bottom: -26px;
 }
 
 /* First-load teaching pulse. One hotspot, three beats, then it stops for good
@@ -667,7 +679,8 @@
    mix-blend-mode element keeps its whole subtree on a blended compositing path
    whatever it is doing, and with a game running on top that cost 15fps
    (45.1 -> 60.3, measured in the Play section). Take it off the page. */
-.room.is-dimmed .grain { display: none; }
+.room.is-dimmed .grain,
+.room.is-menu .grain { display: none; }
 
 @keyframes grain-shift {
   0%   { transform: translate3d(0, 0, 0); }
@@ -676,6 +689,142 @@
   75%  { transform: translate3d(-6px, -6px, 0); }
   100% { transform: translate3d(11px, 5px, 0); }
 }
+
+/* -------- The pinned menu --------------------------------------------------
+   Eight names hung on the objects they belong to, each on a short leader
+   line. No panel, no card, no border: navigation stops being a layer laid
+   over the photograph and becomes part of it.
+
+   This lives inside `.stage`, so the pins share the room's coordinate space
+   and ride the camera push with the art they are pinned to. Everything is
+   positioned in percentages of the 1600x900 scene box, which means a name
+   lands on its own object at any viewport size with nothing measured. */
+.pinned-menu {
+  /* The same cover fit `.stage` performs on itself, so a pin lands on its own
+     object — but measured against the viewport, so the result can be clamped
+     back into frame. Inside the stage there is nothing to clamp against: the
+     stage is wider than the window and its edges are cropped away. */
+  --sw: max(100vw, calc(100vh * 16 / 9));
+  --sh: max(100vh, calc(100vw * 9 / 16));
+  --gutter: clamp(14px, 2.4vw, 40px);
+
+  position: absolute;
+  inset: 0;
+  z-index: 48;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 240ms var(--ease-out), visibility 0s linear 240ms;
+}
+.pinned-menu.is-open {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 240ms var(--ease-out), visibility 0s;
+}
+
+/* The room steps back so the names can be read off it. Under the pins and
+   over the art, inside the stage, so it travels with the picture. */
+.menu-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 47;
+  background: radial-gradient(
+    110% 90% at 50% 46%,
+    rgba(8, 5, 2, 0.62),
+    rgba(5, 3, 1, 0.84)
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms var(--ease-out);
+}
+.room.is-menu .menu-dim { opacity: 1; }
+
+.pin {
+  position: absolute;
+  left: clamp(
+    var(--gutter),
+    calc((100vw - var(--sw)) / 2 + var(--fx) * var(--sw)),
+    calc(100vw - var(--gutter))
+  );
+  top: clamp(
+    var(--gutter),
+    calc((100vh - var(--sh)) / 2 + var(--fy) * var(--sh)),
+    calc(100vh - var(--gutter))
+  );
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--c-screen);
+  white-space: nowrap;
+  cursor: pointer;
+  translate: -50% -50%;
+  -webkit-tap-highlight-color: transparent;
+}
+/* A name near the left edge starts at its object and runs right; one near the
+   right edge ends at its object and runs left. Either way the leader points
+   back at the thing being named. */
+.pin[data-anchor='start'] { translate: 0 -50%; }
+.pin[data-anchor='end'] {
+  translate: -100% -50%;
+  flex-direction: row-reverse;
+}
+.pinned-menu.is-open .pin {
+  animation: pin-in 420ms var(--ease-out) var(--pin-delay, 0ms) both;
+}
+@keyframes pin-in {
+  from { opacity: 0; transform: translate3d(0, 9px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.pin-lead {
+  flex: none;
+  width: clamp(14px, 2.2vw, 36px);
+  height: 1px;
+  background: var(--c-accent);
+  transform-origin: left;
+}
+.pin[data-anchor='end'] .pin-lead { transform-origin: right; }
+.pinned-menu.is-open .pin-lead {
+  animation: pin-draw 380ms var(--ease-out) var(--pin-delay, 0ms) both;
+}
+@keyframes pin-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.pin-no {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 0.72vw, 10px);
+  letter-spacing: 0.1em;
+  color: var(--c-accent);
+}
+.pin-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-stretch: 92%;
+  font-size: clamp(12px, 1.35vw, 21px);
+  letter-spacing: -0.022em;
+  /* The photograph underneath is uneven, so the type carries its own shadow
+     rather than relying on the dim alone. */
+  text-shadow: 0 2px 14px rgba(4, 2, 1, 0.92);
+  transition: color var(--d-hover) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pin:hover .pin-name { color: var(--c-screen-core); }
+}
+.pin:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+.pin:focus-visible .pin-name,
+.pin[aria-current='page'] .pin-name { color: var(--c-screen-core); }
 
 /* -------- Compact / portrait reframing ------------------------------------ */
 
@@ -784,6 +933,10 @@
   .hotspot.is-hinting .hotspot-rim {
     animation: none !important;
   }
+  /* The names still arrive; they just do not travel or draw themselves. */
+  .pinned-menu.is-open .pin { animation: pin-fade 220ms var(--ease-out) both; }
+  .pinned-menu.is-open .pin-lead { animation: none; }
+  @keyframes pin-fade { from { opacity: 0; } to { opacity: 1; } }
   .dust { opacity: var(--dust-o); }
   .stage { animation: none !important; }
   .raindrop { opacity: 0.4; }

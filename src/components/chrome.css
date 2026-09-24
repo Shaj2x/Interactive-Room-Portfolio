@@ -45,89 +45,20 @@
 .nav-bars i { height: 1.5px; background: currentColor; border-radius: 1px; }
 .nav-bars i:last-child { width: 68%; }
 
-/* The same paper as a section, torn small. It is a list of pages, so it is
-   made of the thing those pages are made of.
-
-   It is revealed rather than scaled: a clip-path wipe down from the trigger,
-   with the lines arriving behind it. `clip-path` composites, and a menu that
-   scales from 0.96 is the single most generic entrance on the web. */
-.nav-list {
-  position: absolute;
-  top: calc(100% + 9px);
-  right: 0;
-  min-width: 250px;
-  padding: 6px 0;
-  border-radius: 3px;
-  background: radial-gradient(
-    140% 120% at 12% 0%,
-    var(--p-paper-hi),
-    var(--p-paper) 52%,
-    var(--p-paper-lo) 100%
-  );
-  box-shadow:
-    0 2px 0 rgba(255, 252, 245, 0.5) inset,
-    0 26px 60px rgba(4, 2, 1, 0.6);
-  transform-origin: top right;
-  clip-path: inset(0 0 100% 0);
-  pointer-events: none;
-  transition: clip-path 260ms var(--ease-out);
+/* The trigger only. The menu it opens has no panel — it hangs its names on
+   the objects in the room. See `.pinned-menu` in scene/room.css. */
+.nav-toggle.is-open {
+  color: var(--c-accent);
+  border-color: rgba(232, 164, 101, 0.45);
+  background: rgba(26, 18, 11, 0.88);
 }
-.nav-list.is-open {
-  clip-path: inset(0 0 0 0);
-  pointer-events: auto;
+/* Two bars become a cross, because the control now closes the room rather
+   than a list. */
+.nav-toggle .nav-bars i {
+  transition: transform 220ms var(--ease-out);
 }
-
-.nav-list ul { list-style: none; margin: 0; padding: 0; }
-
-.nav-list button {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  width: 100%;
-  padding: 9px 20px;
-  border: 0;
-  background: transparent;
-  color: var(--p-ink-soft);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-stretch: 96%;
-  font-size: 15.5px;
-  letter-spacing: -0.012em;
-  text-align: left;
-  text-transform: none;
-  cursor: pointer;
-  /* Each line arrives just behind the wipe that uncovers it. */
-  opacity: 0;
-  transform: translate3d(0, -6px, 0);
-  transition:
-    opacity 220ms var(--ease-out),
-    transform 220ms var(--ease-out),
-    color 140ms var(--ease-out);
-}
-.nav-list.is-open button { opacity: 1; transform: translate3d(0, 0, 0); }
-.nav-list.is-open li:nth-child(1) button { transition-delay: 40ms; }
-.nav-list.is-open li:nth-child(2) button { transition-delay: 70ms; }
-.nav-list.is-open li:nth-child(3) button { transition-delay: 100ms; }
-.nav-list.is-open li:nth-child(4) button { transition-delay: 130ms; }
-.nav-list.is-open li:nth-child(5) button { transition-delay: 160ms; }
-.nav-list.is-open li:nth-child(6) button { transition-delay: 190ms; }
-.nav-list.is-open li:nth-child(7) button { transition-delay: 215ms; }
-.nav-list.is-open li:nth-child(n + 8) button { transition-delay: 240ms; }
-
-.nav-no {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: var(--p-accent-dim);
-  transition: color 140ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .nav-list button:hover { color: var(--p-accent); }
-  .nav-list button:hover .nav-no { color: var(--p-accent); }
-}
-.nav-list button[aria-current='page'] { color: var(--p-accent); }
-.nav-list button[aria-current='page'] .nav-no { color: var(--p-accent); }
+.nav-toggle.is-open .nav-bars i:first-child { transform: translateY(2.75px) rotate(45deg); }
+.nav-toggle.is-open .nav-bars i:last-child { width: 100%; transform: translateY(-2.75px) rotate(-45deg); }
 
 /* -------- Sound ------------------------------------------------------------ */
 .sound {

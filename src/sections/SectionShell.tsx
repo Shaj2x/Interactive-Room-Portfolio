@@ -18,12 +18,13 @@ interface Props {
 }
 
 /**
- * The frame every section shares: a sheet of paper pulled under the lamp.
+ * The frame every section shares: the room darkens and the page arrives in it.
  *
- * Warm cream, dark ink, a blank sheet sitting a degree off-square behind it,
- * and a long soft shadow onto the dark room. It grows out of whatever you
- * clicked — the bookshelf, the mug, a line in the menu — and collapses back
- * into it when you leave.
+ * There is no card. The room's menu pins its names straight onto the objects
+ * they belong to, with nothing drawn around them, and a section follows the
+ * same rule — the photograph drops away and the type stands on the darkness.
+ * It still grows out of whatever you clicked — the bookshelf, the mug, a line
+ * in the menu — and collapses back into it when you leave.
  *
  * The growing is done entirely in CSS. `--ox` / `--oy` are the press point in
  * viewport pixels; the stack is centred, so its own left edge is at
@@ -34,8 +35,8 @@ interface Props {
  * middle of the screen, which is the honest answer for a deep link.
  *
  * The frame scales; the type does not. Scaling a page of text from a third of
- * its size renders it blurred for the whole flight, so the paper travels alone
- * and the words fade in once it has landed.
+ * its size renders it blurred for the whole flight, so the ground travels
+ * alone and the words fade in once it has landed.
  */
 export function SectionShell({ title, eyebrow, index, origin, onClose, children }: Props) {
   const paperRef = useRef<HTMLDivElement>(null);
@@ -99,12 +100,6 @@ export function SectionShell({ title, eyebrow, index, origin, onClose, children 
       onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
     >
       <div className="paper-stack" style={originVars}>
-        {/* The sheet underneath. Blank, a degree off-square, and the reason the
-            page reads as a physical thing rather than a rectangle of UI. The
-            page itself stays square: half a degree of rotation on a column of
-            body text costs you crisp glyph rasterisation. */}
-        <div className="paper-under" aria-hidden="true" />
-
         <div
           className="paper"
           role="dialog"

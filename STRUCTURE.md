@@ -302,10 +302,67 @@ had to stay warm while staying apart — so the old teal is terracotta
 against clay is far enough in hue and value to read at speed, which is the only
 job that pair has.
 
+## The menu is in the room
+
+There is no dropdown. Pressing Menu dims the room and the eight section names
+hang on the objects they belong to — the laptop, the bookshelf, the mug — each
+on a short leader line, with nothing drawn around them. `scene/PinnedMenu.tsx`.
+
+This works because every object's box is already known in scene coordinates.
+The one thing that is not obvious is **where the pins live in the DOM**: not
+inside `.stage`.
+
+`.stage` is cover-fitted — `width: max(100vw, 100vh * 16/9)` — so at any aspect
+ratio but 16:9 it is wider than the window and its sides are cropped away. A
+pin positioned inside it in percentages lands on its object correctly and can
+still be off screen, with nothing to clamp against. Measured at 1440x900,
+Leadership started at -4px and Résumé ended 45px past the right edge.
+
+So the pins sit outside the stage and repeat the same fit in `calc()`:
+
+```css
+--sw: max(100vw, calc(100vh * 16 / 9));
+left: clamp(
+  var(--gutter),
+  calc((100vw - var(--sw)) / 2 + var(--fx) * var(--sw)),
+  calc(100vw - var(--gutter))
+);
+```
+
+`--fx` / `--fy` are the object's centre as a fraction, set inline. No measuring
+pass, no resize listener, and the answer is clampable — which is the whole
+point. Verified: all eight on screen with no two overlapping, at 1440x900,
+1920x1080, 1200x760 and 900x620.
+
+Names in the outer thirds anchor inward (`data-anchor`): one on the left starts
+at its object and runs right, one on the right ends at its object and runs
+left, and the leader always points back at the thing it names.
+
+Two things that were tried and removed: hand-tuned nudges to separate Play from
+Contact — measurement showed the two never collide on their own, and the nudges
+were what caused the collision — and a tilt on the hover labels, which a pin
+does not have because a pin is not a tag.
+
+A hover label is one pin shown on its own: same name, same leader, no chip. A
+chip there would be the one container the rest of this navigation refuses to
+draw.
+
+The room freezes behind the menu exactly as it does behind a section
+(`.room.is-menu`), including taking the grain off the page rather than pausing
+it — see the blend-mode note under **Motion**.
+
+On a narrow screen the trigger is not rendered at all: the room is too small to
+read eight names off, and `CompactNav` already lists every section in the open
+underneath it. The trigger is also hidden while a section is showing, where it
+would open a menu nobody can see.
+
 ## The section sheets
 
-A section is not a dialog box. `SectionShell` draws a sheet of paper pulled
-under the lamp, and it **grows out of whatever you clicked**.
+A section is not a dialog box, and it is not a card either. The room drops
+away behind it and the type stands on the darkness — the same rule the menu
+follows, which is why the cream-paper version was dropped: a sheet is a
+container laid over the photograph, and this site's navigation deliberately
+does not draw one. It still **grows out of whatever you clicked**.
 
 ### Where it comes from
 

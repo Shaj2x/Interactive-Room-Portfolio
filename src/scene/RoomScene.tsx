@@ -13,6 +13,7 @@ import { plateVeil } from './plateVeil';
 import { Atmosphere } from './Atmosphere';
 import { WallTexture } from './WallTexture';
 import { Hotspot } from './Hotspot';
+import { PinnedMenu } from './PinnedMenu';
 import { HOTSPOTS, DEPTH, isTappableWhenCompact } from './hotspots';
 import { useParallax } from '../hooks/useParallax';
 import { useWarmFlicker } from '../hooks/useWarmFlicker';
@@ -29,9 +30,23 @@ interface Props {
   compact: boolean;
   /** The first hotspot pulses once, until the visitor interacts. */
   showHint: boolean;
+  /** The room's menu is open: the names hang on their objects. */
+  menuOpen: boolean;
+  onDismissMenu: () => void;
+  /** The section showing, so its own pin reads as current. */
+  current: SectionId | null;
 }
 
-export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: Props) {
+export function RoomScene({
+  onOpen,
+  dimmed,
+  reducedMotion,
+  compact,
+  showHint,
+  menuOpen,
+  onDismissMenu,
+  current,
+}: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [screenLine, setScreenLine] = useState(0);
   const [lampOn, setLampOn] = useState(true);
@@ -91,6 +106,7 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
       className={[
         'room',
         dimmed ? 'is-dimmed' : '',
+        menuOpen ? 'is-menu' : '',
         veiled ? 'is-veiled' : '',
         lampOn ? '' : 'is-lampless',
         lite ? 'is-lite' : '',
@@ -167,13 +183,13 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
 
         {/* Hotspots ride the same depth as the art they sit on, so they never
             drift away from their object as the room parallaxes. */}
-        <div className="hotspot-field" aria-hidden={dimmed}>
+        <div className="hotspot-field" aria-hidden={dimmed || menuOpen}>
           {HOTSPOTS.filter((s) => !compact || isTappableWhenCompact(s)).map((spot) => (
             <div key={spot.id} className="hotspot-depth" data-depth={spot.depth}>
               <Hotspot
                 spot={spot}
                 onOpen={onOpen}
-                disabled={dimmed}
+                disabled={dimmed || menuOpen}
                 hinting={showHint && spot.id === 'build'}
                 alwaysLabel={compact}
               />
@@ -183,6 +199,18 @@ export function RoomScene({ onOpen, dimmed, reducedMotion, compact, showHint }: 
       </div>
 
       <Atmosphere />
+
+      {/* Outside `.stage`, because the stage is cover-fitted and overflows the
+          viewport: a pin placed inside it can land off screen with no way to
+          clamp. Out here each pin repeats the same fit in calc() and clamps
+          the answer, so an edge name always stays in frame. */}
+      <div className="menu-dim" aria-hidden="true" />
+      <PinnedMenu
+        open={menuOpen}
+        onOpen={onOpen}
+        onDismiss={onDismissMenu}
+        current={current}
+      />
     </div>
   );
 }

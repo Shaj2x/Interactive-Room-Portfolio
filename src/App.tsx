@@ -17,6 +17,8 @@ export default function App() {
   const [introDone, setIntroDone] = useState(false);
   /** The teaching state. Flips false on the first interaction and never returns. */
   const [needsHint, setNeedsHint] = useState(true);
+  /** The room's menu. It has no panel, so its state lives with the room. */
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const reducedMotion = useReducedMotion();
   const compact = useIsCompact();
@@ -37,6 +39,7 @@ export default function App() {
     (id: SectionId, from: OpenOrigin | null = null) => {
       setNeedsHint(false);
       setOrigin(from);
+      setMenuOpen(false);
       navigate(id);
     },
     [navigate],
@@ -77,13 +80,20 @@ export default function App() {
         dimmed={route !== null}
         reducedMotion={reducedMotion}
         compact={compact}
-        showHint={roomReady && needsHint && route === null}
+        showHint={roomReady && needsHint && route === null && !menuOpen}
+        menuOpen={menuOpen && route === null}
+        onDismissMenu={() => setMenuOpen(false)}
+        current={route}
       />
 
       {roomReady && (
         <>
           <Signature away={route !== null} />
-          <NavMenu onOpen={open} current={route} />
+          <NavMenu
+            open={menuOpen}
+            onToggle={() => setMenuOpen((v) => !v)}
+            hidden={compact || route !== null}
+          />
           <SoundToggle
             enabled={roomTone.enabled}
             onToggle={roomTone.toggle}

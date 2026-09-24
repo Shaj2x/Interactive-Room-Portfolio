@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { HOTSPOTS } from '../scene/hotspots';
 import { identity, type SectionId } from '../content/profile';
 import { originOf, type OpenOrigin } from '../scene/openOrigin';
@@ -10,67 +9,39 @@ interface NavProps {
 }
 
 /**
- * The plain navigation. The room is the interesting way to get around; this is
- * the way that always works — for screen readers, for keyboards, for anyone who
- * would rather not hunt for a mug. Same sections, same order, no hunting.
+ * The trigger, and nothing else. There is no dropdown any more: the room's
+ * menu hangs its names on the objects they belong to — see <PinnedMenu> — so
+ * this button only says whether those names are up.
+ *
+ * It is hidden on a narrow screen, where the room is too small to read eight
+ * names off and <CompactNav> already lists every section in the open.
  */
-export function NavMenu({ onOpen, current }: NavProps) {
-  const [open, setOpen] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    const onClick = (e: PointerEvent) => {
-      if (!panelRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('keydown', onKey);
-    document.addEventListener('pointerdown', onClick);
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.removeEventListener('pointerdown', onClick);
-    };
-  }, [open]);
+export function NavMenu({
+  open,
+  onToggle,
+  hidden,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  hidden: boolean;
+}) {
+  if (hidden) return null;
 
   return (
-    <div className="nav" ref={panelRef}>
+    <div className="nav">
       <button
         type="button"
-        className="nav-toggle"
+        className={`nav-toggle${open ? ' is-open' : ''}`}
         aria-expanded={open}
         aria-controls="nav-list"
-        onClick={() => setOpen((v) => !v)}
+        onClick={onToggle}
       >
         <span className="nav-bars" aria-hidden="true">
           <i />
           <i />
         </span>
-        Menu
+        {open ? 'Close' : 'Menu'}
       </button>
-
-      <nav id="nav-list" className={`nav-list${open ? ' is-open' : ''}`} aria-label="Sections">
-        <ul>
-          {[...HOTSPOTS]
-            .sort((a, b) => a.order - b.order)
-            .map((h) => (
-              <li key={h.id}>
-                <button
-                  type="button"
-                  aria-current={current === h.id ? 'page' : undefined}
-                  onClick={(e) => {
-                    onOpen(h.id, originOf(e.currentTarget));
-                    setOpen(false);
-                  }}
-                >
-                  <span className="nav-no" aria-hidden="true">
-                    {String(h.order).padStart(2, '0')}
-                  </span>
-                  <span className="nav-label">{h.label}</span>
-                </button>
-              </li>
-            ))}
-        </ul>
-      </nav>
     </div>
   );
 }
