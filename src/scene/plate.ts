@@ -19,11 +19,13 @@ import plateImage from '../assets/room-plate.jpg';
  * the 1600 x 900 box. The image's own pixel size therefore has no bearing on
  * anything here: measure in 1600 x 900 scene units and write that down.
  *
- * The plate is shipped exactly as supplied, with no resize and no re-encode.
- * It was briefly stored downscaled and recompressed, which quietly erased the
- * raindrops on the window glass and the lettering on the book spines — the
- * fine detail this picture is carried by. If it ever needs to be replaced,
- * replace it; do not "optimise" it.
+ * The plate is never resized, and is re-encoded only for a deliberate edit —
+ * there is one, the Rubik's cube standing where the photograph had a mug, and
+ * ASSETS.md records what it cost. It was briefly stored downscaled and
+ * recompressed wholesale, which quietly erased the raindrops on the window
+ * glass and the lettering on the book spines — the fine detail this picture is
+ * carried by. If it ever needs to be replaced, replace it; do not "optimise"
+ * it.
  */
 
 /** `null` falls back to the hand-built SVG room in `scene/layers/*`. */
@@ -196,8 +198,10 @@ export const plateHotspots: HotspotDef[] = [
     id: 'play',
     label: 'Play',
     description: 'Play — browser games and the toolkit',
-    // The Rubik's cube.
-    x: 654, y: 556, w: 62, h: 58, depth: 0.15, order: 5,
+    // The Rubik's cube. Its silhouette on the plate runs x 813-877, y 717-777,
+    // which is 650-702 by 574-622 here; the box carries a couple of units of
+    // margin so the outline does not sit exactly on the plastic.
+    x: 648, y: 571, w: 56, h: 53, depth: 0.15, order: 5,
   },
   {
     id: 'contact',

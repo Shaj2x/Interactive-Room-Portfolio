@@ -7,14 +7,14 @@ file.
 
 | Asset | Form | Location |
 | --- | --- | --- |
-| Room artwork | Room photograph, 2000 × 1125 JPEG, 229 kB | `src/assets/room-plate.jpg` |
+| Room artwork | Room photograph, 2000 × 1125 JPEG, 240 kB, one local edit | `src/assets/room-plate.jpg` |
 | Room artwork (alternative) | Hand-built SVG, five parallax layers | `src/scene/layers/*.tsx` |
 | Arcade artwork | None — drawn at runtime on canvas | `src/game/*/`*Renderer*`.ts` |
 | Dimmed-room backdrop | 48 × 27 baked copy of the plate, inline, ~1.1 kB | `src/scene/plateVeil.ts` |
 | Favicon | Inline SVG data URI | `index.html` |
-| Fonts | Instrument Serif + Inter, Google Fonts | `index.html` |
+| Fonts | Bricolage Grotesque + Schibsted Grotesk + Space Mono, self-hosted | `src/assets/fonts/`, `src/styles/fonts.css` |
 | S-mark logo | **Not present.** See below. | — |
-| Résumé PDF | **Not present.** See below. | — |
+| Résumé PDF | Served as-is, 34 kB | `public/resume.pdf` |
 
 ## Room artwork
 
@@ -23,8 +23,9 @@ The live scene is the plate at `src/assets/room-plate.jpg`, imported by
 rectangle the rain is clipped to are all measured against it in
 `plateHotspots`, `plateLights` and `plateGlass`.
 
-**It ships exactly as supplied — no resize, no re-encode.** That is deliberate,
-and the reason is worth keeping: it was briefly stored downscaled to 1600 × 900
+**It is never resized, and it is re-encoded only for a deliberate edit.** That
+is the rule, and the reason is worth keeping: it was briefly stored downscaled
+to 1600 × 900
 and re-encoded to WebP at quality 0.86, which took it from 229 kB to 53 kB and
 quietly destroyed the detail the picture is carried by. The raindrops on the
 window glass smeared into mush and the lettering on the book spines
@@ -36,6 +37,35 @@ actually use: the SVG scales it into a 1600 × 900 box, so on a 2× screen a
 1600-wide source is being upscaled. Native resolution is not waste here.
 
 If it needs replacing, replace it. Do not compress it.
+
+### The one edit in the picture
+
+The mug on the desk is painted out and a Rubik's cube stands in its place, so
+that Play has an object of its own to hang on. Everything else in the frame is
+the photograph. The edit covers x 803–906, y 697–808 of the 2000 × 1125 plate;
+outside that rectangle the file differs from the original by a mean of 0.27
+levels out of 255, which is the cost of the single JPEG pass at quality 0.92
+(229 kB → 240 kB) and nothing else.
+
+Two things make it sit in the room rather than on top of it, and both are worth
+knowing before anyone touches it:
+
+- **The light is measured, not invented.** The monitor is the only source, and
+  on the mug's white ceramic it reads (73, 34, 7) — an illuminant with almost
+  no blue in it. Every face of the cube is a sticker albedo multiplied by that
+  light, which is why its blue and green squares are nearly black. A saturated
+  blue face is the one thing that could not happen in this room, and the first
+  attempt, which had one, is exactly what read as pasted on.
+- **The hole is filled in three layers**: a lighting field interpolated across
+  it by a masked blur (the phone, the book and the cable are all held out of
+  the blur, so nothing cold or bright leaks into the wood), a Poisson residual
+  that pins that field to the real plate at the seam, and the photograph's own
+  high frequencies so the patch is as grainy as its neighbours.
+
+The pipeline that produced it is not in the repository — it was a one-off — but
+it is reproducible from this description plus the geometry recorded in
+`plate.ts`. If the plate is ever replaced, the cube goes with it: the new
+picture will have its own mug, or no mug, and its own light.
 
 **Swapping the artwork is four steps, and the fourth is easy to miss:**
 
