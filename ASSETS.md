@@ -13,7 +13,7 @@ file.
 | Dimmed-room backdrop | 48 × 27 baked copy of the plate, inline, ~1.1 kB | `src/scene/plateVeil.ts` |
 | Favicon | Inline SVG data URI | `index.html` |
 | Fonts | Bricolage Grotesque + Schibsted Grotesk + Space Mono, self-hosted | `src/assets/fonts/`, `src/styles/fonts.css` |
-| S-mark logo | **Not present.** See below. | — |
+| S-mark logo | **Not present.** A monogram stands in. See below. | `src/game/logoMark.ts` |
 | Résumé PDF | Served as-is, 34 kB | `public/resume.pdf` |
 
 ## Room artwork
@@ -151,9 +151,19 @@ this repository, so **the header and intro use the wordmark rather than the
 S-mark.** The header currently renders `identity.name` as type (`Signature` in
 `src/components/Chrome.tsx`).
 
-To add it: drop the PNG into `public/`, then reference it as
-`${import.meta.env.BASE_URL}shajith-logo.png` in `Signature` and `Intro`. Keep
-it in `public/` rather than `src/assets/` so the filename stays stable.
+Updraft flies the mark as its player, so it needs one either way. Until the
+real file arrives, `src/game/logoMark.ts` draws a monogram — a warm token with
+an S set in Bricolage — and everything downstream asks only for "a square of
+this size". It is a stand-in, and it is the only thing on the site pretending
+to be the logo.
+
+To add the real one: drop the PNG into `src/assets/` and set `LOGO_SRC` in
+`logoMark.ts` to its import. That file documents both options and why the
+default is `null` rather than a speculative path — a missing file at a guessed
+URL would 404 on every run and cost a round trip before falling back anyway.
+For the header and intro, `public/` and
+`${import.meta.env.BASE_URL}shajith-logo.png` still apply, so the filename
+stays stable there.
 
 ### The résumé PDF
 

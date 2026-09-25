@@ -95,7 +95,7 @@ Three games are authored against a fixed logical playfield and mapped in with
 | --- | --- |
 | Pong | 1000 × 620 |
 | Snake | 952 × 612 (28 × 18 cells of 34) |
-| Updraft | 900 × 620, scrolling vertically without limit |
+| Updraft | 800 × 620, scrolling horizontally without limit |
 | Quarter Second | none — a centred dial sized from the smaller edge |
 
 The stage takes each game's own aspect ratio (`Cabinet.aspect`, from those same

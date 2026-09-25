@@ -365,8 +365,8 @@ export const play = {
     {
       id: 'updraft',
       name: 'Updraft',
-      kind: 'Climb',
-      how: 'Climb the weather. Gravity never stops asking.',
+      kind: 'Flight',
+      how: 'One tap is one flap. Fly the gaps, ride the drafts.',
     },
   ],
 } as const;

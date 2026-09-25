@@ -110,6 +110,14 @@ Presentation:
 
 ### 4. Updraft — “Climb the Weather”
 
+> **Superseded.** Updraft was rebuilt as a flap-and-gap game — the owner's own
+> take on Flappy Bird — and the section below describes the vertical climber it
+> replaced. What shipped: the player holds one screen x while the route slides
+> past, one tap is one flap, a cleared gap is a point, and the mark the player
+> flies is the site's logo. The wind zones and the collectible motes survived
+> the change; the platforms, the bounce and the height score did not. Live
+> numbers are in `src/game/updraft/constants.ts`.
+
 Goal: climb as high as possible through an endless vertical route.
 
 Gameplay:
