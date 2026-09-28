@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { RoomScene } from './scene/RoomScene';
 import { Section } from './sections/Sections';
 import { Intro } from './components/Intro';
+import { LiquidGlassFilter } from './components/LiquidGlass';
 import { CompactNav, LookAround, NavMenu, Signature, SoundToggle } from './components/Chrome';
 import { useHashRoute } from './hooks/useHashRoute';
 import { useIsCompact, useReducedMotion } from './hooks/useReducedMotion';
@@ -61,6 +62,8 @@ export default function App() {
       <a className="skip-link" href="#nav-list">
         Skip to the section menu
       </a>
+
+      <LiquidGlassFilter />
 
       <RoomScene
         onOpen={open}

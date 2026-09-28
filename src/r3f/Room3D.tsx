@@ -6,6 +6,7 @@ import { identity, type SectionId } from '../content/profile';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { RoomContext, type RoomState } from './context';
 import { Scene } from './Scene';
+import { LiquidGlassFilter } from '../components/LiquidGlass';
 import { HOME } from './views';
 import './room3d.css';
 
@@ -74,6 +75,7 @@ export default function Room3D() {
   return (
     <RoomContext.Provider value={state}>
       <main className="r3f">
+        <LiquidGlassFilter />
         <Canvas
           className="r3f-canvas"
           shadows
@@ -93,7 +95,7 @@ export default function Room3D() {
           <span className="r3f-sub">the room, in three dimensions</span>
         </header>
 
-        <p className="r3f-label" data-on={Boolean(hovered && !selected)} aria-hidden>
+        <p className="r3f-label glass glass-lens" data-on={Boolean(hovered && !selected)} aria-hidden>
           {hovered ? HOTSPOT_BY_ID[hovered].label : ''}
         </p>
 
@@ -103,6 +105,7 @@ export default function Room3D() {
               <li key={h.id}>
                 <button
                   type="button"
+                  className="glass glass-lens"
                   aria-pressed={selected === h.id}
                   onClick={(e) => select(h.id, { instant: fromKeyboard(e) })}
                   onPointerEnter={() => hover(h.id)}
@@ -115,7 +118,7 @@ export default function Room3D() {
           </ul>
         </nav>
 
-        <aside className="r3f-card" data-open={Boolean(card)} aria-hidden={!card} aria-live="polite">
+        <aside className="r3f-card glass glass-thick" data-open={Boolean(card)} aria-hidden={!card} aria-live="polite">
           {shown && (
             <>
               <h2>{shown.label}</h2>

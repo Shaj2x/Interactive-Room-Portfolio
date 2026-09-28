@@ -35,7 +35,7 @@ export function NavMenu({ onOpen, current }: NavProps) {
     <div className="nav" ref={panelRef}>
       <button
         type="button"
-        className="nav-toggle"
+        className="nav-toggle glass glass-lens"
         aria-expanded={open}
         aria-controls="nav-list"
         onClick={() => setOpen((v) => !v)}
@@ -47,7 +47,7 @@ export function NavMenu({ onOpen, current }: NavProps) {
         Menu
       </button>
 
-      <nav id="nav-list" className={`nav-list${open ? ' is-open' : ''}`} aria-label="Sections">
+      <nav id="nav-list" className={`nav-list glass glass-thick${open ? ' is-open' : ''}`} aria-label="Sections">
         <ul>
           {[...HOTSPOTS]
             .sort((a, b) => a.order - b.order)
@@ -86,6 +86,7 @@ export function CompactNav({ onOpen, current }: NavProps) {
             .map((h) => (
               <li key={h.id}>
                 <button
+                  className="glass glass-lens"
                   type="button"
                   aria-current={current === h.id ? 'page' : undefined}
                   onClick={() => onOpen(h.id)}
@@ -105,7 +106,7 @@ export function SoundToggle({ enabled, onToggle }: { enabled: boolean; onToggle:
   return (
     <button
       type="button"
-      className={`sound${enabled ? ' is-on' : ''}`}
+      className={`sound glass glass-lens${enabled ? ' is-on' : ''}`}
       onClick={onToggle}
       aria-pressed={enabled}
       aria-label={enabled ? 'Mute room tone' : 'Play room tone (rain and hum)'}

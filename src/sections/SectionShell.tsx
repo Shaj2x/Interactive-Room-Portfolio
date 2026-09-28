@@ -81,7 +81,7 @@ export function SectionShell({ title, eyebrow, onClose, children }: Props) {
           {children}
         </div>
 
-        <button type="button" className="back-btn" onClick={onClose}>
+        <button type="button" className="back-btn glass glass-lens" onClick={onClose}>
           <span aria-hidden="true">←</span> Back to the room
         </button>
       </div>

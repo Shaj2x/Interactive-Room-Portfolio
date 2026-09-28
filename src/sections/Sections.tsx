@@ -38,7 +38,7 @@ function Build({ onClose }: { onClose: () => void }) {
 
         <div className="stat-row">
           {problem.stats.map((s) => (
-            <div className="stat" key={s.figure}>
+            <div className="stat glass glass-lens" key={s.figure}>
               <span className="stat-figure">{s.figure}</span>
               <span className="stat-claim">{s.claim}</span>
             </div>
@@ -69,7 +69,7 @@ function Build({ onClose }: { onClose: () => void }) {
         <h2>Six things I build</h2>
         <div className="cards">
           {services.map((s) => (
-            <article className="card" key={s.title}>
+            <article className="card glass glass-thick" key={s.title}>
               <h3>{s.title}</h3>
               <p>{s.body}</p>
               <ul className="tags">

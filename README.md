@@ -186,6 +186,16 @@ before launch.
   contrast. It is lazy-loaded: three.js is downloaded the first time a section
   opens, never for the room itself. Reduced motion keeps it still. Its
   `lightType` is `3d` on purpose: `env` would fetch HDR files from another host.
+- **Liquid glass** — everything that floats over the room (menu, sound
+  toggle, back button, stat tiles, cards, the 3D page's controls) is one
+  material, `styles/glass.css`: tint, blur and a specular rim, plus real edge
+  refraction from an SVG lens filter (`components/LiquidGlass.tsx`) in
+  Chromium browsers. Other browsers get the frosted glass without the bend.
+  Add `glass` (and `glass-lens` for the refraction, `glass-thick` for large
+  surfaces) to any element. Honours reduced transparency and increased
+  contrast. Don't give an ancestor of a glass element a filled
+  opacity/transform animation (`fill-mode: both`): it becomes a backdrop root
+  and the glass has nothing behind it to blur.
 - **Room tone** — soft rain and a distant hum, synthesised with the Web Audio
   API rather than shipped as an audio file. Off by default, toggled bottom-left.
 - **Portrait screens** — the room is fitted rather than cropped so nothing is
