@@ -1,0 +1,466 @@
+<title>Liquid Glass Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: the painted room fills a 16:9 stage; glass objects float on it and
+   refract it. A quiet control strip sits underneath. Tokens follow the
+   portfolio's own tokens.css. Single dark look, by choice. */
+:root {
+  --c-void: #04060a;
+  --c-ink: #070b12;
+  --c-navy: #0c1622;
+  --c-line: #1b2b3d;
+  --c-accent: #5fe7e0;
+  --c-amber: #ffb567;
+  --c-text: #dfe9f4;
+  --c-text-dim: #93a5b8;
+  --c-text-faint: #5d7086;
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--c-void); color: var(--c-text); }
+body {
+  font: 15px/1.55 var(--font-body);
+  padding-inline: 16px;
+  padding-block: 28px 40px;
+}
+.wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 20px; }
+
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 {
+  font: 400 clamp(30px, 5vw, 46px)/1.05 var(--font-display);
+  margin: 0; letter-spacing: -0.01em; text-wrap: balance;
+}
+h1 em { color: var(--c-accent); }
+header p { margin: 0; color: var(--c-text-dim); max-width: 46ch; }
+
+/* ---- stage ------------------------------------------------------------ */
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--c-ink) center / 100% 100% no-repeat;
+  background-image: var(--plate);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 30px 80px -30px #000, 0 0 0 1px var(--c-line);
+}
+
+/* ---- the glass ---------------------------------------------------------- */
+.glass {
+  position: absolute;
+  left: 0; top: 0;
+  border-radius: var(--r);
+  overflow: hidden;
+  cursor: grab;
+  isolation: isolate;
+  /* lift: one soft contact shadow + a wide ambient one */
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 18px 40px -12px rgba(0, 0, 0, 0.55);
+  transition: box-shadow 240ms var(--ease-out), scale 240ms var(--ease-out);
+}
+.glass:active, .glass.dragging { cursor: grabbing; scale: 1.03; }
+.glass:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 4px; }
+
+/* The refracted copy of the room behind this piece of glass. It is the same
+   image at the same size as the stage, shifted so it lines up, then pushed
+   through the per-shape SVG displacement filter. */
+.glass .refract {
+  position: absolute; inset: 0;
+  background-image: var(--plate);
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+/* Tint + inner rim light. The rim is brighter on the top-left edge (light
+   from above-left), dimmer bottom-right, like a real bevel. */
+.glass::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  background: rgba(255, 255, 255, var(--tint, 0.04));
+  box-shadow:
+    inset 1.5px 1.5px 0.5px -0.5px rgba(255, 255, 255, 0.75),
+    inset -1px -1px 0.5px -0.5px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.25),
+    inset 0 0 18px rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+/* Specular sheen: a soft band across the upper half. */
+.glass::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  z-index: 2;
+  background:
+    radial-gradient(120% 60% at 30% -10%, rgba(255, 255, 255, 0.22), transparent 55%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent 40%);
+  mix-blend-mode: screen;
+  opacity: var(--sheen, 1);
+  pointer-events: none;
+}
+.glass .content {
+  position: relative; z-index: 3;
+  height: 100%;
+  display: flex; align-items: center;
+  pointer-events: none;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* nav bar */
+.glass.nav .content { justify-content: space-between; padding: 0 8px 0 18px; gap: 6px; }
+.nav .sig { font: italic 400 20px/1 var(--font-display); white-space: nowrap; }
+.nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; }
+.nav li {
+  font-size: 13px; font-weight: 500; padding: 7px 11px; border-radius: 999px;
+  color: rgba(223, 233, 244, 0.86);
+}
+.nav li.on { background: rgba(255, 255, 255, 0.14); color: #fff; }
+
+/* card */
+.glass.card .content { flex-direction: column; align-items: flex-start; justify-content: center; padding: 18px 22px; gap: 4px; }
+.card .eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(223, 233, 244, 0.72); }
+.card .big { font: 400 30px/1.05 var(--font-display); white-space: nowrap; }
+.card .small { font-size: 13px; color: rgba(223, 233, 244, 0.8); }
+
+/* lens: nothing inside, it is just a magnifier */
+
+.hint {
+  position: absolute; left: 50%; bottom: 14px; translate: -50% 0;
+  font-size: 12px; color: rgba(223, 233, 244, 0.7);
+  background: rgba(4, 6, 10, 0.45); padding: 5px 12px; border-radius: 999px;
+  pointer-events: none; white-space: nowrap;
+  transition: opacity 400ms;
+}
+.stage.touched .hint { opacity: 0; }
+
+/* ---- controls ----------------------------------------------------------- */
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px 28px;
+  padding: 18px 20px;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: var(--c-ink);
+}
+.ctl { display: grid; gap: 6px; min-width: 0; }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--c-text-dim); }
+.ctl output { font: 12px var(--font-mono); color: var(--c-text); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; accent-color: var(--c-accent); }
+.ctl.check label { justify-content: flex-start; align-items: center; gap: 10px; font-size: 13px; color: var(--c-text); cursor: pointer; }
+input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16px; }
+
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 28px; color: var(--c-text-dim); font-size: 13.5px; }
+.notes h2 { font: 400 20px/1.2 var(--font-display); color: var(--c-text); margin: 0 0 4px; }
+.notes p { margin: 0; max-width: 60ch; }
+.notes code { font: 12.5px var(--font-mono); color: var(--c-accent); }
+
+@media (max-width: 640px) {
+  .nav .sig { font-size: 16px; }
+  .nav li { padding: 5px 7px; font-size: 11px; }
+  .card .big { font-size: 20px; }
+  .glass.card .content { padding: 10px 14px; gap: 2px; }
+  .card .small { display: none; }
+  .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Liquid <em>glass</em>, over the room</h1>
+    <p>Real refraction, not blur. Each shape bends the painted room behind it through its own curved bezel. Drag the pieces around.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="glass nav" data-id="nav" tabindex="0" aria-label="Glass navigation bar, draggable">
+      <div class="refract"></div>
+      <div class="content">
+        <span class="sig">Shajith</span>
+        <ul><li class="on">Room</li><li>Work</li><li>Projects</li><li>Contact</li></ul>
+      </div>
+    </div>
+    <div class="glass card" data-id="card" tabindex="0" aria-label="Glass card, draggable">
+      <div class="refract"></div>
+      <div class="content">
+        <span class="eyebrow">Now playing</span>
+        <span class="big">Rain, 2 a.m.</span>
+        <span class="small">Room tone · 42 dB</span>
+      </div>
+    </div>
+    <div class="glass lens" data-id="lens" tabindex="0" aria-label="Glass lens, draggable">
+      <div class="refract"></div>
+      <div class="content"></div>
+    </div>
+    <span class="hint">Drag the glass · arrow keys move the focused piece</span>
+  </div>
+
+  <div class="controls" id="controls">
+    <div class="ctl">
+      <label for="c-bezel">Bezel width <output id="o-bezel"></output></label>
+      <input type="range" id="c-bezel" min="4" max="60" step="1" value="26">
+    </div>
+    <div class="ctl">
+      <label for="c-strength">Refraction <output id="o-strength"></output></label>
+      <input type="range" id="c-strength" min="0" max="120" step="1" value="70">
+    </div>
+    <div class="ctl">
+      <label for="c-frost">Frost <output id="o-frost"></output></label>
+      <input type="range" id="c-frost" min="0" max="6" step="0.1" value="0.4">
+    </div>
+    <div class="ctl check">
+      <label for="c-chroma"><input type="checkbox" id="c-chroma" checked> Chromatic dispersion</label>
+      <label for="c-sheen"><input type="checkbox" id="c-sheen" checked> Specular rim</label>
+    </div>
+  </div>
+
+  <section class="notes">
+    <div>
+      <h2>How the bend is made</h2>
+      <p>For every shape, a canvas draws a displacement map from the rounded rectangle's signed distance field. Inside the bezel, each pixel points toward the centre, with a strength that follows the slope of a convex squircle profile. <code>feDisplacementMap</code> then samples the room along those vectors, so edges magnify and pull in light the way a thick pane does.</p>
+    </div>
+    <div>
+      <h2>Why it looks wet</h2>
+      <p>Red, green and blue are displaced by slightly different amounts and recombined, which gives the thin colour fringe at the rim. An inset highlight lit from the top-left, a screen-blended sheen and a two-layer drop shadow finish the material. The flat centre stays sharp, which is the difference from frosted glass.</p>
+    </div>
+  </section>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs id="filters"></defs>
+</svg>
+
+<script>
+(() => {
+  const PLATE = "__PLATE__";
+  const stage = document.getElementById('stage');
+  document.documentElement.style.setProperty('--plate', `url("${PLATE}")`);
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const defs = document.getElementById('filters');
+  const $ = (id) => document.getElementById(id);
+  const ctl = {
+    bezel: $('c-bezel'), strength: $('c-strength'), frost: $('c-frost'),
+    chroma: $('c-chroma'), sheen: $('c-sheen'),
+  };
+
+  // Each glass shape as a fraction of the stage, so the layout scales with it.
+  const SHAPES = {
+    nav:  { fx: 0.5,  fy: 0.09, fw: 0.56, fh: 0.085, round: 'pill', minW: 330 },
+    card: { fx: 0.22, fy: 0.62, fw: 0.25, fh: 0.2,   round: 26, minW: 150, minH: 72 },
+    lens: { fx: 0.66, fy: 0.55, fw: 0.17, fh: 0.17,  round: 'circle', square: true },
+  };
+  const pieces = [...stage.querySelectorAll('.glass')].map((el) => ({
+    el, id: el.dataset.id, refract: el.querySelector('.refract'), cfg: SHAPES[el.dataset.id],
+    x: 0, y: 0, w: 0, h: 0, r: 0, cx: null, cy: null,
+  }));
+
+  /* ---- displacement map --------------------------------------------------
+     R = x displacement, G = y displacement, 128 = none. For a pixel at depth
+     d inside the bezel (0 at the rim, 1 at the inner edge) the glass surface
+     is a convex squircle: h(d) = (1 - (1 - d)^4)^(1/4). Refraction follows its
+     slope, so the push is strongest right at the rim and fades to zero where
+     the surface goes flat. Direction is the inward normal of the shape. */
+  function sdRoundRect(px, py, hw, hh, r) {
+    const qx = Math.abs(px) - (hw - r), qy = Math.abs(py) - (hh - r);
+    const ox = Math.max(qx, 0), oy = Math.max(qy, 0);
+    return Math.hypot(ox, oy) + Math.min(Math.max(qx, qy), 0) - r;
+  }
+  const height = (d) => Math.pow(1 - Math.pow(1 - d, 4), 0.25);
+
+  function buildMap(w, h, r, bezel) {
+    const cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    const ctx = cv.getContext('2d');
+    const img = ctx.createImageData(w, h);
+    const hw = w / 2, hh = h / 2;
+    const b = Math.max(1, Math.min(bezel, hw - 1, hh - 1));
+    const eps = 0.5;
+    // Slope normalisation: max derivative of h over the sampled range.
+    let maxSlope = 0;
+    for (let i = 1; i <= 64; i++) {
+      const t = i / 64, s = (height(t) - height(t - 1 / 64)) * 64;
+      if (s > maxSlope) maxSlope = s;
+    }
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const px = x + 0.5 - hw, py = y + 0.5 - hh;
+        const sd = sdRoundRect(px, py, hw, hh, r);
+        let dx = 0, dy = 0;
+        const depth = -sd; // distance inward from the rim
+        if (depth > 0 && depth < b) {
+          const t = depth / b;
+          const t0 = Math.max(0, t - 0.02);
+          const slope = (height(t) - height(t0)) / (t - t0 || 1);
+          const mag = Math.min(1, slope / maxSlope);
+          // outward normal from the SDF gradient
+          const gx = sdRoundRect(px + eps, py, hw, hh, r) - sdRoundRect(px - eps, py, hw, hh, r);
+          const gy = sdRoundRect(px, py + eps, hw, hh, r) - sdRoundRect(px, py - eps, hw, hh, r);
+          const gl = Math.hypot(gx, gy) || 1;
+          // sample toward the centre → displacement opposes the outward normal
+          dx = (-gx / gl) * mag;
+          dy = (-gy / gl) * mag;
+        }
+        const k = (y * w + x) * 4;
+        img.data[k]     = Math.round(128 + dx * 127);
+        img.data[k + 1] = Math.round(128 + dy * 127);
+        img.data[k + 2] = 128;
+        img.data[k + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return cv.toDataURL();
+  }
+
+  /* ---- per-shape SVG filter ---------------------------------------------- */
+  function el(tag, attrs, parent) {
+    const n = document.createElementNS(SVGNS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  const ISOLATE = {
+    R: '1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0',
+    G: '0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0',
+    B: '0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0',
+  };
+
+  function buildFilter(p) {
+    const id = `glass-${p.id}`;
+    document.getElementById(id)?.remove();
+    const bezel = +ctl.bezel.value;
+    const strength = +ctl.strength.value * (p.w / 300 > 1 ? 1 : Math.max(0.55, p.w / 300));
+    const frost = +ctl.frost.value;
+    const chroma = ctl.chroma.checked;
+
+    const f = el('filter', {
+      id, x: 0, y: 0, width: p.w, height: p.h,
+      filterUnits: 'userSpaceOnUse', primitiveUnits: 'userSpaceOnUse',
+      'color-interpolation-filters': 'sRGB',
+    }, defs);
+    el('feImage', {
+      href: buildMap(p.w, p.h, p.r, bezel), x: 0, y: 0, width: p.w, height: p.h,
+      preserveAspectRatio: 'none', result: 'map',
+    }, f);
+    // Slight frost first, so edges refract an already-soft image.
+    el('feGaussianBlur', { in: 'SourceGraphic', stdDeviation: frost, result: 'src' }, f);
+
+    if (!chroma) {
+      el('feDisplacementMap', { in: 'src', in2: 'map', scale: strength, xChannelSelector: 'R', yChannelSelector: 'G', result: 'out' }, f);
+    } else {
+      // Blue bends most, red least: the same order as real dispersion.
+      [['R', 1.0], ['G', 1.06], ['B', 1.13]].forEach(([c, m]) => {
+        el('feDisplacementMap', { in: 'src', in2: 'map', scale: strength * m, xChannelSelector: 'R', yChannelSelector: 'G', result: `d${c}` }, f);
+        el('feColorMatrix', { in: `d${c}`, type: 'matrix', values: ISOLATE[c], result: `c${c}` }, f);
+      });
+      el('feComposite', { in: 'cR', in2: 'cG', operator: 'arithmetic', k1: 0, k2: 1, k3: 1, k4: 0, result: 'rg' }, f);
+      el('feComposite', { in: 'rg', in2: 'cB', operator: 'arithmetic', k1: 0, k2: 1, k3: 1, k4: 0, result: 'out' }, f);
+    }
+    el('feColorMatrix', { in: 'out', type: 'saturate', values: 1.25 }, f);
+    // Re-assigning forces the browser to pick up the rebuilt filter.
+    p.refract.style.filter = 'none';
+    void p.refract.offsetWidth;
+    p.refract.style.filter = `url(#${id})`;
+  }
+
+  /* ---- layout ------------------------------------------------------------ */
+  let SW = 0, SH = 0;
+  function layout(rebuild) {
+    const rect = stage.getBoundingClientRect();
+    const sizeChanged = rect.width !== SW || rect.height !== SH;
+    SW = rect.width; SH = rect.height;
+    for (const p of pieces) {
+      const c = p.cfg;
+      let w = Math.round(Math.max(c.fw * SW, Math.min(c.minW || 0, SW - 24)));
+      let h = Math.round(c.fh * SH);
+      if (c.square) w = h = Math.round(Math.min(c.fw * SW, 0.36 * SH, 220));
+      h = Math.max(h, c.minH || (c.round === 'pill' ? 40 : 60));
+      const r = c.round === 'pill' || c.round === 'circle' ? Math.min(w, h) / 2 : Math.min(c.round, w / 2, h / 2);
+      const resized = w !== p.w || h !== p.h;
+      Object.assign(p, { w, h, r });
+      if (p.cx == null || sizeChanged) { p.cx = c.fx * SW; p.cy = c.fy * SH; }
+      p.el.style.width = w + 'px';
+      p.el.style.height = h + 'px';
+      p.el.style.setProperty('--r', r + 'px');
+      p.refract.style.backgroundSize = `${SW}px ${SH}px`;
+      place(p);
+      if (resized || rebuild) buildFilter(p);
+    }
+  }
+  function place(p) {
+    p.cx = Math.min(Math.max(p.cx, p.w / 2), SW - p.w / 2);
+    p.cy = Math.min(Math.max(p.cy, p.h / 2), SH - p.h / 2);
+    p.x = Math.round(p.cx - p.w / 2); p.y = Math.round(p.cy - p.h / 2);
+    p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
+    p.refract.style.backgroundPosition = `${-p.x}px ${-p.y}px`;
+  }
+
+  /* ---- dragging ---------------------------------------------------------- */
+  let z = 10;
+  for (const p of pieces) {
+    p.el.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      p.el.setPointerCapture(e.pointerId);
+      p.el.style.zIndex = ++z;
+      p.el.classList.add('dragging');
+      stage.classList.add('touched');
+      const ox = e.clientX - p.cx, oy = e.clientY - p.cy;
+      const move = (ev) => { p.cx = ev.clientX - ox; p.cy = ev.clientY - oy; place(p); };
+      const up = () => {
+        p.el.classList.remove('dragging');
+        p.el.removeEventListener('pointermove', move);
+        p.el.removeEventListener('pointerup', up);
+        p.el.removeEventListener('pointercancel', up);
+      };
+      p.el.addEventListener('pointermove', move);
+      p.el.addEventListener('pointerup', up);
+      p.el.addEventListener('pointercancel', up);
+    });
+    p.el.addEventListener('keydown', (e) => {
+      const step = e.shiftKey ? 40 : 10;
+      const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+      if (!d) return;
+      e.preventDefault();
+      p.el.style.zIndex = ++z;
+      stage.classList.add('touched');
+      p.cx += d[0]; p.cy += d[1]; place(p);
+    });
+  }
+
+  /* ---- controls ---------------------------------------------------------- */
+  const outs = {
+    bezel: () => `${ctl.bezel.value} px`,
+    strength: () => `${ctl.strength.value}`,
+    frost: () => `${(+ctl.frost.value).toFixed(1)} px`,
+  };
+  function syncOutputs() { for (const k in outs) $('o-' + k).textContent = outs[k](); }
+  let pending = 0;
+  function rebuildSoon() {
+    syncOutputs();
+    cancelAnimationFrame(pending);
+    pending = requestAnimationFrame(() => pieces.forEach(buildFilter));
+  }
+  ['bezel', 'strength', 'frost'].forEach((k) => ctl[k].addEventListener('input', rebuildSoon));
+  ctl.chroma.addEventListener('change', rebuildSoon);
+  ctl.sheen.addEventListener('change', () => {
+    stage.style.setProperty('--sheen', ctl.sheen.checked ? 1 : 0);
+  });
+
+  syncOutputs();
+  layout(true);
+  new ResizeObserver(() => layout(false)).observe(stage);
+})();
+</script>
