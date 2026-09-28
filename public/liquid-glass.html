@@ -105,13 +105,15 @@ header p { margin: 0; color: var(--c-text-dim); max-width: 46ch; }
     inset 0 0 18px rgba(255, 255, 255, 0.06);
   pointer-events: none;
 }
-/* Specular sheen: a soft band across the upper half. */
+/* Specular sheen: a soft band across the upper half, plus a hotspot that
+   follows the cursor while hovered (--hov 0..1, --mx/--my set per frame). */
 .glass::after {
   content: "";
   position: absolute; inset: 0;
   border-radius: inherit;
   z-index: 2;
   background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, calc(0.26 * var(--hov, 0))), transparent var(--spot, 60px)),
     radial-gradient(120% 60% at 30% -10%, rgba(255, 255, 255, 0.22), transparent 55%),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent 40%);
   mix-blend-mode: screen;
@@ -146,6 +148,15 @@ header p { margin: 0; color: var(--c-text-dim); max-width: 46ch; }
   box-shadow: inset 0.5px 0.5px 0 rgba(255, 255, 255, 0.45), inset -0.5px -0.5px 0 rgba(255, 255, 255, 0.15);
   transform-origin: 0 50%;
 }
+/* The hover droplet: fainter, follows the pointer across the tabs. */
+.nav .hov {
+  position: absolute; top: 0; bottom: 0; left: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  transform-origin: 0 50%;
+  opacity: 0;
+}
+.nav li.over { color: #fff; }
 
 /* card */
 .glass.card .content { flex-direction: column; align-items: flex-start; justify-content: center; padding: 18px 22px; gap: 4px; }
@@ -210,7 +221,7 @@ input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16p
       <div class="refract"></div>
       <div class="content">
         <span class="sig">Shajith</span>
-        <ul><span class="drop" aria-hidden="true"></span><li class="on">Room</li><li>Work</li><li>Projects</li><li>Contact</li></ul>
+        <ul><span class="hov" aria-hidden="true"></span><span class="drop" aria-hidden="true"></span><li class="on">Room</li><li>Work</li><li>Projects</li><li>Contact</li></ul>
       </div>
     </div>
     <div class="glass card" data-id="card" tabindex="0" aria-label="Glass card, draggable">
@@ -225,7 +236,7 @@ input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16p
       <div class="refract"></div>
       <div class="content"></div>
     </div>
-    <span class="hint">Drag or flick the glass · tap a tab in the bar</span>
+    <span class="hint">Hover, drag or flick the glass · tap a tab in the bar</span>
   </div>
 
   <div class="controls" id="controls">
@@ -254,7 +265,7 @@ input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16p
     </div>
     <div>
       <h2>How it moves</h2>
-      <p>Everything runs on damped springs, not timed easing. Pieces condense into place on load. Dragging stretches the glass along its velocity and squashes it across, then it wobbles back when you let go. Pressing thickens the pane, so the rim bends harder. The tab droplet's leading edge moves on a stiffer spring than its trailing edge, which is what makes it look poured.</p>
+      <p>Everything runs on damped springs, not timed easing. Pieces condense into place on load. Dragging stretches the glass along its velocity and squashes it across, then it wobbles back when you let go. Hovering draws the pane toward the cursor, moves a highlight under it and bends the rim a little harder. Entering and leaving send a small ripple through the glass. Pressing thickens the pane further. The tab droplet's leading edge moves on a stiffer spring than its trailing edge, which is what makes it look poured.</p>
     </div>
     <div>
       <h2>Why it looks wet</h2>
@@ -449,6 +460,11 @@ input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16p
   pieces.forEach((p, i) => {
     p.intro = spring(0, 170, 13);        // 0 → 1 as the droplet condenses
     p.press = spring(0, 420, 22);        // finger down
+    p.hover = spring(0, 180, 16);        // cursor over the glass
+    p.pullX = spring(0, 150, 11);        // lean toward the cursor, -1..1
+    p.pullY = spring(0, 150, 11);
+    p.spotX = spring(50, 90, 14);        // specular hotspot, % of box
+    p.spotY = spring(-10, 90, 14);
     p.stretch = spring(0, 260, 9);       // along-velocity stretch, wobbly
     p.angle = 0;
     p.vx = 0; p.vy = 0;
@@ -478,6 +494,31 @@ input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16p
     if (snap) { dropL.x = l; dropR.x = rr; dropL.v = dropR.v = 0; }
     tabs.forEach((t, j) => t.classList.toggle('on', j === i));
     tabIndex = i;
+  }
+
+  const hov = nav.el.querySelector('.hov');
+  const hovL = spring(0, 300, 26), hovR = spring(0, 300, 26), hovO = spring(0, 200, 22);
+  let hovIndex = -1;
+  function hoverTab(localX) {
+    let i = -1;
+    if (localX != null) {
+      const x = nav.el.getBoundingClientRect().left + localX;
+      i = tabs.findIndex((t) => { const r = t.getBoundingClientRect(); return x >= r.left - 1 && x <= r.right + 1; });
+    }
+    if (i === hovIndex) return;
+    tabs.forEach((t, j) => t.classList.toggle('over', j === i));
+    if (i < 0) { hovO.t = 0; hovIndex = -1; return; }
+    const ul = hov.parentElement.getBoundingClientRect();
+    const r = tabs[i].getBoundingClientRect();
+    const k = nav.w / (nav.el.getBoundingClientRect().width || nav.w);
+    const l = (r.left - ul.left) * k, rr = (r.right - ul.left) * k;
+    const forward = i > hovIndex;
+    hovL.k = forward ? 170 : 380; hovR.k = forward ? 380 : 170;
+    hovL.t = l; hovR.t = rr;
+    // Appearing from nothing: start as a bead in the tab's middle and swell.
+    if (hovIndex < 0 && hovO.x < 0.05) { hovL.x = hovR.x = (l + rr) / 2; hovL.v = hovR.v = 0; }
+    hovO.t = 1;
+    hovIndex = i;
   }
 
   for (const p of pieces) {
@@ -522,6 +563,37 @@ input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16p
       p.el.addEventListener('pointerup', up);
       p.el.addEventListener('pointercancel', up);
     });
+    // Hover is mouse/pen only; touch gets the press response instead.
+    const aim = (e) => {
+      const r = p.el.getBoundingClientRect();
+      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+      return [Math.max(-1, Math.min(1, nx)), Math.max(-1, Math.min(1, ny)), e.clientX - r.left];
+    };
+    p.el.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'touch') return;
+      const [nx, ny] = aim(e);
+      p.hover.t = 1;
+      // Touching the surface sends a small ripple through it, from the entry side.
+      p.pullX.v -= nx * 6; p.pullY.v -= ny * 6;
+      p.spotX.x = ((nx + 1) / 2) * 100; p.spotY.x = ((ny + 1) / 2) * 100;
+    });
+    p.el.addEventListener('pointermove', (e) => {
+      if (e.pointerType === 'touch') return;
+      const [nx, ny, lx] = aim(e);
+      p.pullX.t = nx; p.pullY.t = ny;
+      p.spotX.t = ((nx + 1) / 2) * 100; p.spotY.t = ((ny + 1) / 2) * 100;
+      if (p === nav) hoverTab(lx);
+    });
+    p.el.addEventListener('pointerleave', (e) => {
+      if (e.pointerType === 'touch') return;
+      p.hover.t = 0;
+      // Let go with a flick outward, so it wobbles back to rest.
+      p.pullX.v += p.pullX.x * 4; p.pullY.v += p.pullY.x * 4;
+      p.pullX.t = 0; p.pullY.t = 0;
+      p.spotX.t = 50; p.spotY.t = -10;
+      if (p === nav) hoverTab(null);
+    });
     p.el.addEventListener('keydown', (e) => {
       if (p === nav && /^[1-4]$/.test(e.key)) { aimDrop(+e.key - 1); return; }
       const step = e.shiftKey ? 40 : 10;
@@ -559,25 +631,43 @@ input[type="checkbox"] { accent-color: var(--c-accent); width: 16px; height: 16p
       if (speed > 30) p.angle = Math.atan2(p.vy, p.vx);
       p.stretch.t = Math.min(0.2, speed / 5000);
       step(p.intro, dt); step(p.press, dt); step(p.stretch, dt);
+      step(p.hover, dt); step(p.pullX, dt); step(p.pullY, dt); step(p.spotX, dt); step(p.spotY, dt);
 
-      const intro = p.intro.x, press = p.press.x;
+      const intro = p.intro.x, press = p.press.x, hover = p.hover.x;
+      // Hover lean: the pane drifts a few px toward the cursor and bulges that
+      // way, like a droplet drawn to a fingertip. Scaled down for big pieces.
+      const px = p.pullX.x, py = p.pullY.x;
+      const reach = Math.min(1, 160 / Math.max(p.w, p.h)) * 0.6 + 0.4;
+      const ox = px * 6 * reach, oy = py * 5 * reach;
+      const pm = Math.min(1.4, Math.hypot(px, py));
+      const pa = (Math.atan2(py, px) * 180) / Math.PI;
+      const ps = 1 + 0.035 * pm * reach;
       const st = Math.max(-0.12, Math.min(0.25, p.stretch.x));
       // Keep the area roughly constant: stretch one way, thin the other.
-      const grow = 0.82 + 0.18 * intro + 0.045 * press;
+      const grow = 0.82 + 0.18 * intro + 0.045 * press + 0.02 * hover;
       const sx = grow * (1 + st), sy = grow / (1 + st * 0.8);
       const a = (p.angle * 180) / Math.PI;
       p.el.style.transform =
-        `translate(${p.x}px, ${p.y}px) rotate(${a}deg) scale(${sx.toFixed(4)}, ${sy.toFixed(4)}) rotate(${-a}deg)`;
+        `translate(${(p.x + ox).toFixed(2)}px, ${(p.y + oy).toFixed(2)}px) ` +
+        `rotate(${pa}deg) scale(${ps.toFixed(4)}, ${(1 / ps).toFixed(4)}) rotate(${-pa}deg) ` +
+        `rotate(${a}deg) scale(${sx.toFixed(4)}, ${sy.toFixed(4)}) rotate(${-a}deg)`;
+      p.el.style.setProperty('--hov', hover.toFixed(3));
+      p.el.style.setProperty('--mx', p.spotX.x.toFixed(1) + '%');
+      p.el.style.setProperty('--my', p.spotY.x.toFixed(1) + '%');
+      p.el.style.setProperty('--spot', Math.round(Math.min(p.w, p.h) * 0.9) + 'px');
       p.el.style.opacity = Math.min(1, Math.max(0, intro * 1.4)).toFixed(3);
 
       // The pane "thickens" under a finger and while condensing in.
-      const kS = p.base * Math.max(0, intro) * (1 + 0.4 * press);
+      const kS = p.base * Math.max(0, intro) * (1 + 0.4 * press + 0.15 * hover);
       if (p.disps && (p.lastK == null || Math.abs(kS - p.lastK) > 0.25)) {
         p.disps.forEach(([n, m]) => n.setAttribute('scale', (kS * m).toFixed(2)));
         p.lastK = kS;
       }
     }
-    step(dropL, dt); step(dropR, dt);
+    step(dropL, dt); step(dropR, dt); step(hovL, dt); step(hovR, dt); step(hovO, dt);
+    hov.style.width = Math.max(0, hovR.x - hovL.x) + 'px';
+    hov.style.transform = `translateX(${hovL.x}px) scaleY(${(0.7 + 0.3 * Math.min(1, hovO.x)).toFixed(3)})`;
+    hov.style.opacity = Math.max(0, Math.min(1, hovO.x)).toFixed(3);
     const w = Math.max(8, dropR.x - dropL.x);
     drop.style.width = w + 'px';
     drop.style.transform = `translateX(${dropL.x}px) scaleY(${(1 - Math.min(0.12, Math.abs(dropL.v - dropR.v) / 9000)).toFixed(4)})`;
