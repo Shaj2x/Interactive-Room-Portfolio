@@ -244,3 +244,22 @@ state only changes when the user does something (select, hover, lamp).
 `prefers-reduced-motion` switches the canvas to `frameloop="demand"`: the camera
 cuts instead of flying, and rain, dust and flicker hold still. Keyboard
 navigation also cuts the camera instead of flying it.
+
+## 7. Design guidance: UI UX Pro Max
+
+`.claude/skills/ui-ux-pro-max/` is the
+[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) skill
+(MIT), installed for this project so Claude Code picks it up automatically. It
+is a searchable database of UX rules, palettes, font pairings and stack
+guidance:
+
+```bash
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "touch target size" --domain ux
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "focus trap dialog" --stack react
+```
+
+The room keeps its own design system (`styles/tokens.css`); the skill is used
+for its UX rules. The first audit against them fixed: faint text below 4.5:1
+contrast, labels under 12px, controls under 44px, the phone section list
+covering an open section, and closing a section reached from a shared link
+leaving the site.

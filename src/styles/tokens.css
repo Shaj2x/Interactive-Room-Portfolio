@@ -28,7 +28,7 @@
   /* Type */
   --c-text: #dfe9f4;
   --c-text-dim: #93a5b8;
-  --c-text-faint: #5d7086;
+  --c-text-faint: #7b8fa6; /* 4.6:1 or better on every surface (WCAG AA) */
 
   --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

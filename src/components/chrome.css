@@ -130,7 +130,7 @@
 .sig-line {
   margin: 3px 0 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--c-text-faint);
@@ -168,7 +168,7 @@
     right: clamp(16px, 2.4vw, 28px);
     top: 66px;
   }
-  .look-around { font-size: 10.5px; letter-spacing: 0.1em; }
+  .look-around { font-size: 12px; letter-spacing: 0.1em; }
   .sig-line { display: none; }
 }
 

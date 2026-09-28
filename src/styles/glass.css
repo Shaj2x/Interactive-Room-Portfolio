@@ -55,6 +55,23 @@
   backdrop-filter: url(#lg-refract) blur(4px) saturate(180%) brightness(1.06);
 }
 
+/* Every control is at least 44px tall: the minimum comfortable touch
+   target (Apple HIG). */
+.nav-toggle,
+.sound,
+.back-btn,
+.nav-list button {
+  min-height: 44px;
+}
+.sound { min-width: 44px; justify-content: center; }
+@media (pointer: coarse) {
+  .r3f-nav button,
+  .r3f-card a,
+  .r3f-card button {
+    min-height: 44px;
+  }
+}
+
 /* Press: on pointer-down, instantly, and back out on release. */
 button.glass,
 a.glass {

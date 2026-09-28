@@ -79,7 +79,7 @@ export default function App() {
           <NavMenu onOpen={open} current={route} />
           <SoundToggle enabled={roomTone.enabled} onToggle={roomTone.toggle} />
           {compact ? (
-            <CompactNav onOpen={open} current={route} />
+            route === null && <CompactNav onOpen={open} current={route} />
           ) : (
             <LookAround visible={needsHint && route === null} />
           )}

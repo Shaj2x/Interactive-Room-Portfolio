@@ -397,7 +397,7 @@
   opacity: 0.82;
   transform: translate3d(-50%, 0, 0);
   bottom: -28px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* First-load teaching pulse. One hotspot, three beats, then it stops for good
@@ -483,7 +483,7 @@
       rgba(2, 4, 7, 0.9) 100%
     );
   }
-  .hotspot-label { font-size: 10px; padding: 3px 8px; bottom: -22px; }
+  .hotspot-label { font-size: 12px; padding: 3px 8px; bottom: -24px; }
 
   /* The room renders about 220px tall here. The painterly edge displacement
      is not visible at that size but costs exactly as much as it does on a
