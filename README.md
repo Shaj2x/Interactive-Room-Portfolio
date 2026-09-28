@@ -14,6 +14,9 @@ secretly interactive: hover reveals them, clicking moves into a section.
 - Ambient motion runs on CSS keyframes (off the main thread); only the
   pointer-following parallax uses `requestAnimationFrame`.
 
+There is also a second page, **`room3d.html`** — the same room rebuilt in real
+3D with react-three-fiber. See [the 3D room](#6-the-3d-room-react-three-fiber).
+
 ```bash
 npm install
 npm run dev      # http://localhost:5173
@@ -200,3 +203,28 @@ Actions** and it runs.
 
 For a domain root instead, build with `BASE_PATH=/ npm run build` and update
 the canonical and `og:url` tags in `index.html`.
+
+## 6. The 3D room (react-three-fiber)
+
+`room3d.html` (source in `src/r3f/`) is the room built as a real 3D scene with
+[react-three-fiber](https://r3f.docs.pmnd.rs/). It is fully procedural: no
+models and no image files; textures are drawn into canvases at load. It reads
+the same `profile.ts` and `HOTSPOTS`, so labels and sections stay in sync, and
+"Open this section" deep-links into the 2D room. Three.js is only downloaded by
+this page.
+
+| File | What it shows |
+| --- | --- |
+| `Scene.tsx` | Declarative scene graph: the room, furniture, and the eight objects |
+| `Interactive.tsx` | Pointer events on 3D objects: hover glow and click to focus |
+| `Rig.tsx` | Spring-driven camera, pointer parallax, on-demand rendering, quality guard |
+| `spring.ts` | A critically damped spring: interruptible camera flights |
+| `Lights.tsx` | Lamp (the easter egg), flickering candles, the door strip |
+| `Weather.tsx` | 280 rain streaks in one `InstancedMesh`: a single draw call |
+| `Dust.tsx` | Particles animated in a vertex shader from one time uniform |
+
+Per-frame work mutates refs inside `useFrame` and never calls `setState`. React
+state only changes when the user does something (select, hover, lamp).
+`prefers-reduced-motion` switches the canvas to `frameloop="demand"`: the camera
+cuts instead of flying, and rain, dust and flicker hold still. Keyboard
+navigation also cuts the camera instead of flying it.
