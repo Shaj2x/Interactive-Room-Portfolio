@@ -28,6 +28,7 @@
   border: 1px solid rgba(95, 231, 224, 0.13);
   border-radius: 14px;
   background: linear-gradient(170deg, rgba(12, 22, 34, 0.93), rgba(5, 9, 15, 0.97));
+  isolation: isolate;
   box-shadow:
     0 40px 120px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(191, 228, 255, 0.05);
@@ -39,6 +40,32 @@
 @keyframes panel-in {
   from { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.955); }
   to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* The ShaderGradient layer. It sits under the content and is washed down
+   with a scrim, so body text keeps its contrast wherever the light drifts.
+   It fades in once three.js has loaded instead of popping in. Until then,
+   and if WebGL is unavailable, the panel's own gradient shows. */
+.panel-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  animation: gradient-in 900ms var(--ease-out) both;
+}
+.panel-gradient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(170deg, rgba(7, 12, 20, 0.42), rgba(4, 7, 12, 0.7));
+}
+.panel-gradient-canvas {
+  position: absolute !important;
+  inset: 0;
+}
+@keyframes gradient-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .section-scroll {

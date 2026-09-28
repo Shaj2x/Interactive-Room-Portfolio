@@ -1,4 +1,7 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useRef, type ReactNode } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+
+const PanelGradient = lazy(() => import('./PanelGradient'));
 
 interface Props {
   title: string;
@@ -18,6 +21,7 @@ interface Props {
  * styles, so adding a paragraph needs no bookkeeping.
  */
 export function SectionShell({ title, eyebrow, onClose, children }: Props) {
+  const reducedMotion = useReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -61,6 +65,12 @@ export function SectionShell({ title, eyebrow, onClose, children }: Props) {
         aria-label={title}
         ref={panelRef}
       >
+        <div className="panel-gradient" aria-hidden="true">
+          <Suspense fallback={null}>
+            <PanelGradient still={reducedMotion} />
+          </Suspense>
+        </div>
+
         <div className="section-scroll">
           <header className="section-head stagger">
             <p className="eyebrow">{eyebrow}</p>

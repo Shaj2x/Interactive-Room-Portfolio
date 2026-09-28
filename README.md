@@ -180,6 +180,12 @@ before launch.
   `data-warm-swing` setting how far it is allowed to move.
 - **Rain** — falling drops seen through the glass, plus drops that cling to the
   window and then break and run down it.
+- **Section backdrop** — behind every section panel is a slow
+  [ShaderGradient](https://github.com/ruucm/shadergradient) in the room's
+  palette (`sections/PanelGradient.tsx`), under a scrim so text keeps its
+  contrast. It is lazy-loaded: three.js is downloaded the first time a section
+  opens, never for the room itself. Reduced motion keeps it still. Its
+  `lightType` is `3d` on purpose: `env` would fetch HDR files from another host.
 - **Room tone** — soft rain and a distant hum, synthesised with the Web Audio
   API rather than shipped as an audio file. Off by default, toggled bottom-left.
 - **Portrait screens** — the room is fitted rather than cropped so nothing is
