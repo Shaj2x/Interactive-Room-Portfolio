@@ -16,8 +16,8 @@
    (menus, cards) blurs harder and casts a deeper shadow, because bigger
    surfaces read as thicker. Glass is never stacked on glass.
 
-   Loaded after every component stylesheet (see main.tsx), and the selectors
-   are doubled so they beat each component's own background.
+   Selectors are tripled so they outrank any component's own background or
+   :hover rule however the bundler orders the stylesheets.
 ----------------------------------------------------------------------------- */
 
 :root {
@@ -29,7 +29,7 @@
   --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.32);
 }
 
-.glass.glass {
+.glass.glass.glass {
   border: 1px solid var(--glass-edge);
   background:
     linear-gradient(165deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0) 42%),
@@ -51,7 +51,7 @@
 
 /* Refraction. The lens filter runs first and a light blur after it, so the
    bend stays visible instead of being smeared away. */
-.lg-refract .glass-lens.glass-lens {
+.lg-refract .glass-lens.glass-lens.glass-lens {
   backdrop-filter: url(#lg-refract) blur(4px) saturate(180%) brightness(1.06);
 }
 
@@ -80,15 +80,15 @@ a.glass:active {
 
 /* Accessibility: frostier or solid when the viewer asks for it. */
 @media (prefers-reduced-transparency: reduce) {
-  .glass.glass,
-  .lg-refract .glass-lens.glass-lens {
+  .glass.glass.glass,
+  .lg-refract .glass-lens.glass-lens.glass-lens {
     --glass-tint: rgba(9, 16, 25, 0.96);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 }
 @media (prefers-contrast: more) {
-  .glass.glass {
+  .glass.glass.glass {
     --glass-tint: rgba(5, 10, 16, 0.95);
     --glass-edge: rgba(223, 233, 244, 0.6);
     -webkit-backdrop-filter: none;
